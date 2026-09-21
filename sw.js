@@ -1,75 +1,82 @@
-const CACHE="lyricsed-offline-v1";
-const INDEX="./index.html";
-const BOOT_FILES=[
-  "./index.html",
-  "./assets/css/style.css",
-  "./assets/js/app.js",
-  "./assets/images/icon-sedera.png",
-  "./assets/images/ankino-logo.webp",
-  "./manifest.webmanifest",
-  "./version.json",
-  "./data/songs.json",
-  "./data/announcements.json"
+const CACHE='lyricsed-offline-v2';
+const CORE_PATHS=[
+  '/', '/index.html', '/assets/css/style-v2.css', '/assets/js/app-v2.js',
+  '/version-v2.json', '/data/songs-v2.json', '/data/announcements-v2.json',
+  '/manifest.webmanifest'
 ];
 
-function canonicalRequest(request){
-  const u=new URL(request.url);
-  u.search="";
-  return new Request(u.toString(),{method:"GET"});
+function localPath(url){
+  const u=new URL(url);
+  const scope=new URL(self.registration.scope);
+  let p=u.pathname;
+  if(p.startsWith(scope.pathname))p=p.slice(scope.pathname.length);
+  return '/'+p.replace(/^\/+/, '');
+}
+function isCore(req){
+  const p=localPath(req.url);
+  return req.mode==='navigate' || CORE_PATHS.includes(p);
 }
 
-self.addEventListener("install",event=>{
+self.addEventListener('install', event=>{
   event.waitUntil((async()=>{
     const cache=await caches.open(CACHE);
-
-    // Do not fail the service-worker installation if one file is temporarily unavailable.
-    for(const path of BOOT_FILES){
-      try{
-        const r=await fetch(path,{cache:"no-store"});
-        if(r&&r.ok)await cache.put(path,r.clone());
-      }catch{}
+    // Fail installation rather than replacing the old working SW with an incomplete shell.
+    for(const rel of ['index.html','assets/css/style-v2.css','assets/js/app-v2.js','version-v2.json','data/songs-v2.json','data/announcements-v2.json','manifest.webmanifest']){
+      const url=new URL(rel,self.registration.scope).toString();
+      const r=await fetch(url,{cache:'no-store'});
+      if(!r.ok)throw new Error('Missing core file: '+rel);
+      await cache.put(url,r.clone());
     }
     await self.skipWaiting();
   })());
 });
 
-self.addEventListener("activate",event=>{
-  // Important: never delete CACHE here. It contains the user's offline library.
+self.addEventListener('activate', event=>{
+  // Keep older caches: they may contain already-downloaded MP3/Solfa files.
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener("fetch",event=>{
-  if(event.request.method!=="GET")return;
+self.addEventListener('fetch', event=>{
+  if(event.request.method!=='GET')return;
   const url=new URL(event.request.url);
   if(url.origin!==self.location.origin)return;
 
-  // Requests carrying __network are used only to verify/download real GitHub updates.
-  // Never satisfy them from cache, otherwise the app could think it is online when it is not.
-  if(url.searchParams.has("__network")){
+  // Explicit network verification requests must never be fulfilled from cache.
+  if(url.searchParams.has('__network')){
     event.respondWith(fetch(event.request));
+    return;
+  }
+
+  if(isCore(event.request)){
+    event.respondWith((async()=>{
+      const cache=await caches.open(CACHE);
+      try{
+        const fresh=await fetch(event.request,{cache:'no-store'});
+        if(fresh&&fresh.ok)await cache.put(event.request,fresh.clone());
+        return fresh;
+      }catch{
+        const hit=await cache.match(event.request,{ignoreSearch:true}) || await caches.match(event.request,{ignoreSearch:true});
+        if(hit)return hit;
+        if(event.request.mode==='navigate'){
+          const fallback=await cache.match(new URL('index.html',self.registration.scope).toString());
+          if(fallback)return fallback;
+        }
+        return new Response('',{status:503,statusText:'Offline'});
+      }
+    })());
     return;
   }
 
   event.respondWith((async()=>{
     const cache=await caches.open(CACHE);
-    const key=canonicalRequest(event.request);
-
-    let cached=await cache.match(key,{ignoreSearch:true});
-    if(!cached)cached=await cache.match(event.request,{ignoreSearch:true});
-    if(cached)return cached;
-
+    const hit=await cache.match(event.request,{ignoreSearch:true}) || await caches.match(event.request,{ignoreSearch:true});
+    if(hit)return hit;
     try{
-      const network=await fetch(event.request);
-      if(network&&network.ok){
-        try{await cache.put(key,network.clone())}catch{}
-      }
-      return network;
+      const fresh=await fetch(event.request);
+      if(fresh&&fresh.ok)await cache.put(event.request,fresh.clone());
+      return fresh;
     }catch{
-      if(event.request.mode==="navigate"){
-        const fallback=await cache.match(INDEX,{ignoreSearch:true});
-        if(fallback)return fallback;
-      }
-      return new Response("",{status:503,statusText:"Offline"});
+      return new Response('',{status:503,statusText:'Offline'});
     }
   })());
 });

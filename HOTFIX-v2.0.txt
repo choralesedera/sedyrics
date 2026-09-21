@@ -1,0 +1,15 @@
+LYRICSED v2.0 HOTFIX CACHE
+
+Cause corrigée :
+- data/announcements.json manquait dans le ZIP précédent ;
+- app.js pouvait rester une ancienne copie servie par le Service Worker/cache Android.
+
+Correctif :
+- nouveaux fichiers app-v2.js, style-v2.css, songs-v2.json, version-v2.json ;
+- announcements.json et announcements-v2.json inclus ;
+- sw.js devient network-first pour les fichiers critiques ;
+- les anciens caches audio ne sont pas supprimés ;
+- notes, favoris, repères et playlists locales ne sont pas effacés.
+
+Après upload GitHub : fermer complètement LyriCSED, remettre Internet, puis rouvrir.
+Si l'ancien écran reste affiché après deux ouvertures, Android garde encore l'ancien WebView cache : utiliser Paramètres Android > Applications > LyriCSED > Stockage > Vider le cache uniquement (ne pas effacer les données), puis rouvrir.

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 13,
+  "schemaVersion": 20,
   "appVersion": "2.0",
   "files": [
     {
@@ -28,6 +28,11 @@
       "sha256": "a818d25312fb5aa4bb1e93df47f626e548f161549147c43ad605889e80c082da"
     },
     {
+      "path": "HOTFIX-v2.0.txt",
+      "size": 853,
+      "sha256": "619317bed80a834470bbce9c7ac6b5cdde6399011e290bf4a981d984cc9008fa"
+    },
+    {
       "path": "KODULAR-v12-INTEGRATION.txt",
       "size": 3420,
       "sha256": "2c44221f49e547675acf06d45f76b8743d8265d74086ad60d6097d742ee35d71"
@@ -43,14 +48,39 @@
       "sha256": "fc3be1d369eb8e93a7bcb015f5b8d7996df7785b2fcc501db9900ef0bbaf88e7"
     },
     {
+      "path": "assets/css/style-v2.css",
+      "size": 49252,
+      "sha256": "57a1a1249f5917d1313b1abd6578132f92ae76151946d14f443efb079408c934"
+    },
+    {
       "path": "assets/css/style.css",
       "size": 49252,
       "sha256": "57a1a1249f5917d1313b1abd6578132f92ae76151946d14f443efb079408c934"
     },
     {
+      "path": "assets/js/app-v2.js",
+      "size": 62815,
+      "sha256": "97156d87dfe024b3df3d9c595d3273a3c5ee61a0212e08bbbfa746b3eb9198f3"
+    },
+    {
       "path": "assets/js/app.js",
-      "size": 62794,
-      "sha256": "9f833132c79a5da3ad4c86d5bd7c7c479c59739b6766661abc8a5e0c9ee499bb"
+      "size": 62815,
+      "sha256": "97156d87dfe024b3df3d9c595d3273a3c5ee61a0212e08bbbfa746b3eb9198f3"
+    },
+    {
+      "path": "data/announcements-v2.json",
+      "size": 26,
+      "sha256": "eb9a1dfd382a1c96f05ea71baa6a011bd209dedb6deaebd9230167b4fe097c78"
+    },
+    {
+      "path": "data/announcements.json",
+      "size": 26,
+      "sha256": "eb9a1dfd382a1c96f05ea71baa6a011bd209dedb6deaebd9230167b4fe097c78"
+    },
+    {
+      "path": "data/songs-v2.json",
+      "size": 14747,
+      "sha256": "3b49a5793c795bc0dfb16218f3bfb507aab2ebabf4b108f5ebc115a51da954a3"
     },
     {
       "path": "data/songs.json",
@@ -59,8 +89,8 @@
     },
     {
       "path": "index.html",
-      "size": 35122,
-      "sha256": "f93e35d0ff4352a82e6b33d5fab44e036786cf395eacf5a6ad69f72124cce502"
+      "size": 35128,
+      "sha256": "07b2e4071369cebf9c3245f182d265dd13848e3d16b7a362e3cd20bce2680e32"
     },
     {
       "path": "lyrics/anao-ny-dera.txt",
@@ -194,13 +224,18 @@
     },
     {
       "path": "sw.js",
-      "size": 2229,
-      "sha256": "01fa550ddd4a15471fb3d47a02d2d59b3ad9eca92591f7e122af34481ed1e270"
+      "size": 2948,
+      "sha256": "496dc99cbc4859f563d5250d18a18a61d6042da66d42b5f729fcbd3c47cbe2b6"
+    },
+    {
+      "path": "version-v2.json",
+      "size": 581,
+      "sha256": "b9b9d73e0ba87330d558795555a3def1ef536853fe14483b3572ab46ff88d450"
     },
     {
       "path": "version.json",
-      "size": 575,
-      "sha256": "584851ef7846b9457db018369d39d3d29e42ba09c8434dfb6bb55572666ae952"
+      "size": 581,
+      "sha256": "b9b9d73e0ba87330d558795555a3def1ef536853fe14483b3572ab46ff88d450"
     }
   ]
 }
