@@ -28,6 +28,7 @@
       <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a3 3 0 0 1 3-3h13v17H7a3 3 0 0 0-3 3V5Z"/><path d="M4 19a3 3 0 0 1 3-3h13"/></symbol>
       <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M5 21h14"/></symbol>
       <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
       <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
       <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
       <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5"/><path d="M19 11a7.5 7.5 0 1 0 .4 4"/></symbol>
@@ -48,12 +49,63 @@
         <div><strong>LyriCSED</strong><span>Lyrics Chorale Sedera Ambalavato</span></div>
       </div>
       <div class="header-actions">
+        <button class="header-playback hidden" id="headerPlayback" type="button" aria-label="Ouvrir le mini-lecteur">
+          <span class="header-disc"><img src="assets/images/icon-sedera.png" alt=""></span>
+          <span class="header-playback-copy"><small>PLAYBACK</small><strong id="headerPlaybackTitle">...</strong></span>
+          <span class="header-playback-toggle" id="headerPlaybackToggle"><svg><use href="#i-pause"/></svg></span>
+        </button>
         <button class="update-btn" id="updateBtn" type="button" title="Actualiser l'application">
           <svg><use href="#i-refresh"/></svg><span>Actualiser</span>
         </button>
         <span class="demo-pill">DEMO</span>
       </div>
     </header>
+
+
+    <section class="global-event-player" id="eventPlayer">
+      <div class="event-player-head">
+        <div>
+          <span id="eventPlayerSection">PLAYLIST</span>
+          <strong id="eventPlayerTitle">Aucun playback</strong>
+          <small id="eventNextTitle">Prochain : aucun</small>
+        </div>
+        <button id="eventStopBtn" class="event-stop" type="button" aria-label="Arrêter"><svg><use href="#i-close"/></svg></button>
+      </div>
+
+      <div class="event-player-controls">
+        <button id="eventPrevBtn" aria-label="Précédent"><svg><use href="#i-prev"/></svg></button>
+        <button id="eventPlayBtn" class="event-main-play" aria-label="Lecture ou pause"><svg><use href="#i-play"/></svg></button>
+        <button id="eventNextBtn" aria-label="Suivant"><svg><use href="#i-next"/></svg></button>
+      </div>
+
+      <div class="event-time-row"><span id="eventElapsed">0:00</span><span id="eventDuration">0:00</span></div>
+      <input id="eventSeek" class="range" type="range" min="0" max="1000" value="0">
+
+      <div class="event-volume">
+        <svg><use href="#i-volume"/></svg>
+        <input id="eventVolume" class="range" type="range" min="0" max="100" value="100">
+        <span id="eventVolumeValue">100%</span>
+      </div>
+
+      <div class="event-countdown hidden" id="eventCountdown">
+        <div>
+          <span>PROCHAIN PLAYBACK DANS</span>
+          <strong><b id="countdownSeconds">0</b> s</strong>
+        </div>
+        <button id="playNextNow" type="button">Lancer maintenant</button>
+      </div>
+
+      <div class="up-next">
+        <span>À SUIVRE</span>
+        <div id="eventUpcomingList"><small>Aucun morceau suivant</small></div>
+      </div>
+
+      <div class="event-queue-meta">
+        <span id="eventQueuePosition">0 / 0</span>
+        <span id="eventQueueMode">Lecture automatique</span>
+      </div>
+    </section>
+
 
     <main class="main-content">
       <section class="view active" id="homeView" data-view="home">
@@ -83,7 +135,8 @@
         <div class="quick-grid">
           <button class="quick-card" data-nav="songs"><span class="quick-icon"><svg><use href="#i-music"/></svg></span><span><b>Hira rehetra</b><small>Lyrics, Solfa, Playback</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
           <button class="quick-card" data-nav="announcements"><span class="quick-icon"><svg><use href="#i-bell"/></svg></span><span><b>Filazan-draharaha</b><small>Vaovao sy fampahafantarana</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
-          <button class="quick-card" data-nav="playlists"><span class="quick-icon"><svg><use href="#i-list"/></svg></span><span><b>Playback & Planning</b><small>Liturgie, concert, Antsam-panahy</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
+          <button class="quick-card" data-nav="liturgy"><span class="quick-icon"><svg><use href="#i-list"/></svg></span><span><b>LITURGIE</b><small>Prélude, Interlude, Rakitra, Postlude</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
+          <button class="quick-card" data-nav="concert"><span class="quick-icon"><svg><use href="#i-music"/></svg></span><span><b>PLANNING CONCERT</b><small>Concert / Antsam-panahy</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
           <button class="quick-card" data-nav="notes"><span class="quick-icon"><svg><use href="#i-note"/></svg></span><span><b>Fanamarihana</b><small>Notes de répétition</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
         </div>
 
@@ -124,7 +177,14 @@
 
         <div class="song-content-card">
           <section class="tab-panel active" id="lyricsPanel">
-            <div class="reader-toolbar"><span>Haben'ny soratra</span><div><button id="fontDown">A−</button><span id="fontSizeValue">18</span><button id="fontUp">A+</button></div></div>
+            <div class="reader-toolbar">
+              <span>Haben'ny soratra</span>
+              <div class="font-controls">
+                <button class="font-control" id="fontDown" type="button" aria-label="Réduire la taille du texte"><svg><use href="#i-minus"/></svg><span>A</span></button>
+                <span class="font-size-pill" id="fontSizeValue">18</span>
+                <button class="font-control" id="fontUp" type="button" aria-label="Augmenter la taille du texte"><svg><use href="#i-plus"/></svg><span>A</span></button>
+              </div>
+            </div>
             <div class="lyrics-text" id="lyricsText">...</div>
             <div class="credits-card" id="creditsCard"></div>
           </section>
@@ -167,129 +227,174 @@
       </section>
 
 
-      <section class="view" id="playlistsView" data-view="playlists">
+
+      <section class="view" id="liturgyView" data-view="liturgy">
         <div class="page-title">
-          <span>PLAYBACK & PLANNING</span>
-          <h1>Préparer un événement</h1>
-          <p>Safidio sy alamino mialoha ny playback ampiasaina amin'ny liturgie, Antsam-panahy na concert.</p>
+          <span>PLAYBACK LITURGIE</span>
+          <h1>Liturgie</h1>
+          <p>Préparez et organisez les playbacks de la liturgie. La lecture continue même si vous consultez une autre partie de LyriCSED.</p>
         </div>
 
-        <div class="planner-switch" role="tablist">
-          <button class="planner-tab active" data-planner-type="liturgy">Liturgie</button>
-          <button class="planner-tab" data-planner-type="concert">Concert / Antsam-panahy</button>
+        <div class="delay-settings">
+          <div>
+            <span class="mini-label">PAUSE ENTRE LES PLAYBACKS</span>
+            <strong>Délai général de la liturgie</strong>
+          </div>
+          <select id="liturgyPauseSelect">
+            <option value="0">Aucune pause</option>
+            <option value="5">5 secondes</option>
+            <option value="10">10 secondes</option>
+            <option value="15">15 secondes</option>
+            <option value="30">30 secondes</option>
+            <option value="custom">Personnalisée</option>
+          </select>
+          <div class="custom-delay hidden" id="liturgyCustomDelay">
+            <input id="liturgyPauseCustom" type="number" min="1" max="300" inputmode="numeric" value="10">
+            <span>secondes</span>
+          </div>
         </div>
 
-        <div class="planner-panel active" id="liturgyPlanner">
-          <div class="planner-intro">
-            <span class="mini-label">PLAYBACK LITURGIE</span>
-            <h2>Filaharan'ny playback</h2>
-            <p>Azonao ampidirina avy amin'ny LyriCSED na avy amin'ny rakitra audio ao amin'ny finday.</p>
-          </div>
-
-          <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="prelude">
-            <div class="playlist-section-head">
-              <div><span>01</span><div><h3>PRÉLUDE</h3><p>Playback alohan'ny fanombohana</p></div></div>
-              <button class="section-play" data-play-section="liturgy:prelude"><svg><use href="#i-play"/></svg>Lire</button>
-            </div>
-            <div class="playlist-items" id="playlist-liturgy-prelude"></div>
-            <div class="playlist-add-row">
-              <button data-add-library="liturgy:prelude"><svg><use href="#i-music"/></svg>LyriCSED</button>
-              <button data-add-phone="liturgy:prelude"><svg><use href="#i-folder"/></svg>Téléphone</button>
-            </div>
-          </div>
-
-          <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="interlude">
-            <div class="playlist-section-head">
-              <div><span>02</span><div><h3>INTERLUDE</h3><p>Playback eo anelanelan'ny fotoana</p></div></div>
-              <button class="section-play" data-play-section="liturgy:interlude"><svg><use href="#i-play"/></svg>Lire</button>
-            </div>
-            <div class="playlist-items" id="playlist-liturgy-interlude"></div>
-            <div class="playlist-add-row">
-              <button data-add-library="liturgy:interlude"><svg><use href="#i-music"/></svg>LyriCSED</button>
-              <button data-add-phone="liturgy:interlude"><svg><use href="#i-folder"/></svg>Téléphone</button>
-            </div>
-          </div>
-
-          <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="rakitra">
-            <div class="playlist-section-head">
-              <div><span>03</span><div><h3>RAKITRA</h3><p>Playback mandritra ny rakitra</p></div></div>
-              <button class="section-play" data-play-section="liturgy:rakitra"><svg><use href="#i-play"/></svg>Lire</button>
-            </div>
-            <div class="playlist-items" id="playlist-liturgy-rakitra"></div>
-            <div class="playlist-add-row">
-              <button data-add-library="liturgy:rakitra"><svg><use href="#i-music"/></svg>LyriCSED</button>
-              <button data-add-phone="liturgy:rakitra"><svg><use href="#i-folder"/></svg>Téléphone</button>
-            </div>
-          </div>
-
-          <button class="play-event-btn" data-play-event="liturgy"><svg><use href="#i-play"/></svg><span><strong>Lire toute la liturgie</strong><small>PRÉLUDE → INTERLUDE → RAKITRA</small></span></button>
+        <div class="planner-intro">
+          <span class="mini-label">FILAHARAN'NY PLAYBACK</span>
+          <h2>Programme de la liturgie</h2>
+          <p>Ajoutez les instrumentaux LyriCSED ou des fichiers audio enregistrés sur le téléphone.</p>
         </div>
 
-        <div class="planner-panel" id="concertPlanner">
-          <div class="planner-intro">
-            <span class="mini-label">PLANNING CONCERT / ANTSAM-PANAHY</span>
-            <h2>Déroulement complet</h2>
-            <p>Ampidiro hira maromaro isaky ny partie ary alamino amin'ny filaharana tianao.</p>
+        <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="prelude">
+          <div class="playlist-section-head">
+            <div><span>01</span><div><h3>PRÉLUDE</h3><p>Playback avant le début</p></div></div>
+            <button class="section-play" data-play-section="liturgy:prelude"><svg><use href="#i-play"/></svg>Lire</button>
           </div>
-
-          <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part1">
-            <div class="playlist-section-head">
-              <div><span>I</span><div><h3>PARTIE I</h3><p>Fizarana voalohany</p></div></div>
-              <button class="section-play" data-play-section="concert:part1"><svg><use href="#i-play"/></svg>Lire</button>
-            </div>
-            <div class="playlist-items" id="playlist-concert-part1"></div>
-            <div class="playlist-add-row">
-              <button data-add-library="concert:part1"><svg><use href="#i-music"/></svg>LyriCSED</button>
-              <button data-add-phone="concert:part1"><svg><use href="#i-folder"/></svg>Téléphone</button>
-            </div>
+          <div class="playlist-items" id="playlist-liturgy-prelude"></div>
+          <div class="playlist-add-row">
+            <button data-add-library="liturgy:prelude"><svg><use href="#i-music"/></svg>LyriCSED</button>
+            <button data-add-phone="liturgy:prelude"><svg><use href="#i-folder"/></svg>Téléphone</button>
           </div>
-
-          <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part2">
-            <div class="playlist-section-head">
-              <div><span>II</span><div><h3>PARTIE II</h3><p>Fizarana faharoa</p></div></div>
-              <button class="section-play" data-play-section="concert:part2"><svg><use href="#i-play"/></svg>Lire</button>
-            </div>
-            <div class="playlist-items" id="playlist-concert-part2"></div>
-            <div class="playlist-add-row">
-              <button data-add-library="concert:part2"><svg><use href="#i-music"/></svg>LyriCSED</button>
-              <button data-add-phone="concert:part2"><svg><use href="#i-folder"/></svg>Téléphone</button>
-            </div>
-          </div>
-
-          <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part3">
-            <div class="playlist-section-head">
-              <div><span>III</span><div><h3>PARTIE III</h3><p>Fizarana fahatelo</p></div></div>
-              <button class="section-play" data-play-section="concert:part3"><svg><use href="#i-play"/></svg>Lire</button>
-            </div>
-            <div class="playlist-items" id="playlist-concert-part3"></div>
-            <div class="playlist-add-row">
-              <button data-add-library="concert:part3"><svg><use href="#i-music"/></svg>LyriCSED</button>
-              <button data-add-phone="concert:part3"><svg><use href="#i-folder"/></svg>Téléphone</button>
-            </div>
-          </div>
-
-          <button class="play-event-btn" data-play-event="concert"><svg><use href="#i-play"/></svg><span><strong>Lire tout le planning</strong><small>PARTIE I → PARTIE II → PARTIE III</small></span></button>
         </div>
 
-        <div class="event-player" id="eventPlayer">
-          <div class="event-player-head">
-            <div><span id="eventPlayerSection">PLAYLIST</span><strong id="eventPlayerTitle">Aucun playback</strong></div>
-            <button id="eventStopBtn" class="event-stop" type="button"><svg><use href="#i-close"/></svg></button>
+        <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="interlude">
+          <div class="playlist-section-head">
+            <div><span>02</span><div><h3>INTERLUDE</h3><p>Playback entre deux moments</p></div></div>
+            <button class="section-play" data-play-section="liturgy:interlude"><svg><use href="#i-play"/></svg>Lire</button>
           </div>
-          <div class="event-player-controls">
-            <button id="eventPrevBtn"><svg><use href="#i-prev"/></svg></button>
-            <button id="eventPlayBtn" class="event-main-play"><svg><use href="#i-play"/></svg></button>
-            <button id="eventNextBtn"><svg><use href="#i-next"/></svg></button>
+          <div class="playlist-items" id="playlist-liturgy-interlude"></div>
+          <div class="playlist-add-row">
+            <button data-add-library="liturgy:interlude"><svg><use href="#i-music"/></svg>LyriCSED</button>
+            <button data-add-phone="liturgy:interlude"><svg><use href="#i-folder"/></svg>Téléphone</button>
           </div>
-          <div class="event-time-row"><span id="eventElapsed">0:00</span><span id="eventDuration">0:00</span></div>
-          <input id="eventSeek" class="range" type="range" min="0" max="1000" value="0">
-          <div class="event-volume"><svg><use href="#i-volume"/></svg><input id="eventVolume" class="range" type="range" min="0" max="100" value="100"><span id="eventVolumeValue">100%</span></div>
-          <div class="event-queue-meta"><span id="eventQueuePosition">0 / 0</span><span>Lecture automatique du morceau suivant</span></div>
         </div>
+
+        <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="rakitra">
+          <div class="playlist-section-head">
+            <div><span>03</span><div><h3>RAKITRA</h3><p>Playback pendant le Rakitra</p></div></div>
+            <button class="section-play" data-play-section="liturgy:rakitra"><svg><use href="#i-play"/></svg>Lire</button>
+          </div>
+          <div class="playlist-items" id="playlist-liturgy-rakitra"></div>
+          <div class="playlist-add-row">
+            <button data-add-library="liturgy:rakitra"><svg><use href="#i-music"/></svg>LyriCSED</button>
+            <button data-add-phone="liturgy:rakitra"><svg><use href="#i-folder"/></svg>Téléphone</button>
+          </div>
+        </div>
+
+        <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="postlude">
+          <div class="playlist-section-head">
+            <div><span>04</span><div><h3>POSTLUDE</h3><p>Playback après la fin</p></div></div>
+            <button class="section-play" data-play-section="liturgy:postlude"><svg><use href="#i-play"/></svg>Lire</button>
+          </div>
+          <div class="playlist-items" id="playlist-liturgy-postlude"></div>
+          <div class="playlist-add-row">
+            <button data-add-library="liturgy:postlude"><svg><use href="#i-music"/></svg>LyriCSED</button>
+            <button data-add-phone="liturgy:postlude"><svg><use href="#i-folder"/></svg>Téléphone</button>
+          </div>
+        </div>
+
+        <button class="play-event-btn" data-play-event="liturgy">
+          <svg><use href="#i-play"/></svg>
+          <span><strong>Lire toute la liturgie</strong><small>PRÉLUDE → INTERLUDE → RAKITRA → POSTLUDE</small></span>
+        </button>
 
         <div class="playlist-storage-note">
           <svg><use href="#i-download"/></svg>
-          <div><strong>Enregistrement local</strong><p>Ny playlist sy ny audio ampidirina avy amin'ny finday dia tehirizina eo an-toerana mba ho azo ampiasaina offline.</p></div>
+          <div><strong>Enregistrement local</strong><p>Les playlists et les fichiers audio importés du téléphone restent enregistrés localement pour une utilisation hors connexion.</p></div>
+        </div>
+      </section>
+
+      <section class="view" id="concertView" data-view="concert">
+        <div class="page-title">
+          <span>PLANNING CONCERT / ANTSAM-PANAHY</span>
+          <h1>Planning Concert</h1>
+          <p>Organisez les playbacks de chaque partie dans l'ordre exact du concert ou de l'Antsam-panahy.</p>
+        </div>
+
+        <div class="delay-settings">
+          <div>
+            <span class="mini-label">PAUSE ENTRE LES PLAYBACKS</span>
+            <strong>Délai général du planning</strong>
+          </div>
+          <select id="concertPauseSelect">
+            <option value="0">Aucune pause</option>
+            <option value="5">5 secondes</option>
+            <option value="10">10 secondes</option>
+            <option value="15">15 secondes</option>
+            <option value="30">30 secondes</option>
+            <option value="custom">Personnalisée</option>
+          </select>
+          <div class="custom-delay hidden" id="concertCustomDelay">
+            <input id="concertPauseCustom" type="number" min="1" max="300" inputmode="numeric" value="10">
+            <span>secondes</span>
+          </div>
+        </div>
+
+        <div class="planner-intro">
+          <span class="mini-label">PLANNING COMPLET</span>
+          <h2>Concert / Antsam-panahy</h2>
+          <p>Ajoutez plusieurs playbacks par partie et modifiez facilement leur ordre de lecture.</p>
+        </div>
+
+        <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part1">
+          <div class="playlist-section-head">
+            <div><span>I</span><div><h3>PARTIE I</h3><p>Première partie</p></div></div>
+            <button class="section-play" data-play-section="concert:part1"><svg><use href="#i-play"/></svg>Lire</button>
+          </div>
+          <div class="playlist-items" id="playlist-concert-part1"></div>
+          <div class="playlist-add-row">
+            <button data-add-library="concert:part1"><svg><use href="#i-music"/></svg>LyriCSED</button>
+            <button data-add-phone="concert:part1"><svg><use href="#i-folder"/></svg>Téléphone</button>
+          </div>
+        </div>
+
+        <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part2">
+          <div class="playlist-section-head">
+            <div><span>II</span><div><h3>PARTIE II</h3><p>Deuxième partie</p></div></div>
+            <button class="section-play" data-play-section="concert:part2"><svg><use href="#i-play"/></svg>Lire</button>
+          </div>
+          <div class="playlist-items" id="playlist-concert-part2"></div>
+          <div class="playlist-add-row">
+            <button data-add-library="concert:part2"><svg><use href="#i-music"/></svg>LyriCSED</button>
+            <button data-add-phone="concert:part2"><svg><use href="#i-folder"/></svg>Téléphone</button>
+          </div>
+        </div>
+
+        <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part3">
+          <div class="playlist-section-head">
+            <div><span>III</span><div><h3>PARTIE III</h3><p>Troisième partie</p></div></div>
+            <button class="section-play" data-play-section="concert:part3"><svg><use href="#i-play"/></svg>Lire</button>
+          </div>
+          <div class="playlist-items" id="playlist-concert-part3"></div>
+          <div class="playlist-add-row">
+            <button data-add-library="concert:part3"><svg><use href="#i-music"/></svg>LyriCSED</button>
+            <button data-add-phone="concert:part3"><svg><use href="#i-folder"/></svg>Téléphone</button>
+          </div>
+        </div>
+
+        <button class="play-event-btn" data-play-event="concert">
+          <svg><use href="#i-play"/></svg>
+          <span><strong>Lire tout le planning</strong><small>PARTIE I → PARTIE II → PARTIE III</small></span>
+        </button>
+
+        <div class="playlist-storage-note">
+          <svg><use href="#i-download"/></svg>
+          <div><strong>Enregistrement local</strong><p>Le planning et les fichiers audio locaux restent disponibles sans connexion après leur importation.</p></div>
         </div>
       </section>
 
@@ -313,8 +418,9 @@
     <nav class="bottom-nav" id="bottomNav">
       <button class="nav-item active" data-nav="home"><svg><use href="#i-home"/></svg><span>Accueil</span></button>
       <button class="nav-item" data-nav="songs"><svg><use href="#i-music"/></svg><span>Hira</span></button>
+      <button class="nav-item" data-nav="liturgy"><svg><use href="#i-list"/></svg><span>Liturgie</span></button>
+      <button class="nav-item" data-nav="concert"><svg><use href="#i-play"/></svg><span>Concert</span></button>
       <button class="nav-item" data-nav="announcements"><svg><use href="#i-bell"/></svg><span>Vaovao</span></button>
-      <button class="nav-item" data-nav="playlists"><svg><use href="#i-list"/></svg><span>Planning</span></button>
       <button class="nav-item" data-nav="about"><svg><use href="#i-info"/></svg><span>À propos</span></button>
     </nav>
 
@@ -332,6 +438,22 @@
     </div>
     <input id="localAudioPicker" class="file-picker-hidden" type="file" accept="audio/*,.mp3,.wav,.mpeg,.mpga,.m4a,.aac,.ogg,.flac" multiple>
     <audio id="playlistAudio" preload="metadata"></audio>
+
+
+    <div class="mini-player-overlay hidden" id="globalMiniPlayer" aria-hidden="true">
+      <div class="mini-player-sheet">
+        <div class="mini-player-sheet-head">
+          <div><span>PLAYBACK EN COURS</span><strong id="miniGlobalTitle">...</strong><small id="miniGlobalNext">Prochain : aucun</small></div>
+          <button id="closeGlobalMiniPlayer" type="button"><svg><use href="#i-close"/></svg></button>
+        </div>
+        <div class="mini-global-controls">
+          <button id="miniGlobalPrev" type="button"><svg><use href="#i-prev"/></svg></button>
+          <button id="miniGlobalPlay" class="mini-global-main" type="button"><svg><use href="#i-play"/></svg></button>
+          <button id="miniGlobalNextBtn" type="button"><svg><use href="#i-next"/></svg></button>
+        </div>
+        <button class="mini-return-player" id="returnToPlayer" type="button">Revenir au lecteur</button>
+      </div>
+    </div>
 
     <div class="toast" id="toast"></div>
 

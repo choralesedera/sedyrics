@@ -162,3 +162,33 @@ Aucune détection automatique approximative de tonalité n'est ajoutée.
 La sélection locale utilise le sélecteur HTML `input type=file`.
 Sur la plupart des WebView Android récents, le sélecteur système s'ouvre.
 Si le WebViewer Kodular utilisé sur un appareil précis ne relaie pas le sélecteur de fichiers, il faudra connecter le composant de sélection de fichier de Kodular à cette même logique locale.
+
+
+## Version v6 - Liturgie et Concert séparés
+
+- LITURGIE est une section autonome.
+- PLANNING CONCERT / ANTSAM-PANAHY est une section autonome.
+- Liturgie contient : PRÉLUDE, INTERLUDE, RAKITRA et POSTLUDE.
+- Le lecteur de playlist est placé en haut des pages Liturgie / Concert.
+- La lecture continue quand l'utilisateur consulte Accueil, Hira, Lyrics, Solfa,
+  Vaovao, Notes ou À propos.
+- L'en-tête reste visible dans la fiche d'un chant.
+- Lorsqu'un playback événementiel est actif, l'en-tête affiche un mini-indicateur
+  avec disque animé, titre et Lecture/Pause.
+- Un appui sur ce mini-indicateur ouvre un mini-lecteur Précédent / Lecture-Pause /
+  Suivant, avec accès direct au lecteur complet.
+- Le lecteur indique le prochain playback et jusqu'à trois morceaux suivants.
+- Délai général configurable : 0, 5, 10, 15, 30 secondes ou durée personnalisée.
+- Chaque morceau peut utiliser le délai global ou un délai individuel 0/5/10/15/30 s.
+- Pendant le délai, un compte à rebours est affiché et « Lancer maintenant » permet
+  de démarrer immédiatement le morceau suivant.
+- La faute « fhasoavana » a été corrigée en « fahasoavana ».
+- Les petites polices des playlists ont été agrandies.
+- Les commandes internes de taille des Lyrics A-/A+ ont été modernisées.
+
+### Zoom WebViewer Kodular
+Les boutons + / - Android qui apparaissent en bas à droite ne sont pas créés par
+index.html. Les seuls contrôles de taille ajoutés par LyriCSED sont ceux de la barre
+« Haben'ny soratra ». Si le WebViewer Kodular affiche ses propres contrôles de zoom,
+désactivez l'affichage/activation du zoom dans les propriétés du WebViewer, puis
+utilisez les commandes de taille intégrées à LyriCSED.

@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 5,
+  "schemaVersion": 6,
   "files": [
     {
       "path": ".nojekyll",
@@ -8,13 +8,13 @@
     },
     {
       "path": "README.md",
-      "size": 6329,
-      "sha256": "0561692e03bbce7b7cfa1049eb1860fb1996eb11a9abf175ac83fd65b82d7a1b"
+      "size": 8067,
+      "sha256": "94de500ab64b52aed2fb71a6d67ee57c338622f080f7d5b0602c5385b2c521d0"
     },
     {
       "path": "assets/css/style.css",
-      "size": 28516,
-      "sha256": "b0933e8d770a06773a8fbfadb7f240822f7b29e30e12a9faaa13c91915bf0148"
+      "size": 37379,
+      "sha256": "db578f87663fb818d62ad77382c2804e57a1c26d6ec1b40f3598618cb1471479"
     },
     {
       "path": "assets/images/ankino-logo.webp",
@@ -28,8 +28,8 @@
     },
     {
       "path": "assets/js/app.js",
-      "size": 43479,
-      "sha256": "65b28f271b789e6f24b92499ba8a3e7f9c0114f2292001b0847e2239b05d07dc"
+      "size": 52200,
+      "sha256": "6505565662d5d3d4d50aa2b2acb0993fdfd4135e57992d29937adfc85298290c"
     },
     {
       "path": "data/announcements.json",
@@ -43,8 +43,8 @@
     },
     {
       "path": "index.html",
-      "size": 24238,
-      "sha256": "c101a0db86ac4a6252ea1392e9314948579f00c5c5c56a03a8f809aac720f367"
+      "size": 29637,
+      "sha256": "a55509c297bf75f05b2c0f3cae1a6c78dab4639fb60cce140455e8e4658f61ac"
     },
     {
       "path": "instrumentals/anao-ny-dera-instrumental.mp3",
@@ -124,7 +124,7 @@
     {
       "path": "version.json",
       "size": 526,
-      "sha256": "b69cc71026a9e438a36a737cbf4791b006c9518560984222979caef1a766747a"
+      "sha256": "6f2ab0a81c7b54d0496c5443ffc7a2c27462f3a873463756d227483ebf15f803"
     }
   ]
 }
