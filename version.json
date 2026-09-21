@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 4,
+  "contentVersion": 4,
+  "updatedAt": "2026-09-21T11:30:00+03:00",
+  "catalog": "data/songs.json",
+  "announcements": "data/announcements.json",
+  "prefetch": {
+    "lyrics": true,
+    "solfas": true,
+    "instrumentals": false
+  }
+}

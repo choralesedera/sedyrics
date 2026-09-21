@@ -1,0 +1,15 @@
+{
+  "name": "LyriCSED",
+  "short_name": "LyriCSED",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F6FBFF",
+  "theme_color": "#0C4A6E",
+  "icons": [
+    {
+      "src": "assets/images/icon-sedera.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
