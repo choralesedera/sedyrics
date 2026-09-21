@@ -1,10 +1,15 @@
 {
-  "schemaVersion": 11,
+  "schemaVersion": 12,
   "files": [
     {
       "path": "AUDIT-LyriCSED-v11.md",
       "size": 1499,
       "sha256": "3b6a0d911f80d24cb6ece718eb53a9f69ef8ed182375906ce9cf068124dd96e1"
+    },
+    {
+      "path": "AUDIT-LyriCSED-v12.md",
+      "size": 713,
+      "sha256": "363f66e0cecef2d27b828ff9268f9a555d4550616fadb70a6eac03fa709e4bf3"
     },
     {
       "path": "AUDIT-LyriCSED-v8.md",
@@ -15,6 +20,11 @@
       "path": "AUDIT-LyriCSED-v9.md",
       "size": 1624,
       "sha256": "64f0a2beab7bb03ca5c87e383fd59aae3209102b12dc434d275367f91885ccc7"
+    },
+    {
+      "path": "KODULAR-v12-INTEGRATION.txt",
+      "size": 3420,
+      "sha256": "2c44221f49e547675acf06d45f76b8743d8265d74086ad60d6097d742ee35d71"
     },
     {
       "path": "README.md",
@@ -28,13 +38,13 @@
     },
     {
       "path": "assets/css/style.css",
-      "size": 46020,
-      "sha256": "3bb82c0a9bb39b8ac2fadce960fff3b1963ae0b2827ec47b45fcb5279514d510"
+      "size": 49252,
+      "sha256": "57a1a1249f5917d1313b1abd6578132f92ae76151946d14f443efb079408c934"
     },
     {
       "path": "assets/js/app.js",
-      "size": 57831,
-      "sha256": "ebb7f4883e92aea9cbe6bfb8740850d7cfdb0a9f2af2aa985342700fcdd48052"
+      "size": 61822,
+      "sha256": "fdf40aa8be34b050e5421f51d09f3f59153eacc52b08a49eb7627afd0a162599"
     },
     {
       "path": "data/songs.json",
@@ -43,8 +53,8 @@
     },
     {
       "path": "index.html",
-      "size": 33131,
-      "sha256": "68bdf7bf4ac4b6ed533c064c5f1ac10f5151660db09fdfc1c1f85c5deaa83d50"
+      "size": 35122,
+      "sha256": "f93e35d0ff4352a82e6b33d5fab44e036786cf395eacf5a6ad69f72124cce502"
     },
     {
       "path": "lyrics/anao-ny-dera.txt",
@@ -184,7 +194,7 @@
     {
       "path": "version.json",
       "size": 528,
-      "sha256": "9c6eac59486edc64eb48f41054c32f61bcd2a460af8dafb51aa2e2d1a47c8dde"
+      "sha256": "4841891f0fab97115bd096c4480afcc4c4fd3c4e22bd79cef376861e6941ab6f"
     }
   ]
 }

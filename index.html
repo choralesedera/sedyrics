@@ -183,7 +183,7 @@
           <div class="song-heading"><span class="content-badge" id="availabilityBadge">LYRICS</span><h1 id="detailTitle">...</h1><p id="detailArtist">...</p></div>
         </div>
 
-        <div class="segmented-tabs" role="tablist">
+        <div class="segmented-tabs" id="songTabs" role="tablist" data-count="3">
           <button class="segment active" data-song-tab="lyrics"><svg><use href="#i-book"/></svg>Lyrics</button>
           <button class="segment" data-song-tab="solfa"><svg><use href="#i-note"/></svg>Solfa</button>
           <button class="segment" data-song-tab="instrumental"><svg><use href="#i-playback"/></svg>Playback</button>
@@ -486,6 +486,42 @@
           <button id="miniGlobalNextBtn" type="button"><svg><use href="#i-next"/></svg></button>
         </div>
         <button class="mini-return-player" id="returnToPlayer" type="button">Revenir au lecteur</button>
+      </div>
+    </div>
+
+
+    <div class="native-choice-overlay hidden" id="facebookChoiceModal" aria-hidden="true">
+      <div class="native-choice-sheet" role="dialog" aria-modal="true" aria-labelledby="facebookChoiceTitle">
+        <div class="native-choice-icon facebook"><svg><use href="#i-facebook"/></svg></div>
+        <span class="native-choice-kicker">FACEBOOK</span>
+        <h3 id="facebookChoiceTitle">Ouvrir la page</h3>
+        <p id="facebookChoiceName">Chorale Sedera Ambalavato</p>
+
+        <div class="native-choice-actions">
+          <button class="native-choice-primary" id="facebookOpenInside" type="button">
+            <svg><use href="#i-globe"/></svg>
+            <span><strong>Ouvrir dans LyriCSED</strong><small>Consulter sans quitter l'application</small></span>
+          </button>
+          <button class="native-choice-secondary" id="facebookOpenExternal" type="button">
+            <svg><use href="#i-facebook"/></svg>
+            <span><strong>Ouvrir dans Facebook</strong><small>Application Facebook ou navigateur</small></span>
+          </button>
+        </div>
+
+        <button class="native-choice-cancel" id="facebookChoiceCancel" type="button">Annuler</button>
+      </div>
+    </div>
+
+    <div class="native-choice-overlay hidden" id="exitConfirmModal" aria-hidden="true">
+      <div class="native-choice-sheet compact" role="dialog" aria-modal="true" aria-labelledby="exitConfirmTitle">
+        <div class="native-choice-icon"><svg><use href="#i-close"/></svg></div>
+        <span class="native-choice-kicker">LYRICSED</span>
+        <h3 id="exitConfirmTitle">Voulez-vous vraiment quitter l’application ?</h3>
+        <p>Vos notes enregistrées automatiquement resteront disponibles.</p>
+        <div class="exit-choice-actions">
+          <button class="exit-cancel" id="exitCancel" type="button">Annuler</button>
+          <button class="exit-confirm" id="exitConfirm" type="button">Quitter</button>
+        </div>
       </div>
     </div>
 

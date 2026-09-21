@@ -1,0 +1,86 @@
+LYRICSED v12 - INTEGRATION KODULAR
+
+Cette version ajoute la partie HTML/JS des fonctions demandées, mais deux fonctions
+doivent être reliées au niveau Android/Kodular :
+1. bouton Retour physique + fermeture de l'application ;
+2. ouverture Facebook dans un second WebViewer ou dans Facebook/navigateur.
+
+POURQUOI ?
+Le WebViewer Kodular ne traite pas le bouton Retour Android comme l'historique d'un
+navigateur. Kodular fournit l'événement Screen.BackPressed et la méthode WebViewer.EvaluateJS.
+LyriCSED utilise aussi WebViewString pour envoyer des commandes propres à Kodular.
+
+COMPOSANTS KODULAR A AJOUTER
+- Notifier : non obligatoire pour cette version, car les dialogues sont déjà dans le HTML.
+- ActivityStarter1
+- Un deuxième WebViewer : Afficheur_Facebook
+- Une disposition contenant Afficheur_Facebook et un bouton "Retour à LyriCSED".
+  Cette disposition doit être invisible au démarrage.
+- Le WebViewer principal reste Afficheur_Web1.
+
+BLOC 1 - BOUTON RETOUR ANDROID
+Quand Screen1.BackPressed :
+    appeler Afficheur_Web1.Evaluate JS
+    script =
+    "window.LyriCSED && window.LyriCSED.handleAndroidBack();"
+
+Résultat :
+- dans une sous-section : LyriCSED revient à la page précédente ;
+- sur Accueil : la fenêtre "Voulez-vous vraiment quitter l'application ?" apparaît ;
+- Annuler : rien ne se ferme ;
+- Quitter : LyriCSED envoie LYRICSED::EXIT_APP à Kodular.
+
+BLOC 2 - WEB VIEW STRING CHANGE
+Quand Afficheur_Web1.Web View String Change (value) :
+
+Si value commence par :
+    "LYRICSED::EXIT_APP::"
+        -> fermer l'application avec le bloc Control > fermer l'application
+
+Si value commence par :
+    "LYRICSED::FACEBOOK_INSIDE::"
+        -> récupérer l'URL située après le préfixe
+        -> rendre Afficheur_Web1 invisible
+        -> rendre la disposition Facebook visible
+        -> Afficheur_Facebook.Go To URL = URL reçue
+
+Si value commence par :
+    "LYRICSED::FACEBOOK_EXTERNAL::"
+        -> récupérer l'URL
+        -> ActivityStarter1.Action = "android.intent.action.VIEW"
+        -> ActivityStarter1.Data Uri = URL
+
+        Pour essayer Facebook en priorité :
+        ActivityStarter1.Activity Package = "com.facebook.katana"
+        Si ActivityStarter1.Resolve Activity n'est pas vide :
+            ActivityStarter1.Start Activity
+        Sinon :
+            ActivityStarter1.Activity Package = ""
+            ActivityStarter1.Start Activity
+        Android ouvrira alors le navigateur si Facebook n'est pas disponible.
+
+BLOC 3 - RETOUR DU WEBVIEW FACEBOOK
+Quand le bouton "Retour à LyriCSED" est cliqué :
+    rendre la disposition Facebook invisible
+    rendre Afficheur_Web1 visible
+
+Optionnel :
+Quand Screen1.BackPressed et la disposition Facebook est visible :
+    si Afficheur_Facebook.Can Go Back = vrai :
+        Afficheur_Facebook.Go Back
+    sinon :
+        masquer la disposition Facebook
+        réafficher Afficheur_Web1
+
+REGLAGES DES DEUX WEBVIEWERS
+- JavaScript : Oui
+- Use External Browser / Navigateur externe : Non pour Afficheur_Facebook
+- Zoom Display / Afficher le zoom : Non
+- Afficheur_Facebook peut utiliser Follow Links / Suivre les liens : Oui
+
+IMPORTANT
+Aucun lien intent:// n'est affiché par LyriCSED v12.
+Le HTML envoie uniquement des commandes propres via WebViewString.
+
+Facebook peut parfois imposer une connexion ou limiter certaines fonctions dans un
+WebView Android. Dans ce cas, l'utilisateur peut choisir "Ouvrir dans Facebook".
