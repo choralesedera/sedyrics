@@ -1,0 +1,41 @@
+LYRICSED v7 - NOUVEAUX CHANTS
+
+Total du catalogue après mise à jour : 17 chants
+Nouveaux chants ajoutés : 11
+Chant existant mis à jour : Ho mpanomponao
+
+INSTRUMENTAUX RELIES AUTOMATIQUEMENT
+- Andriamanitra o, henoy -> instrumentals/andriamanitra-o-henoy.mp3
+- Inona kosa -> instrumentals/inona-kosa-instrumental.mp3
+- Intoy rolahy -> instrumentals/intoy-rolahy-instrumental.mp3
+- Lovasoa -> instrumentals/lovasoa-instrumental.mp3
+- Mbola tsara -> instrumentals/mbola-tsara-instrumental.mp3
+- Miandry anao -> instrumentals/miandry-anao-instrumental.wma
+- Mpandresy -> instrumentals/mpandresy-instrumental.mp3
+
+CHANTS AJOUTES SANS INSTRUMENTAL CORRESPONDANT
+- Famonjena ho ahy
+- Ho avy ny Tomponao
+- Ô! Iraho Jeso
+- Zanaka Adala
+
+INSTRUMENTAUX PRESENTS DANS VOTRE CAPTURE MAIS NON RELIES
+Aucun titre correspondant n'est présent dans le fichier Lyrics SEDERA.txt :
+- instrumentals/andao-hibebaka-instrumental.mp3
+- instrumentals/Jesosy-mandigny-anao-instrumental.mp3
+- instrumentals/mitsangana-instrumental.mp3
+- instrumentals/tsy-mba-vola-instrumental.mp3
+- instrumentals/Tsy-misy-olana_instrumental.mp3
+
+REMARQUE IMPORTANTE
+Miandry anao est relié à :
+instrumentals/miandry-anao-instrumental.wma
+
+Le fichier est référencé tel qu'il a été fourni. Le format WMA peut ne pas être
+pris en charge de façon fiable par Android WebView. Pour une meilleure compatibilité,
+convertissez-le en MP3 puis modifiez le chemin dans data/songs.json.
+
+Le mot "Ahitsio" présent après plusieurs titres dans le fichier source n'a pas été
+inséré dans les paroles affichées, car il a été traité comme une instruction éditoriale.
+Les autres formulations des paroles ont été conservées telles qu'elles apparaissent
+dans le fichier fourni.

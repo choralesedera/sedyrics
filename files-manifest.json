@@ -1,10 +1,15 @@
 {
-  "schemaVersion": 6,
+  "schemaVersion": 7,
   "files": [
     {
       "path": ".nojekyll",
       "size": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "MISE-A-JOUR-v7.txt",
+      "size": 1741,
+      "sha256": "661f6b04d9a69243685d8909737b3204cd37d05ca4d0eed2e4ddb03a33181fe2"
     },
     {
       "path": "README.md",
@@ -38,8 +43,8 @@
     },
     {
       "path": "data/songs.json",
-      "size": 3215,
-      "sha256": "3bde2b01d3367f724d7681c15615b48233d3906b5f3caef77288ea259561c37d"
+      "size": 8761,
+      "sha256": "c3423c70a7f76f3d9108d3d352e945b6f53481e6e73b1cf97379a15dd3b95b0e"
     },
     {
       "path": "index.html",
@@ -82,9 +87,49 @@
       "sha256": "3f94067debb44e0d3ff562cc36bf9878d5ead6bc78edb85370923b8cb5b6576e"
     },
     {
+      "path": "lyrics/andriamanitra-o-henoy.txt",
+      "size": 382,
+      "sha256": "f1e5677745352708ca8b8f5da8ce502ea918767f480c123839c99d0ba2deb0a5"
+    },
+    {
+      "path": "lyrics/famonjena-ho-ahy.txt",
+      "size": 740,
+      "sha256": "f170eaf3e7163f977c838e85c1f0f1c9fcf0b69a5dc09c06f90fa49533b164ce"
+    },
+    {
+      "path": "lyrics/ho-avy-ny-tomponao.txt",
+      "size": 611,
+      "sha256": "4a5ebadd53b0d4cfdaa1384a1430e0ae7436f3ce41dfa10efa18b15a61e733f1"
+    },
+    {
       "path": "lyrics/ho-mpanomponao.txt",
       "size": 627,
       "sha256": "c8396e54527d7d60db5628aba082365851e88ead2460ff9a90e6ddae344897d3"
+    },
+    {
+      "path": "lyrics/inona-kosa.txt",
+      "size": 766,
+      "sha256": "eed8e3f22f2a58ee4a72b4319effca096ff9871e795cd1e3d79233c3e7bb89a2"
+    },
+    {
+      "path": "lyrics/intoy-rolahy.txt",
+      "size": 394,
+      "sha256": "c421f02036b1fcf4d1b5266cba46044eb655ba73b8d8dc8c3b7a68ad70399a4e"
+    },
+    {
+      "path": "lyrics/lovasoa.txt",
+      "size": 630,
+      "sha256": "7e6053423b3a163d8eb31875896339f0b20afd8280b9fed98357478a19a6d03a"
+    },
+    {
+      "path": "lyrics/mbola-tsara.txt",
+      "size": 448,
+      "sha256": "52ccde6a55a631c90db619fd80bfafecabf7cf488632131523ed353ac30d527b"
+    },
+    {
+      "path": "lyrics/miandry-anao.txt",
+      "size": 859,
+      "sha256": "271374c78139a824690d95a4e72599e7e69e430d9637158e1be706526da7ff62"
     },
     {
       "path": "lyrics/mino-anao-aho.txt",
@@ -92,9 +137,19 @@
       "sha256": "95a8cd9221dbc9b82d26c5710d943352fd52cf0f768303ffe8f2a6aa055d25fe"
     },
     {
+      "path": "lyrics/mpandresy.txt",
+      "size": 789,
+      "sha256": "8b30a2c071143fa5cc9d0b7e1aa464bfe58608ea9efa50b9272c4523d23191f6"
+    },
+    {
       "path": "lyrics/noho-ny-helokao.txt",
       "size": 657,
       "sha256": "b1b20bd3966654c3d1580dd46fee7f336b962b22a93c1fec25a9c1dd922b2d8e"
+    },
+    {
+      "path": "lyrics/o-iraho-jeso.txt",
+      "size": 521,
+      "sha256": "67220bb11d37d1b1fdc81bb08f047132002134f741fafe80173677e4edd71976"
     },
     {
       "path": "lyrics/ry-fanahy-masina.txt",
@@ -105,6 +160,11 @@
       "path": "lyrics/zanahary-o-tahio.txt",
       "size": 501,
       "sha256": "98b60aa5c0ae03092499f14b954017f29613ff6dbea83af7ec587f27c2258092"
+    },
+    {
+      "path": "lyrics/zanaka-adala.txt",
+      "size": 562,
+      "sha256": "1d4ec4d9405e4c5d75364db4acb83f27e7bedbc44bbf64b636f5b778d4687d7c"
     },
     {
       "path": "manifest.webmanifest",
@@ -124,7 +184,7 @@
     {
       "path": "version.json",
       "size": 526,
-      "sha256": "6f2ab0a81c7b54d0496c5443ffc7a2c27462f3a873463756d227483ebf15f803"
+      "sha256": "fe0fe8db0cbd1c9a7b5fe39cba4aa5fa74bbba093161dc38fd01ddd8e9236ffe"
     }
   ]
 }
