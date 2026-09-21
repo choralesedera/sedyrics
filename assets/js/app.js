@@ -57,7 +57,7 @@ function renderSongs(){
 }
 function renderAnnouncements(){
   const host=$("announcementList");host.innerHTML="";
-  if(!ANNOUNCEMENTS.length){host.innerHTML=`<div class="empty-announcement">${icon("i-bell")}<h3>Tsy mbola misy filazan-drahaha</h3><p>Rehefa misy vaovao ampidirina ao amin'ny GitHub dia hiseho eto ary ho voatahiry offline.</p></div>`;return}
+  if(!ANNOUNCEMENTS.length){host.innerHTML=`<div class="empty-announcement">${icon("i-bell")}<h3>Tsy mbola misy filazan-drahaha</h3><p>Eto no hiseho ireo vaovao mahakasika ny activité ato amin-tsika.</p></div>`;return}
   ANNOUNCEMENTS.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).forEach(a=>{const el=document.createElement("article");el.className="announcement-card";el.innerHTML=`<span class="date">${escapeHtml(a.date||"")}</span><h3>${escapeHtml(a.title||"")}</h3><p>${escapeHtml(a.body||"")}</p>`;host.appendChild(el)})
 }
 
