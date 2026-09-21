@@ -44,6 +44,17 @@
       <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></symbol>
       <symbol id="i-prev" viewBox="0 0 24 24"><path d="M6 5v14M18 6l-8 6 8 6z"/></symbol>
       <symbol id="i-next" viewBox="0 0 24 24"><path d="M18 5v14M6 6l8 6-8 6z"/></symbol>
+
+      <symbol id="i-liturgy" viewBox="0 0 24 24"><path d="M5 20h14M7 20V9l5-5 5 5v11M10 12h4M12 10v4"/></symbol>
+      <symbol id="i-concert" viewBox="0 0 24 24"><path d="M5 19h14M7 16h10M9 13h6M12 4v6M9 7h6"/></symbol>
+      <symbol id="i-prelude" viewBox="0 0 24 24"><path d="M4 17h16M6 14a6 6 0 0 1 12 0M12 4v3M5.5 7.5l2 2M18.5 7.5l-2 2"/></symbol>
+      <symbol id="i-interlude" viewBox="0 0 24 24"><path d="M7 5v14M17 5v14M10 8h4M10 12h4M10 16h4"/></symbol>
+      <symbol id="i-rakitra" viewBox="0 0 24 24"><path d="M4 12h16v7H4zM7 12l2-5h6l2 5M10 15h4"/></symbol>
+      <symbol id="i-postlude" viewBox="0 0 24 24"><path d="M4 17h11M11 13l4 4-4 4M17 5v8M14 8l3-3 3 3"/></symbol>
+      <symbol id="i-part1" viewBox="0 0 24 24"><path d="M5 18h14M8 15V9M12 15V6M16 15v-3"/></symbol>
+      <symbol id="i-part2" viewBox="0 0 24 24"><path d="M5 18h14M8 15v-3M12 15V6M16 15V9"/></symbol>
+      <symbol id="i-part3" viewBox="0 0 24 24"><path d="M5 18h14M8 15V6M12 15V9M16 15v-3"/></symbol>
+      <symbol id="i-playback" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="m10 8 6 4-6 4z"/></symbol>
     </svg>
 
     <header class="app-header" id="mainHeader">
@@ -54,7 +65,7 @@
       <div class="header-actions">
         <button class="header-playback hidden" id="headerPlayback" type="button" aria-label="Ouvrir le mini-lecteur">
           <span class="header-disc"><img src="assets/images/icon-sedera.png" alt=""></span>
-          <span class="header-playback-copy"><small>PLAYBACK</small><strong id="headerPlaybackTitle">...</strong></span>
+          <span class="header-playback-copy"><small>Playback</small><strong id="headerPlaybackTitle">...</strong><span class="header-mini-time" id="headerPlaybackTime">0:00</span></span>
           <span class="header-playback-toggle" id="headerPlaybackToggle"><svg><use href="#i-pause"/></svg></span>
         </button>
         <button class="update-btn" id="updateBtn" type="button" title="Actualiser l'application">
@@ -68,7 +79,7 @@
     <section class="global-event-player" id="eventPlayer">
       <div class="event-player-head">
         <div>
-          <span id="eventPlayerSection">PLAYLIST</span>
+          <span id="eventPlayerSection">Playlist</span>
           <strong id="eventPlayerTitle">Aucun playback</strong>
           <small id="eventNextTitle">Prochain : aucun</small>
         </div>
@@ -148,9 +159,9 @@
       </section>
 
       <section class="view" id="songsView" data-view="songs">
-        <div class="page-title"><span>TRANOM-BOKY</span><h1>Hira rehetra</h1><p>Karohy, tehirizo ary sokafy ny votoatin'ny hira.</p></div>
+        <div class="page-title"><span>Lyrics ihany</span><h1>Hira rehetra</h1><p>Karohy sy vakio ny tononkira.</p></div>
         <div class="search-card"><svg><use href="#i-search"/></svg><input id="songSearch" type="search" placeholder="Lohateny na laharana..." autocomplete="off"></div>
-        <div class="chip-row"><button class="chip active" data-filter="all">Rehetra</button><button class="chip" data-filter="favorites">Favoris</button><button class="chip" data-filter="solfa">Misy Solfa</button><button class="chip" data-filter="instrumental">Misy Playback</button></div>
+        <div class="chip-row"><button class="chip active" data-filter="all">Rehetra</button><button class="chip" data-filter="favorites">Favoris</button></div>
         <div class="library-meta"><span id="libraryCount">0 hira</span><span id="libraryStatus"></span></div>
         <div class="song-grid" id="songGrid"></div>
       </section>
@@ -175,7 +186,7 @@
         <div class="segmented-tabs" role="tablist">
           <button class="segment active" data-song-tab="lyrics"><svg><use href="#i-book"/></svg>Lyrics</button>
           <button class="segment" data-song-tab="solfa"><svg><use href="#i-note"/></svg>Solfa</button>
-          <button class="segment" data-song-tab="instrumental"><svg><use href="#i-music"/></svg>Instrumental</button>
+          <button class="segment" data-song-tab="instrumental"><svg><use href="#i-playback"/></svg>Playback</button>
         </div>
 
         <div class="reader-zoom-bar" id="readerZoomBar">
@@ -199,7 +210,7 @@
 
           <section class="tab-panel" id="instrumentalPanel">
             <div class="advanced-player" id="advancedPlayer">
-              <div class="player-title-row"><div><span>PLAYBACK</span><strong id="audioTitle">Instrumental</strong></div><span class="offline-badge" id="audioCacheBadge">En ligne</span></div>
+              <div class="player-title-row"><div><span>Playback</span><strong id="audioTitle">Instrumental</strong></div><span class="offline-badge" id="audioCacheBadge">En ligne</span></div>
 
               <div class="transport">
                 <button class="transport-btn" id="rewindBtn" title="Retour 10 secondes"><svg><use href="#i-rewind"/></svg><small>10</small></button>
@@ -234,14 +245,14 @@
 
       <section class="view" id="liturgyView" data-view="liturgy">
         <div class="page-title">
-          <span>PLAYBACK LITURGIE</span>
+          <span class="page-icon-label"><svg><use href="#i-liturgy"/></svg>Playback Liturgie</span>
           <h1>Liturgie</h1>
           <p>Préparez et organisez les playbacks de la liturgie. La lecture continue même si vous consultez une autre partie de LyriCSED.</p>
         </div>
 
         <div class="delay-settings">
           <div>
-            <span class="mini-label">PAUSE ENTRE LES PLAYBACKS</span>
+            <span class="mini-label">Pause entre les playbacks</span>
             <strong>Délai général de la liturgie</strong>
           </div>
           <select id="liturgyPauseSelect">
@@ -259,14 +270,14 @@
         </div>
 
         <div class="planner-intro">
-          <span class="mini-label">FILAHARAN'NY PLAYBACK</span>
+          <span class="mini-label">Filaharan'ny playback</span>
           <h2>Programme de la liturgie</h2>
           <p>Ajoutez les instrumentaux LyriCSED ou des fichiers audio enregistrés sur le téléphone.</p>
         </div>
 
         <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="prelude">
           <div class="playlist-section-head">
-            <div><span>01</span><div><h3>PRÉLUDE</h3><p>Playback avant le début</p></div></div>
+            <div><span class="playlist-section-icon"><svg><use href="#i-prelude"/></svg></span><div><h3>Prélude</h3><p>Playback avant le début</p></div></div>
             <button class="section-play" data-play-section="liturgy:prelude"><svg><use href="#i-play"/></svg>Lire</button>
           </div>
           <div class="playlist-items" id="playlist-liturgy-prelude"></div>
@@ -278,7 +289,7 @@
 
         <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="interlude">
           <div class="playlist-section-head">
-            <div><span>02</span><div><h3>INTERLUDE</h3><p>Playback entre deux moments</p></div></div>
+            <div><span class="playlist-section-icon"><svg><use href="#i-interlude"/></svg></span><div><h3>Interlude</h3><p>Playback entre deux moments</p></div></div>
             <button class="section-play" data-play-section="liturgy:interlude"><svg><use href="#i-play"/></svg>Lire</button>
           </div>
           <div class="playlist-items" id="playlist-liturgy-interlude"></div>
@@ -290,7 +301,7 @@
 
         <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="rakitra">
           <div class="playlist-section-head">
-            <div><span>03</span><div><h3>RAKITRA</h3><p>Playback pendant le Rakitra</p></div></div>
+            <div><span class="playlist-section-icon"><svg><use href="#i-rakitra"/></svg></span><div><h3>Rakitra</h3><p>Playback pendant le Rakitra</p></div></div>
             <button class="section-play" data-play-section="liturgy:rakitra"><svg><use href="#i-play"/></svg>Lire</button>
           </div>
           <div class="playlist-items" id="playlist-liturgy-rakitra"></div>
@@ -302,7 +313,7 @@
 
         <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="postlude">
           <div class="playlist-section-head">
-            <div><span>04</span><div><h3>POSTLUDE</h3><p>Playback après la fin</p></div></div>
+            <div><span class="playlist-section-icon"><svg><use href="#i-postlude"/></svg></span><div><h3>Postlude</h3><p>Playback après la fin</p></div></div>
             <button class="section-play" data-play-section="liturgy:postlude"><svg><use href="#i-play"/></svg>Lire</button>
           </div>
           <div class="playlist-items" id="playlist-liturgy-postlude"></div>
@@ -314,7 +325,7 @@
 
         <button class="play-event-btn" data-play-event="liturgy">
           <svg><use href="#i-play"/></svg>
-          <span><strong>Lire toute la liturgie</strong><small>PRÉLUDE → INTERLUDE → RAKITRA → POSTLUDE</small></span>
+          <span><strong>Lire toute la liturgie</strong><small>Prélude → Interlude → Rakitra → Postlude</small></span>
         </button>
 
         <div class="playlist-storage-note">
@@ -325,14 +336,14 @@
 
       <section class="view" id="concertView" data-view="concert">
         <div class="page-title">
-          <span>PLANNING CONCERT / ANTSAM-PANAHY</span>
-          <h1>Planning Concert</h1>
+          <span class="page-icon-label"><svg><use href="#i-concert"/></svg>Planning Concert / Antsam-panahy</span>
+          <h1>Concert</h1>
           <p>Organisez les playbacks de chaque partie dans l'ordre exact du concert ou de l'Antsam-panahy.</p>
         </div>
 
         <div class="delay-settings">
           <div>
-            <span class="mini-label">PAUSE ENTRE LES PLAYBACKS</span>
+            <span class="mini-label">Pause entre les playbacks</span>
             <strong>Délai général du planning</strong>
           </div>
           <select id="concertPauseSelect">
@@ -350,14 +361,14 @@
         </div>
 
         <div class="planner-intro">
-          <span class="mini-label">PLANNING COMPLET</span>
+          <span class="mini-label">Planning complet</span>
           <h2>Concert / Antsam-panahy</h2>
           <p>Ajoutez plusieurs playbacks par partie et modifiez facilement leur ordre de lecture.</p>
         </div>
 
         <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part1">
           <div class="playlist-section-head">
-            <div><span>I</span><div><h3>PARTIE I</h3><p>Première partie</p></div></div>
+            <div><span class="playlist-section-icon"><svg><use href="#i-part1"/></svg></span><div><h3>Partie I</h3><p>Première partie</p></div></div>
             <button class="section-play" data-play-section="concert:part1"><svg><use href="#i-play"/></svg>Lire</button>
           </div>
           <div class="playlist-items" id="playlist-concert-part1"></div>
@@ -369,7 +380,7 @@
 
         <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part2">
           <div class="playlist-section-head">
-            <div><span>II</span><div><h3>PARTIE II</h3><p>Deuxième partie</p></div></div>
+            <div><span class="playlist-section-icon"><svg><use href="#i-part2"/></svg></span><div><h3>Partie II</h3><p>Deuxième partie</p></div></div>
             <button class="section-play" data-play-section="concert:part2"><svg><use href="#i-play"/></svg>Lire</button>
           </div>
           <div class="playlist-items" id="playlist-concert-part2"></div>
@@ -381,7 +392,7 @@
 
         <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part3">
           <div class="playlist-section-head">
-            <div><span>III</span><div><h3>PARTIE III</h3><p>Troisième partie</p></div></div>
+            <div><span class="playlist-section-icon"><svg><use href="#i-part3"/></svg></span><div><h3>Partie III</h3><p>Troisième partie</p></div></div>
             <button class="section-play" data-play-section="concert:part3"><svg><use href="#i-play"/></svg>Lire</button>
           </div>
           <div class="playlist-items" id="playlist-concert-part3"></div>
@@ -393,7 +404,7 @@
 
         <button class="play-event-btn" data-play-event="concert">
           <svg><use href="#i-play"/></svg>
-          <span><strong>Lire tout le planning</strong><small>PARTIE I → PARTIE II → PARTIE III</small></span>
+          <span><strong>Lire tout le planning</strong><small>Partie I → Partie II → Partie III</small></span>
         </button>
 
         <div class="playlist-storage-note">
@@ -414,22 +425,22 @@
 
       <section class="view" id="aboutView" data-view="about">
         <div class="about-hero"><img src="assets/images/icon-sedera.png" alt="Sedera"><span class="demo-pill large">VERSION DÉMO</span><h1>LyriCSED</h1><p>Lyrics Chorale Sedera Ambalavato<br>FLM Antsirabe</p></div>
-        <a class="about-card about-link" href="https://www.ankino.com/" target="_blank" rel="noopener"><div><span>Créée par</span><strong>Ankino MG</strong></div><span class="about-link-icon"><svg><use href="#i-globe"/></svg></span></a>
+        <a class="about-card about-link smart-link" href="https://www.ankino.com/" data-smart-link="web"><div><span>Créée par</span><strong>Ankino MG</strong></div><span class="about-link-icon"><svg><use href="#i-globe"/></svg></span></a>
         <div class="about-social-heading">
           <span>COMPTES OFFICIELS</span>
           <strong>Chorale Sedera Ambalavato</strong>
         </div>
         <div class="about-socials">
-          <a class="social-link" href="https://web.facebook.com/antoko.mpihira.sedera.ambalavato" target="_blank" rel="noopener">
+          <a class="social-link smart-link" href="https://web.facebook.com/antoko.mpihira.sedera.ambalavato" data-smart-link="facebook">
             <svg><use href="#i-facebook"/></svg><strong>Chorale Sedera Ambalavato - Video</strong>
           </a>
-          <a class="social-link" href="https://web.facebook.com/Tanora.Sedera.Ambalavato" target="_blank" rel="noopener">
+          <a class="social-link smart-link" href="https://web.facebook.com/Tanora.Sedera.Ambalavato" data-smart-link="facebook">
             <svg><use href="#i-facebook"/></svg><strong>Chorale Sedera Ambalavato</strong>
           </a>
-          <a class="social-link" href="https://web.facebook.com/antoko.mpihira.sedera.ambalavato.2025" target="_blank" rel="noopener">
+          <a class="social-link smart-link" href="https://web.facebook.com/antoko.mpihira.sedera.ambalavato.2025" data-smart-link="facebook">
             <svg><use href="#i-facebook"/></svg><strong>Chorale Sedera Ambalavato Kaonty</strong>
           </a>
-          <a class="social-link" href="https://web.facebook.com/groups/443038859083631" target="_blank" rel="noopener">
+          <a class="social-link smart-link" href="https://web.facebook.com/groups/443038859083631" data-smart-link="facebook">
             <svg><use href="#i-facebook"/></svg><strong>Groupe Facebook Chorale Sedera Ambalavato</strong>
           </a>
         </div>
@@ -440,8 +451,8 @@
     <nav class="bottom-nav" id="bottomNav">
       <button class="nav-item active" data-nav="home"><svg><use href="#i-home"/></svg><span>Accueil</span></button>
       <button class="nav-item" data-nav="songs"><svg><use href="#i-music"/></svg><span>Hira</span></button>
-      <button class="nav-item" data-nav="liturgy"><svg><use href="#i-list"/></svg><span>Liturgie</span></button>
-      <button class="nav-item" data-nav="concert"><svg><use href="#i-play"/></svg><span>Concert</span></button>
+      <button class="nav-item" data-nav="liturgy"><svg><use href="#i-liturgy"/></svg><span>Liturgie</span></button>
+      <button class="nav-item" data-nav="concert"><svg><use href="#i-concert"/></svg><span>Concert</span></button>
       <button class="nav-item" data-nav="announcements"><svg><use href="#i-bell"/></svg><span>Vaovao</span></button>
       <button class="nav-item" data-nav="about"><svg><use href="#i-info"/></svg><span>À propos</span></button>
     </nav>
@@ -451,7 +462,7 @@
     <div class="picker-overlay hidden" id="libraryPicker" aria-hidden="true">
       <div class="picker-sheet">
         <div class="picker-head">
-          <div><span>LYRICSED</span><h2>Choisir un playback</h2></div>
+          <div><span>LyriCSED</span><h2>Choisir un playback</h2></div>
           <button id="closeLibraryPicker" type="button"><svg><use href="#i-close"/></svg></button>
         </div>
         <div class="search-card picker-search"><svg><use href="#i-search"/></svg><input id="playlistLibrarySearch" type="search" placeholder="Karohy ny playback..." autocomplete="off"></div>
@@ -459,14 +470,15 @@
       </div>
     </div>
     <input id="localAudioPicker" class="file-picker-hidden" type="file" accept="audio/*,.mp3,.wav,.mpeg,.mpga,.m4a,.aac,.ogg,.flac" multiple>
-    <audio id="playlistAudio" preload="metadata"></audio>
-
-
-    <div class="mini-player-overlay hidden" id="globalMiniPlayer" aria-hidden="true">
+<div class="mini-player-overlay hidden" id="globalMiniPlayer" aria-hidden="true">
       <div class="mini-player-sheet">
         <div class="mini-player-sheet-head">
-          <div><span>PLAYBACK EN COURS</span><strong id="miniGlobalTitle">...</strong><small id="miniGlobalNext">Prochain : aucun</small></div>
+          <div><span>Playback en cours</span><strong id="miniGlobalTitle">...</strong><small id="miniGlobalNext">Prochain : aucun</small></div>
           <button id="closeGlobalMiniPlayer" type="button"><svg><use href="#i-close"/></svg></button>
+        </div>
+        <div class="mini-global-progress">
+          <div class="mini-global-time"><span id="miniGlobalElapsed">0:00</span><span id="miniGlobalDuration">0:00</span></div>
+          <input id="miniGlobalSeek" class="range" type="range" min="0" max="1000" value="0">
         </div>
         <div class="mini-global-controls">
           <button id="miniGlobalPrev" type="button"><svg><use href="#i-prev"/></svg></button>
@@ -482,7 +494,7 @@
     <div class="sync-overlay hidden" id="syncOverlay" role="status" aria-live="polite">
       <div class="sync-modal">
         <div class="sync-logo"><img src="assets/images/icon-sedera.png" alt=""></div>
-        <span class="sync-kicker">LYRICSED OFFLINE</span>
+        <span class="sync-kicker">LyriCSED Offline</span>
         <h2 id="syncTitle">Fanomanana offline</h2>
         <p id="syncMessage">Alaina sy tehirizina ao amin'ny finday ny votoaty ilaina.</p>
         <div class="sync-progress"><i id="syncProgress"></i></div>
