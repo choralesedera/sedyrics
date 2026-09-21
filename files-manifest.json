@@ -1,85 +1,35 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 9,
   "files": [
     {
-      "path": ".nojekyll",
-      "size": 0,
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      "path": "AUDIT-LyriCSED-v8.md",
+      "size": 3099,
+      "sha256": "faeaa1da6171daa47f3fe258ff671543d002b9e14d6280f4980ef3b56295f372"
     },
     {
-      "path": "MISE-A-JOUR-v7.txt",
-      "size": 1741,
-      "sha256": "661f6b04d9a69243685d8909737b3204cd37d05ca4d0eed2e4ddb03a33181fe2"
-    },
-    {
-      "path": "README.md",
-      "size": 8067,
-      "sha256": "94de500ab64b52aed2fb71a6d67ee57c338622f080f7d5b0602c5385b2c521d0"
+      "path": "AUDIT-LyriCSED-v9.md",
+      "size": 1624,
+      "sha256": "64f0a2beab7bb03ca5c87e383fd59aae3209102b12dc434d275367f91885ccc7"
     },
     {
       "path": "assets/css/style.css",
-      "size": 37379,
-      "sha256": "db578f87663fb818d62ad77382c2804e57a1c26d6ec1b40f3598618cb1471479"
-    },
-    {
-      "path": "assets/images/ankino-logo.webp",
-      "size": 20666,
-      "sha256": "dac9a83afc4f95633c9bcc9c4730d206376c9bd4146873f9c81f136fa4385069"
-    },
-    {
-      "path": "assets/images/icon-sedera.png",
-      "size": 60445,
-      "sha256": "bc5ec50d30202a953e3a4be175773c12b3cca0453aec5f2d7b79fd5e964eeb27"
+      "size": 42939,
+      "sha256": "acba7cf3e89f8e033628353ab244c0199fc25b8bfbbaf365624146aeb7f983b9"
     },
     {
       "path": "assets/js/app.js",
-      "size": 52200,
-      "sha256": "6505565662d5d3d4d50aa2b2acb0993fdfd4135e57992d29937adfc85298290c"
-    },
-    {
-      "path": "data/announcements.json",
-      "size": 47,
-      "sha256": "4fa60d8b6828c239535e1acaa997823bb751f5b89c689423d633a02948c5e927"
+      "size": 54328,
+      "sha256": "558ed553d544069ad67634b069af2dad2b39b928164d5f3fcd0979df284a4318"
     },
     {
       "path": "data/songs.json",
-      "size": 8761,
-      "sha256": "c3423c70a7f76f3d9108d3d352e945b6f53481e6e73b1cf97379a15dd3b95b0e"
+      "size": 14747,
+      "sha256": "3b49a5793c795bc0dfb16218f3bfb507aab2ebabf4b108f5ebc115a51da954a3"
     },
     {
       "path": "index.html",
-      "size": 29637,
-      "sha256": "a55509c297bf75f05b2c0f3cae1a6c78dab4639fb60cce140455e8e4658f61ac"
-    },
-    {
-      "path": "instrumentals/anao-ny-dera-instrumental.mp3",
-      "size": 6443925,
-      "sha256": "b414351c32d500e0a8332685e38c71874c3c975f9719f29b230344be1b0cf36b"
-    },
-    {
-      "path": "instrumentals/ho-mpanomponao-instrumental.mp3",
-      "size": 11312108,
-      "sha256": "a6f1c2849bad8d7108b1e1ee0875b6cc66db9063868295078e598c4f105ae9ca"
-    },
-    {
-      "path": "instrumentals/mino-anao-instrumental.mp3",
-      "size": 8404147,
-      "sha256": "47309f78b14ba3b3510c8c3457de42f64e2ead3c36e71a22b023226924d726e0"
-    },
-    {
-      "path": "instrumentals/noho-ny-helokao-instrumental.mp3",
-      "size": 13025743,
-      "sha256": "97a6a7c0f1a9562fe5b5512bcfae0dc41b4f20934e293ec0093fa016bb035240"
-    },
-    {
-      "path": "instrumentals/ry-fanahy-masina-instrumental.mp3",
-      "size": 12563932,
-      "sha256": "50d45a767a78cdd46c2b699eb06455c81e31f67aaf897695abac6156bb2e4cfe"
-    },
-    {
-      "path": "instrumentals/zanahary-o-tahio-instrumental.mp3",
-      "size": 11684128,
-      "sha256": "e8bd1feb9f5896dcae2c35a9dae9a435207e38b6ce856422cfcdc13fba611655"
+      "size": 31310,
+      "sha256": "c97473a7eb1d951dff44c50462e0f01d2804792f3a9dfa6496930ea985659749"
     },
     {
       "path": "lyrics/anao-ny-dera.txt",
@@ -97,9 +47,19 @@
       "sha256": "f170eaf3e7163f977c838e85c1f0f1c9fcf0b69a5dc09c06f90fa49533b164ce"
     },
     {
+      "path": "lyrics/fitiavani-jesosy.txt",
+      "size": 643,
+      "sha256": "eb7d1e5edd73ddaf57880a40f1fb7924209bf459e7f2c52456d8d05674922021"
+    },
+    {
+      "path": "lyrics/getsemane.txt",
+      "size": 695,
+      "sha256": "d814a5e6bbe5e249b25d4259919d0c1fdcf47b13f05857344af5a07a739dec11"
+    },
+    {
       "path": "lyrics/ho-avy-ny-tomponao.txt",
-      "size": 611,
-      "sha256": "4a5ebadd53b0d4cfdaa1384a1430e0ae7436f3ce41dfa10efa18b15a61e733f1"
+      "size": 1226,
+      "sha256": "38ef84a90c88b3840bf8b0a3c4e8880d88d3051def4c6a7745ab0a402899f75a"
     },
     {
       "path": "lyrics/ho-mpanomponao.txt",
@@ -112,9 +72,19 @@
       "sha256": "eed8e3f22f2a58ee4a72b4319effca096ff9871e795cd1e3d79233c3e7bb89a2"
     },
     {
+      "path": "lyrics/inona-no-havalinao.txt",
+      "size": 720,
+      "sha256": "66b557b95087cce76d48964419b2396277b04c22a9b9c84f2fd5b33eb12c8dad"
+    },
+    {
       "path": "lyrics/intoy-rolahy.txt",
       "size": 394,
       "sha256": "c421f02036b1fcf4d1b5266cba46044eb655ba73b8d8dc8c3b7a68ad70399a4e"
+    },
+    {
+      "path": "lyrics/jesosy-mandigny-anao.txt",
+      "size": 1415,
+      "sha256": "dff128b5d65529c4bd61d46615b933281c993313c2c34a1fad0329791a3e476d"
     },
     {
       "path": "lyrics/lovasoa.txt",
@@ -142,9 +112,19 @@
       "sha256": "8b30a2c071143fa5cc9d0b7e1aa464bfe58608ea9efa50b9272c4523d23191f6"
     },
     {
+      "path": "lyrics/natolotrao-ho-avotray.txt",
+      "size": 625,
+      "sha256": "38da3a58c6e5d981bf0e2cd1c95b30691c3c132ae28747d31d9526ac0c3cf7ec"
+    },
+    {
       "path": "lyrics/noho-ny-helokao.txt",
       "size": 657,
       "sha256": "b1b20bd3966654c3d1580dd46fee7f336b962b22a93c1fec25a9c1dd922b2d8e"
+    },
+    {
+      "path": "lyrics/ny-alin-ny-getsemane.txt",
+      "size": 690,
+      "sha256": "f5f910b75de3d3a2a134285b64743adf928f88668ea4646a25eef82ec6cd11da"
     },
     {
       "path": "lyrics/o-iraho-jeso.txt",
@@ -157,24 +137,29 @@
       "sha256": "7bb19cfb2c48507a9d4235ced685cd0549118ad82cf1e6593dd7190105f9947c"
     },
     {
+      "path": "lyrics/sedera-o.txt",
+      "size": 218,
+      "sha256": "bd1f6d9769725a3588988f09c6e7f6a92a496472ef6bdbf1991b476f310e4fd2"
+    },
+    {
+      "path": "lyrics/tsy-mba-vola.txt",
+      "size": 931,
+      "sha256": "5b202ebd807ce7dcfd00a19183a98c91e7432d1103175b84c4e38a3cbd4b2912"
+    },
+    {
       "path": "lyrics/zanahary-o-tahio.txt",
       "size": 501,
       "sha256": "98b60aa5c0ae03092499f14b954017f29613ff6dbea83af7ec587f27c2258092"
     },
     {
       "path": "lyrics/zanaka-adala.txt",
-      "size": 562,
-      "sha256": "1d4ec4d9405e4c5d75364db4acb83f27e7bedbc44bbf64b636f5b778d4687d7c"
+      "size": 2056,
+      "sha256": "283d581cf8bb2e3f31d645fbbcb914461e61870c77f929ee079aef9f8ca0169a"
     },
     {
       "path": "manifest.webmanifest",
       "size": 290,
       "sha256": "7cf3eeba77a16c11abeb5268b9abc5f7971739e5c23435f5c58ea3840fae4aee"
-    },
-    {
-      "path": "solfa/anao-ny-dera-solfa.png",
-      "size": 159448,
-      "sha256": "d7a2a439bd3a9bfc32a2799ef632698d7c62e2123c929783f4fb25eeb3e9c96b"
     },
     {
       "path": "sw.js",
@@ -184,7 +169,7 @@
     {
       "path": "version.json",
       "size": 526,
-      "sha256": "fe0fe8db0cbd1c9a7b5fe39cba4aa5fa74bbba093161dc38fd01ddd8e9236ffe"
+      "sha256": "e5b61d4742cdc988623c2164f4243b04cc61511991ac683c964831b36cfd76f6"
     }
   ]
 }
