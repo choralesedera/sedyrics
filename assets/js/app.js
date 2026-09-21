@@ -419,10 +419,37 @@ function renderRecent(){
 function isFav(id){return favorites.includes(Number(id))}
 function toggleFav(){if(!currentSong)return;const id=Number(currentSong.id);favorites=isFav(id)?favorites.filter(x=>x!==id):[...favorites,id];writeJSON("sedyricsFavorites",favorites);refreshFavorite();renderSongs();toast(isFav(id)?"Favori ajouté":"Favori retiré")}
 function getFilteredSongs(){const q=normalize($("songSearch").value.trim());return SONGS.filter(s=>{const pass=songFilter==="all"||(songFilter==="favorites"&&isFav(s.id))||(songFilter==="solfa"&&s.solfa)||(songFilter==="instrumental"&&s.instrumental);return pass&&(!q||normalize(s.title).includes(q)||normalize(s.artist).includes(q)||(String(songNo(s)).includes(q)||String(s.id).includes(q)))})}
+function songAvailability(s){
+  const items=[];
+  if(s?.lyrics)items.push({key:'lyrics',label:'Lyrics'});
+  if(s?.instrumental)items.push({key:'instrumental',label:'Playback'});
+  if(s?.solfa)items.push({key:'solfa',label:'Solfa'});
+  return items;
+}
+function availabilityTags(s){
+  const items=songAvailability(s);
+  if(!items.length)return '<span class="tiny-tag muted">À venir</span>';
+  if(items.length===1)return `<span class="tiny-tag ${items[0].key}">${items[0].label} ihany</span>`;
+  return items.map(x=>`<span class="tiny-tag ${x.key}">${x.label}</span>`).join('');
+}
 function renderSongs(){
-  const list=getFilteredSongs(),host=$("songGrid");host.innerHTML="";$("libraryCount").textContent=`${list.length} hira`;
-  if(!list.length){host.innerHTML='<div class="empty-announcement">Tsy misy hira hita.</div>';return}
-  list.forEach(s=>{const b=document.createElement("button");b.className="song-card";const tags=s.lyrics?'<span class="tiny-tag">LYRICS IHANY</span>':s.instrumental?'<span class="tiny-tag">PLAYBACK</span>':'<span class="tiny-tag muted">À VENIR</span>';b.innerHTML=`<span class="song-num">${String(songNo(s)).padStart(2,"0")}</span><span><h3>${isFav(s.id)?"♥ ":""}${escapeHtml(s.title)}</h3><p>${escapeHtml(s.artist||"")}</p><span class="song-tags">${tags}</span></span><svg class="chev"><use href="#i-chevron"/></svg>`;b.onclick=()=>openSong(s.id);host.appendChild(b)})
+  const list=getFilteredSongs(),host=$("songGrid");
+  host.innerHTML="";
+  $("libraryCount").textContent=`${list.length} hira`;
+
+  if(!list.length){
+    host.innerHTML='<div class="empty-announcement">Tsy misy hira hita.</div>';
+    return;
+  }
+
+  list.forEach(s=>{
+    const b=document.createElement("button");
+    b.className="song-card";
+    const tags=availabilityTags(s);
+    b.innerHTML=`<span class="song-num">${String(songNo(s)).padStart(2,"0")}</span><span><h3>${isFav(s.id)?"♥ ":""}${escapeHtml(s.title)}</h3><p>${escapeHtml(s.artist||"")}</p><span class="song-tags">${tags}</span></span><svg class="chev"><use href="#i-chevron"/></svg>`;
+    b.onclick=()=>openSong(s.id);
+    host.appendChild(b);
+  });
 }
 function renderAnnouncements(){
   const host=$("announcementList");host.innerHTML="";
@@ -453,14 +480,26 @@ async function openSong(id,{push=true}={}){
   $("audioTitle").textContent=`${s.title} • Playback`;
   $("miniTrackTitle").textContent=s.title;
 
-  const available=[s.lyrics?"LYRICS":"",s.solfa?"SOLFA":"",s.instrumental?"PLAYBACK":""].filter(Boolean);
-  $("availabilityBadge").textContent=available.join(" • ")||"CONTENU À VENIR";
+  const available=songAvailability(s);
+  $("availabilityBadge").textContent=available.length
+    ? available.map(x=>x.label.toUpperCase()).join(" • ")
+    : "CONTENU À VENIR";
+
   $$('[data-song-tab]').forEach(b=>{
     const tab=b.dataset.songTab;
     const enabled=tab==='lyrics'?!!s.lyrics:tab==='solfa'?!!s.solfa:!!s.instrumental;
     b.disabled=!enabled;
+    b.hidden=!enabled;
     b.classList.toggle('disabled',!enabled);
+    if(!enabled)b.classList.remove('active');
   });
+
+  const tabs=$("songTabs");
+  if(tabs){
+    tabs.dataset.count=String(Math.max(1,available.length));
+    tabs.classList.toggle('single-tab',available.length===1);
+    tabs.classList.toggle('no-tabs',available.length===0);
+  }
 
   refreshFavorite();applyReaderZoom();loadSongNote();setView('song',{push});
   const firstTab=s.lyrics?'lyrics':s.solfa?'solfa':s.instrumental?'instrumental':'lyrics';
@@ -472,7 +511,9 @@ async function openSong(id,{push=true}={}){
     try{const r=await getCached(withRevision(s.lyrics,resourceRevision(s,'lyrics')));$("lyricsText").textContent=(await r.text()).trim()}
     catch{$("lyricsText").textContent="Tononkira tsy azo vakiana amin'izao fotoana izao."}
   }else{
-    $("lyricsText").textContent="Tsy mbola misy Lyrics ho an'ity hira ity. Playback ihany no misy amin'izao fotoana izao.";
+    $("lyricsText").textContent=currentSong?.instrumental
+      ?"Tsy mbola misy Lyrics ho an'ity hira ity. Playback ihany no misy amin'izao fotoana izao."
+      :"Tsy mbola misy Lyrics ho an'ity hira ity.";
   }
   applyReaderZoom();loadSolfa();loadInstrumental();renderMarkers();updateHeaderPlayback();
 }
@@ -1280,20 +1321,147 @@ bindDelayControls('concert');
 
 
 
-function openSmartLink(url,kind='web'){
-  if(!url)return;
-  const target=String(url).replace('://web.facebook.com/', '://www.facebook.com/');
-  if(kind==='facebook'&&/Android/i.test(navigator.userAgent)){
-    const noScheme=target.replace(/^https?:\/\//,'');
-    const intent=`intent://${noScheme}#Intent;scheme=https;package=com.facebook.katana;S.browser_fallback_url=${encodeURIComponent(target)};end`;
-    try{window.location.href=intent;return}catch{}
-  }
-  if(kind==='web'){
-    try{window.location.href=target;return}catch{}
-  }
-  try{const w=window.open(target,'_blank');if(!w)window.location.href=target}catch{window.location.href=target}
+
+let pendingFacebookLink=null;
+
+function nativeMessage(action,value=''){
+  const payload=`LYRICSED::${action}::${String(value||'')}`;
+  try{
+    if(window.Kodular&&typeof window.Kodular.setWebViewString==='function'){
+      window.Kodular.setWebViewString(`${payload}::${Date.now()}`);
+      return true;
+    }
+  }catch{}
+  try{
+    if(window.AppInventor&&typeof window.AppInventor.setWebViewString==='function'){
+      window.AppInventor.setWebViewString(`${payload}::${Date.now()}`);
+      return true;
+    }
+  }catch{}
+  return false;
 }
-$$('.smart-link').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openSmartLink(a.href,a.dataset.smartLink||'web')}));
+
+function normalizeFacebookUrl(url){
+  return String(url||'').replace('://web.facebook.com/', '://www.facebook.com/');
+}
+
+function openFacebookChoice(url,name='Chorale Sedera Ambalavato'){
+  pendingFacebookLink=normalizeFacebookUrl(url);
+  $("facebookChoiceName").textContent=name||'Chorale Sedera Ambalavato';
+  $("facebookChoiceModal").classList.remove('hidden');
+  $("facebookChoiceModal").setAttribute('aria-hidden','false');
+}
+
+function closeFacebookChoice(){
+  $("facebookChoiceModal").classList.add('hidden');
+  $("facebookChoiceModal").setAttribute('aria-hidden','true');
+}
+
+function openFacebookInside(){
+  if(!pendingFacebookLink)return;
+  const url=pendingFacebookLink;
+  closeFacebookChoice();
+
+  if(!nativeMessage('FACEBOOK_INSIDE',url)){
+    // Browser fallback when LyriCSED is viewed outside Kodular.
+    try{window.open(url,'_blank')}catch{}
+  }
+}
+
+function openFacebookExternal(){
+  if(!pendingFacebookLink)return;
+  const url=pendingFacebookLink;
+  closeFacebookChoice();
+
+  if(!nativeMessage('FACEBOOK_EXTERNAL',url)){
+    try{window.open(url,'_blank')}catch{location.href=url}
+  }
+}
+
+function openSmartLink(url,kind='web',label=''){
+  if(!url)return;
+  const target=kind==='facebook'?normalizeFacebookUrl(url):String(url);
+
+  if(kind==='facebook'){
+    openFacebookChoice(target,label);
+    return;
+  }
+
+  // Normal website: keep the current LyriCSED behavior.
+  try{window.location.href=target}catch{
+    try{window.open(target,'_blank')}catch{}
+  }
+}
+
+function closeTransientUi(){
+  if(!$("facebookChoiceModal").classList.contains('hidden')){
+    closeFacebookChoice();
+    return true;
+  }
+  if(!$("globalMiniPlayer").classList.contains('hidden')){
+    closeGlobalMiniPlayer();
+    return true;
+  }
+  if(!$("libraryPicker").classList.contains('hidden')){
+    closeLibraryPicker();
+    return true;
+  }
+  if(!$("exitConfirmModal").classList.contains('hidden')){
+    hideExitConfirmation();
+    return true;
+  }
+  return false;
+}
+
+function showExitConfirmation(){
+  $("exitConfirmModal").classList.remove('hidden');
+  $("exitConfirmModal").setAttribute('aria-hidden','false');
+}
+function hideExitConfirmation(){
+  $("exitConfirmModal").classList.add('hidden');
+  $("exitConfirmModal").setAttribute('aria-hidden','true');
+}
+
+function handleAndroidBack(){
+  if(closeTransientUi())return 'handled';
+
+  if(currentView!=='home'){
+    history.back();
+    return 'back';
+  }
+
+  showExitConfirmation();
+  return 'confirm-exit';
+}
+
+window.LyriCSED=Object.assign(window.LyriCSED||{},{
+  handleAndroidBack,
+  showExitConfirmation,
+  hideExitConfirmation
+});
+
+$$('.smart-link').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault();
+  openSmartLink(a.href,a.dataset.smartLink||'web',a.textContent.trim());
+}));
+
+$("facebookOpenInside").onclick=openFacebookInside;
+$("facebookOpenExternal").onclick=openFacebookExternal;
+$("facebookChoiceCancel").onclick=closeFacebookChoice;
+$("facebookChoiceModal").addEventListener('click',e=>{
+  if(e.target===$("facebookChoiceModal"))closeFacebookChoice();
+});
+
+$("exitCancel").onclick=hideExitConfirmation;
+$("exitConfirm").onclick=()=>{
+  hideExitConfirmation();
+  if(!nativeMessage('EXIT_APP')){
+    toast("La fermeture complète est disponible dans l'application Android.");
+  }
+};
+$("exitConfirmModal").addEventListener('click',e=>{
+  if(e.target===$("exitConfirmModal"))hideExitConfirmation();
+});
 
 // Navigation
 $("updateBtn").onclick=forceAppUpdate;
