@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="mg">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0C4A6E">
+  <meta name="color-scheme" content="light">
+  <title>LyriCSED</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="i-search" viewBox="0 0 24 24"><path d="m21 21-4.35-4.35m1.35-5.15a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1V10Z"/></symbol>
+      <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+      <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></symbol>
+      <symbol id="i-note" viewBox="0 0 24 24"><path d="M5 3h14v18H5zM8 7h8M8 11h8M8 15h5"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 10v7M12 7h.01"/></symbol>
+      <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+      <symbol id="i-rewind" viewBox="0 0 24 24"><path d="M3 12h13M7 8l-4 4 4 4"/><path d="M12 8a5 5 0 1 1-1 7"/></symbol>
+      <symbol id="i-forward" viewBox="0 0 24 24"><path d="M21 12H8m9-4 4 4-4 4"/><path d="M12 8a5 5 0 1 0 1 7"/></symbol>
+      <symbol id="i-volume" viewBox="0 0 24 24"><path d="M5 10v4h4l5 4V6L9 10H5ZM17 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></symbol>
+      <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a3 3 0 0 1 3-3h13v17H7a3 3 0 0 0-3 3V5Z"/><path d="M4 19a3 3 0 0 1 3-3h13"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M5 21h14"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5"/><path d="M19 11a7.5 7.5 0 1 0 .4 4"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+
+      <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></symbol>
+      <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z"/></symbol>
+      <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
+      <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></symbol>
+      <symbol id="i-prev" viewBox="0 0 24 24"><path d="M6 5v14M18 6l-8 6 8 6z"/></symbol>
+      <symbol id="i-next" viewBox="0 0 24 24"><path d="M18 5v14M6 6l8 6-8 6z"/></symbol>
+    </svg>
+
+    <header class="app-header" id="mainHeader">
+      <div class="brand-lockup">
+        <img src="assets/images/icon-sedera.png" alt="Sedera" class="brand-mark">
+        <div><strong>LyriCSED</strong><span>Lyrics Chorale Sedera Ambalavato</span></div>
+      </div>
+      <div class="header-actions">
+        <button class="update-btn" id="updateBtn" type="button" title="Actualiser l'application">
+          <svg><use href="#i-refresh"/></svg><span>Actualiser</span>
+        </button>
+        <span class="demo-pill">DEMO</span>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section class="view active" id="homeView" data-view="home">
+        <div class="hero-premium">
+          <div class="hero-glow"></div>
+          <span class="kicker">HIRA • SOLFA • PLAYBACK</span>
+          <h1>Ny hirantsika,<br><em>eo am-pelatananao.</em></h1>
+          <p>Tononkira, solfa, playback ary fanamarihana ho an'ny famerenana.</p>
+          <div class="hero-meta"><span id="homeSongCount">0 hira</span><span id="syncPill">Fanomanana...</span></div>
+        </div>
+
+        <div class="verse-card">
+          <div class="verse-mark"><svg><use href="#i-book"/></svg></div>
+          <div>
+            <span class="verse-label">TENIN'ANDRIAMANITRA</span>
+            <p>“Aoka ny tenin'i Kristy hitoetra betsaka ao aminareo amin'ny fahendrena rehetra, dia mifampianara ka mifananara amin'ny salamo sy ny fihirana ary ny tonon-kiram-panahy, mihira amin'ny fhasoavana ao am-ponareo ho an'Andriamanitra.”</p>
+            <strong>Kolosiana 3:16</strong>
+          </div>
+        </div>
+
+        <div class="search-card global-search">
+          <svg><use href="#i-search"/></svg>
+          <input id="globalSearch" type="search" placeholder="Karohy ny hira..." autocomplete="off">
+          <kbd>⌕</kbd>
+        </div>
+
+        <div class="quick-grid">
+          <button class="quick-card" data-nav="songs"><span class="quick-icon"><svg><use href="#i-music"/></svg></span><span><b>Hira rehetra</b><small>Lyrics, Solfa, Playback</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
+          <button class="quick-card" data-nav="announcements"><span class="quick-icon"><svg><use href="#i-bell"/></svg></span><span><b>Filazan-draharaha</b><small>Vaovao sy fampahafantarana</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
+          <button class="quick-card" data-nav="playlists"><span class="quick-icon"><svg><use href="#i-list"/></svg></span><span><b>Playback & Planning</b><small>Liturgie, concert, Antsam-panahy</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
+          <button class="quick-card" data-nav="notes"><span class="quick-icon"><svg><use href="#i-note"/></svg></span><span><b>Fanamarihana</b><small>Notes de répétition</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
+        </div>
+
+        <div class="section-head"><div><span>VAOVAO</span><h2>Hira vao nosokafana</h2></div><button class="text-btn" data-nav="songs">Hijery rehetra</button></div>
+        <div class="recent-list" id="recentSongs"></div>
+      </section>
+
+      <section class="view" id="songsView" data-view="songs">
+        <div class="page-title"><span>TRANOM-BOKY</span><h1>Hira rehetra</h1><p>Karohy, tehirizo ary sokafy ny votoatin'ny hira.</p></div>
+        <div class="search-card"><svg><use href="#i-search"/></svg><input id="songSearch" type="search" placeholder="Lohateny na laharana..." autocomplete="off"></div>
+        <div class="chip-row"><button class="chip active" data-filter="all">Rehetra</button><button class="chip" data-filter="favorites">Favoris</button><button class="chip" data-filter="solfa">Misy Solfa</button><button class="chip" data-filter="instrumental">Misy Playback</button></div>
+        <div class="library-meta"><span id="libraryCount">0 hira</span><span id="libraryStatus"></span></div>
+        <div class="song-grid" id="songGrid"></div>
+      </section>
+
+      <section class="view song-detail" id="songView" data-view="song">
+        <div class="song-topbar">
+          <button class="circle-btn" id="songBack"><svg><use href="#i-back"/></svg></button>
+          <div class="song-mini-title"><span id="detailNumber">HIRA</span><strong id="detailMiniTitle">LyriCSED</strong></div>
+          <button class="circle-btn" id="favoriteBtn"><svg><use href="#i-heart"/></svg></button>
+        </div>
+
+        <div class="persistent-player" id="persistentPlayer">
+          <div class="mini-track"><img src="assets/images/icon-sedera.png" alt=""><div><strong id="miniTrackTitle">Playback</strong><span id="miniTrackTime">0:00 / 0:00</span></div></div>
+          <button id="miniRewind"><svg><use href="#i-rewind"/></svg></button><button class="mini-play" id="miniPlay"><svg><use href="#i-play"/></svg></button><button id="miniForward"><svg><use href="#i-forward"/></svg></button>
+        </div>
+
+        <div class="song-hero">
+          <div class="song-art"><img src="assets/images/icon-sedera.png" alt="Sedera"><div class="playing-bars" id="playingBars"><i></i><i></i><i></i><i></i></div></div>
+          <div class="song-heading"><span class="content-badge" id="availabilityBadge">LYRICS</span><h1 id="detailTitle">...</h1><p id="detailArtist">...</p></div>
+        </div>
+
+        <div class="segmented-tabs" role="tablist">
+          <button class="segment active" data-song-tab="lyrics"><svg><use href="#i-book"/></svg>Lyrics</button>
+          <button class="segment" data-song-tab="solfa"><svg><use href="#i-note"/></svg>Solfa</button>
+          <button class="segment" data-song-tab="instrumental"><svg><use href="#i-music"/></svg>Instrumental</button>
+        </div>
+
+        <div class="song-content-card">
+          <section class="tab-panel active" id="lyricsPanel">
+            <div class="reader-toolbar"><span>Haben'ny soratra</span><div><button id="fontDown">A−</button><span id="fontSizeValue">18</span><button id="fontUp">A+</button></div></div>
+            <div class="lyrics-text" id="lyricsText">...</div>
+            <div class="credits-card" id="creditsCard"></div>
+          </section>
+
+          <section class="tab-panel" id="solfaPanel">
+            <div id="solfaContent"></div>
+          </section>
+
+          <section class="tab-panel" id="instrumentalPanel">
+            <div class="advanced-player" id="advancedPlayer">
+              <div class="player-title-row"><div><span>PLAYBACK</span><strong id="audioTitle">Instrumental</strong></div><span class="offline-badge" id="audioCacheBadge">En ligne</span></div>
+
+              <div class="transport">
+                <button class="transport-btn" id="rewindBtn" title="Retour 10 secondes"><svg><use href="#i-rewind"/></svg><small>10</small></button>
+                <button class="main-play" id="mainPlayBtn"><svg><use href="#i-play"/></svg></button>
+                <button class="transport-btn" id="forwardBtn" title="Avance 10 secondes"><svg><use href="#i-forward"/></svg><small>10</small></button>
+              </div>
+
+              <div class="timeline"><div class="time-row"><span id="elapsed">0:00</span><span id="duration">0:00</span></div><input id="seekBar" class="range" type="range" min="0" max="1000" value="0"></div>
+
+              <div class="volume-row"><svg><use href="#i-volume"/></svg><input id="volumeBar" class="range" type="range" min="0" max="100" value="100"><span id="volumeValue">100%</span></div>
+
+              <div class="loop-card">
+                <div><span class="mini-label">RÉPÉTITION A/B</span><p>Safidio ny fiandohana sy fiafaran'ny ampahany haverina.</p></div>
+                <div class="loop-controls"><button id="setA">A <span id="aTime">--:--</span></button><button id="setB">B <span id="bTime">--:--</span></button><button id="toggleLoop" class="loop-toggle">Répéter</button><button id="clearLoop" class="ghost-btn">Effacer</button></div>
+              </div>
+
+              <div class="markers-card">
+                <div class="markers-head"><div><span class="mini-label">REPÈRES DE RÉPÉTITION</span><p>Tsindrio ny repère iray mba hitsambikina amin'io fotoana io.</p></div></div>
+                <div class="marker-list" id="markerList"></div>
+                <div class="marker-add"><input id="markerLabel" type="text" maxlength="32" placeholder="Ohatra: Refrain"><button id="addMarkerBtn"><svg><use href="#i-plus"/></svg>Mariho</button></div>
+              </div>
+            </div>
+            <div class="empty-panel" id="instrumentalEmpty"><span class="empty-icon"><svg><use href="#i-music"/></svg></span><h3>Instrumental à venir</h3><p>Mbola tsy misy playback ho an'ity hira ity.</p></div>
+          </section>
+        </div>
+
+        <div class="song-note-card"><div class="note-head"><div><span>NOTE DE RÉPÉTITION</span><strong>Fanamarihana manokana</strong></div><span id="songNoteSaved">Voatahiry</span></div><textarea id="songNote" rows="4" placeholder="Soraty eto ny fanamarihanao..."></textarea></div>
+
+      </section>
+
+
+      <section class="view" id="playlistsView" data-view="playlists">
+        <div class="page-title">
+          <span>PLAYBACK & PLANNING</span>
+          <h1>Préparer un événement</h1>
+          <p>Safidio sy alamino mialoha ny playback ampiasaina amin'ny liturgie, Antsam-panahy na concert.</p>
+        </div>
+
+        <div class="planner-switch" role="tablist">
+          <button class="planner-tab active" data-planner-type="liturgy">Liturgie</button>
+          <button class="planner-tab" data-planner-type="concert">Concert / Antsam-panahy</button>
+        </div>
+
+        <div class="planner-panel active" id="liturgyPlanner">
+          <div class="planner-intro">
+            <span class="mini-label">PLAYBACK LITURGIE</span>
+            <h2>Filaharan'ny playback</h2>
+            <p>Azonao ampidirina avy amin'ny LyriCSED na avy amin'ny rakitra audio ao amin'ny finday.</p>
+          </div>
+
+          <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="prelude">
+            <div class="playlist-section-head">
+              <div><span>01</span><div><h3>PRÉLUDE</h3><p>Playback alohan'ny fanombohana</p></div></div>
+              <button class="section-play" data-play-section="liturgy:prelude"><svg><use href="#i-play"/></svg>Lire</button>
+            </div>
+            <div class="playlist-items" id="playlist-liturgy-prelude"></div>
+            <div class="playlist-add-row">
+              <button data-add-library="liturgy:prelude"><svg><use href="#i-music"/></svg>LyriCSED</button>
+              <button data-add-phone="liturgy:prelude"><svg><use href="#i-folder"/></svg>Téléphone</button>
+            </div>
+          </div>
+
+          <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="interlude">
+            <div class="playlist-section-head">
+              <div><span>02</span><div><h3>INTERLUDE</h3><p>Playback eo anelanelan'ny fotoana</p></div></div>
+              <button class="section-play" data-play-section="liturgy:interlude"><svg><use href="#i-play"/></svg>Lire</button>
+            </div>
+            <div class="playlist-items" id="playlist-liturgy-interlude"></div>
+            <div class="playlist-add-row">
+              <button data-add-library="liturgy:interlude"><svg><use href="#i-music"/></svg>LyriCSED</button>
+              <button data-add-phone="liturgy:interlude"><svg><use href="#i-folder"/></svg>Téléphone</button>
+            </div>
+          </div>
+
+          <div class="playlist-section" data-playlist-type="liturgy" data-playlist-section="rakitra">
+            <div class="playlist-section-head">
+              <div><span>03</span><div><h3>RAKITRA</h3><p>Playback mandritra ny rakitra</p></div></div>
+              <button class="section-play" data-play-section="liturgy:rakitra"><svg><use href="#i-play"/></svg>Lire</button>
+            </div>
+            <div class="playlist-items" id="playlist-liturgy-rakitra"></div>
+            <div class="playlist-add-row">
+              <button data-add-library="liturgy:rakitra"><svg><use href="#i-music"/></svg>LyriCSED</button>
+              <button data-add-phone="liturgy:rakitra"><svg><use href="#i-folder"/></svg>Téléphone</button>
+            </div>
+          </div>
+
+          <button class="play-event-btn" data-play-event="liturgy"><svg><use href="#i-play"/></svg><span><strong>Lire toute la liturgie</strong><small>PRÉLUDE → INTERLUDE → RAKITRA</small></span></button>
+        </div>
+
+        <div class="planner-panel" id="concertPlanner">
+          <div class="planner-intro">
+            <span class="mini-label">PLANNING CONCERT / ANTSAM-PANAHY</span>
+            <h2>Déroulement complet</h2>
+            <p>Ampidiro hira maromaro isaky ny partie ary alamino amin'ny filaharana tianao.</p>
+          </div>
+
+          <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part1">
+            <div class="playlist-section-head">
+              <div><span>I</span><div><h3>PARTIE I</h3><p>Fizarana voalohany</p></div></div>
+              <button class="section-play" data-play-section="concert:part1"><svg><use href="#i-play"/></svg>Lire</button>
+            </div>
+            <div class="playlist-items" id="playlist-concert-part1"></div>
+            <div class="playlist-add-row">
+              <button data-add-library="concert:part1"><svg><use href="#i-music"/></svg>LyriCSED</button>
+              <button data-add-phone="concert:part1"><svg><use href="#i-folder"/></svg>Téléphone</button>
+            </div>
+          </div>
+
+          <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part2">
+            <div class="playlist-section-head">
+              <div><span>II</span><div><h3>PARTIE II</h3><p>Fizarana faharoa</p></div></div>
+              <button class="section-play" data-play-section="concert:part2"><svg><use href="#i-play"/></svg>Lire</button>
+            </div>
+            <div class="playlist-items" id="playlist-concert-part2"></div>
+            <div class="playlist-add-row">
+              <button data-add-library="concert:part2"><svg><use href="#i-music"/></svg>LyriCSED</button>
+              <button data-add-phone="concert:part2"><svg><use href="#i-folder"/></svg>Téléphone</button>
+            </div>
+          </div>
+
+          <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part3">
+            <div class="playlist-section-head">
+              <div><span>III</span><div><h3>PARTIE III</h3><p>Fizarana fahatelo</p></div></div>
+              <button class="section-play" data-play-section="concert:part3"><svg><use href="#i-play"/></svg>Lire</button>
+            </div>
+            <div class="playlist-items" id="playlist-concert-part3"></div>
+            <div class="playlist-add-row">
+              <button data-add-library="concert:part3"><svg><use href="#i-music"/></svg>LyriCSED</button>
+              <button data-add-phone="concert:part3"><svg><use href="#i-folder"/></svg>Téléphone</button>
+            </div>
+          </div>
+
+          <button class="play-event-btn" data-play-event="concert"><svg><use href="#i-play"/></svg><span><strong>Lire tout le planning</strong><small>PARTIE I → PARTIE II → PARTIE III</small></span></button>
+        </div>
+
+        <div class="event-player" id="eventPlayer">
+          <div class="event-player-head">
+            <div><span id="eventPlayerSection">PLAYLIST</span><strong id="eventPlayerTitle">Aucun playback</strong></div>
+            <button id="eventStopBtn" class="event-stop" type="button"><svg><use href="#i-close"/></svg></button>
+          </div>
+          <div class="event-player-controls">
+            <button id="eventPrevBtn"><svg><use href="#i-prev"/></svg></button>
+            <button id="eventPlayBtn" class="event-main-play"><svg><use href="#i-play"/></svg></button>
+            <button id="eventNextBtn"><svg><use href="#i-next"/></svg></button>
+          </div>
+          <div class="event-time-row"><span id="eventElapsed">0:00</span><span id="eventDuration">0:00</span></div>
+          <input id="eventSeek" class="range" type="range" min="0" max="1000" value="0">
+          <div class="event-volume"><svg><use href="#i-volume"/></svg><input id="eventVolume" class="range" type="range" min="0" max="100" value="100"><span id="eventVolumeValue">100%</span></div>
+          <div class="event-queue-meta"><span id="eventQueuePosition">0 / 0</span><span>Lecture automatique du morceau suivant</span></div>
+        </div>
+
+        <div class="playlist-storage-note">
+          <svg><use href="#i-download"/></svg>
+          <div><strong>Enregistrement local</strong><p>Ny playlist sy ny audio ampidirina avy amin'ny finday dia tehirizina eo an-toerana mba ho azo ampiasaina offline.</p></div>
+        </div>
+      </section>
+
+      <section class="view" id="announcementsView" data-view="announcements">
+        <div class="page-title"><span>FILAZAN-DRAHARAHA</span><h1>Vaovao sy fampahafantarana</h1><p>Ny vaovao voaray farany dia tehirizina ho azo vakiana offline.</p></div>
+        <div class="announcement-list" id="announcementList"></div>
+      </section>
+
+      <section class="view" id="notesView" data-view="notes">
+        <div class="page-title"><span>FANAMARIHANA</span><h1>Notes de répétition</h1><p>Voatahiry ho azy ao amin'ny findainao ny zavatra soratanao.</p></div>
+        <div class="notes-card"><div class="note-head"><div><span>AUTOSAVE</span><strong>Fanamarihana ankapobeny</strong></div><span id="generalSaved">Voatahiry</span></div><textarea id="generalNotes" rows="14" placeholder="Soraty eto ny zavatra tokony hotadidina amin'ny famerenana..."></textarea></div>
+      </section>
+
+      <section class="view" id="aboutView" data-view="about">
+        <div class="about-hero"><img src="assets/images/icon-sedera.png" alt="Sedera"><span class="demo-pill large">VERSION DÉMO</span><h1>LyriCSED</h1><p>Lyrics Chorale Sedera Ambalavato<br>FLM Antsirabe</p></div>
+        <div class="about-card"><div><span>Créée par</span><strong>Ankino MG</strong></div><img src="assets/images/ankino-logo.webp" alt="Ankino MG"></div>
+        <div class="about-meta"><div><span>Version</span><strong>Démo</strong></div><div><span>Date</span><strong>Septembre 2026</strong></div><div><span>Mode</span><strong>Online + Offline</strong></div></div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" id="bottomNav">
+      <button class="nav-item active" data-nav="home"><svg><use href="#i-home"/></svg><span>Accueil</span></button>
+      <button class="nav-item" data-nav="songs"><svg><use href="#i-music"/></svg><span>Hira</span></button>
+      <button class="nav-item" data-nav="announcements"><svg><use href="#i-bell"/></svg><span>Vaovao</span></button>
+      <button class="nav-item" data-nav="playlists"><svg><use href="#i-list"/></svg><span>Planning</span></button>
+      <button class="nav-item" data-nav="about"><svg><use href="#i-info"/></svg><span>À propos</span></button>
+    </nav>
+
+    <audio id="audio" preload="metadata" controlsList="nodownload noplaybackrate" disablePictureInPicture oncontextmenu="return false"></audio>
+
+    <div class="picker-overlay hidden" id="libraryPicker" aria-hidden="true">
+      <div class="picker-sheet">
+        <div class="picker-head">
+          <div><span>LYRICSED</span><h2>Choisir un playback</h2></div>
+          <button id="closeLibraryPicker" type="button"><svg><use href="#i-close"/></svg></button>
+        </div>
+        <div class="search-card picker-search"><svg><use href="#i-search"/></svg><input id="playlistLibrarySearch" type="search" placeholder="Karohy ny playback..." autocomplete="off"></div>
+        <div class="picker-list" id="playlistLibraryList"></div>
+      </div>
+    </div>
+    <input id="localAudioPicker" class="file-picker-hidden" type="file" accept="audio/*,.mp3,.wav,.mpeg,.mpga,.m4a,.aac,.ogg,.flac" multiple>
+    <audio id="playlistAudio" preload="metadata"></audio>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="sync-overlay hidden" id="syncOverlay" role="status" aria-live="polite">
+      <div class="sync-modal">
+        <div class="sync-logo"><img src="assets/images/icon-sedera.png" alt=""></div>
+        <span class="sync-kicker">LYRICSED OFFLINE</span>
+        <h2 id="syncTitle">Fanomanana offline</h2>
+        <p id="syncMessage">Alaina sy tehirizina ao amin'ny finday ny votoaty ilaina.</p>
+        <div class="sync-progress"><i id="syncProgress"></i></div>
+        <div class="sync-meta"><span id="syncCount">0 / 0</span><span id="syncPercent">0%</span></div>
+        <button class="sync-retry hidden" id="syncRetry" type="button">Hanandrana indray</button>
+      </div>
+    </div>
+
+  </div>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

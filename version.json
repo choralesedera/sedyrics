@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 6,
+  "contentVersion": 6,
+  "updatedAt": "2026-09-21T12:45:00+03:00",
+  "catalog": "data/songs.json",
+  "announcements": "data/announcements.json",
+  "prefetch": {
+    "lyrics": true,
+    "solfas": true,
+    "instrumentals": true
+  },
+  "offline": {
+    "downloadAllSongContentOnFirstSync": true,
+    "atomicUpdates": true,
+    "keepLocalDataIfUpdateFails": true
+  },
+  "features": {
+    "eventPlaylists": true,
+    "localAudioImport": true,
+    "localAudioIndexedDB": true,
+    "pitchShift": false
+  }
+}
