@@ -1,0 +1,27 @@
+LYRICSED v10 - REPAIR COMPLET
+
+Pourquoi la mise à jour restait à 17 chants :
+- la mise à jour v9 était un petit patch qui supposait que les fichiers Lyrics de la v8
+  existaient déjà tous sur GitHub ;
+- si un seul fichier référencé par data/songs.json manque sur GitHub, le système Offline First
+  annule la mise à jour et garde l'ancienne bibliothèque locale intacte ;
+- c'est exactement le comportement visible avec le message :
+  "Mise à jour non effectuée. Les données offline restent intactes."
+
+Ce pack réunit :
+- la dernière interface v9 ;
+- la numérotation alphabétique ;
+- les comptes officiels ;
+- tous les fichiers Lyrics présents dans la v8 ;
+- data/songs.json avec 28 chants ;
+- sw.js et manifest.webmanifest.
+
+Ce pack NE contient PAS instrumentals/ :
+ne supprimez donc jamais le dossier instrumentals déjà présent sur GitHub.
+
+Après upload :
+1. uploader le contenu du ZIP par-dessus les fichiers existants ;
+2. ne pas supprimer instrumentals/, solfa/ ni assets/images/ ;
+3. faire Commit changes ;
+4. attendre la publication GitHub Pages ;
+5. ouvrir LyriCSED avec Internet et appuyer sur Actualiser.
