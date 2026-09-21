@@ -85,16 +85,22 @@ async function getAnyCached(path){
   return null;
 }
 
-async function getCached(path){
+async function getCached(path,{timeout=10000}={}){
   const key=reqFor(path);
   const main=await caches.open(OFFLINE_CACHE);
   const cached=await getAnyCached(path);
   if(cached)return cached;
 
-  const r=await fetch(cleanPath(path),{cache:"no-store"});
-  if(!r.ok)throw new Error("resource unavailable");
-  await main.put(key,r.clone());
-  return r;
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),timeout);
+  try{
+    const r=await fetch(cleanPath(path),{cache:"no-store",signal:controller.signal});
+    if(!r.ok)throw new Error("resource unavailable");
+    await main.put(key,r.clone());
+    return r;
+  }finally{
+    clearTimeout(timer);
+  }
 }
 
 async function networkFetch(path,{timeout=120000}={}){
@@ -184,37 +190,60 @@ async function forceAppUpdate(){
 }
 
 async function loadCatalog(){
+  // 1. Show the last known catalog immediately, before any network request.
+  const snapshot=readJSON(CATALOG_SNAPSHOT_KEY,null);
+  if(snapshot?.songs?.length){
+    SONGS=snapshot.songs;
+    $("syncPill").textContent="Données locales";
+    $("libraryStatus").textContent="Chargement local";
+    renderAll();
+  }
+
+  // 2. Try the active cache / network, but never leave the screen blank indefinitely.
   try{
-    const vr=await getCached("version.json");
+    const vr=await getCached("version.json",{timeout:7000});
     APP_VERSION=await vr.json();
 
     const catalogPath=APP_VERSION.catalog||"data/songs.json";
-    const cr=await getCached(catalogPath);
-    SONGS=(await cr.json()).songs||[];
+    const cr=await getCached(catalogPath,{timeout:7000});
+    const catalog=await cr.json();
+
+    if(catalog?.songs?.length){
+      SONGS=catalog.songs;
+      writeJSON(CATALOG_SNAPSHOT_KEY,catalog);
+    }
 
     try{
-      const ar=await getCached(APP_VERSION.announcements||"data/announcements.json");
+      const ar=await getCached(APP_VERSION.announcements||"data/announcements.json",{timeout:7000});
       ANNOUNCEMENTS=(await ar.json()).announcements||[];
     }catch{
-      ANNOUNCEMENTS=[];
+      ANNOUNCEMENTS=ANNOUNCEMENTS||[];
     }
 
     const state=readJSON(SYNC_STATE_KEY,null);
     if(state?.complete){
-      $("syncPill").textContent=navigator.onLine?`Offline prêt • v${state.contentVersion||APP_VERSION.contentVersion}`:"Offline prêt • hors connexion";
+      $("syncPill").textContent=navigator.onLine
+        ?`Offline prêt • v${state.contentVersion||APP_VERSION.contentVersion||""}`.replace(/ • v$/,"")
+        :"Offline prêt • hors connexion";
       $("libraryStatus").textContent=navigator.onLine?"Données locales prêtes":"Mode hors connexion";
     }else{
-      $("syncPill").textContent=navigator.onLine?"Téléchargement initial requis":"Première connexion requise";
-      $("libraryStatus").textContent=SONGS.length?"Données partielles":"Aucune donnée locale";
+      $("syncPill").textContent=SONGS.length?"Préparation offline...":"Première connexion requise";
+      $("libraryStatus").textContent=SONGS.length?"Catalogue chargé":"Aucune donnée locale";
     }
     renderAll();
   }catch{
-    $("syncPill").textContent="Première connexion requise";
-    $("libraryStatus").textContent="Aucune donnée locale";
-    renderAll();
+    // Keep showing the local snapshot instead of replacing it with "0 hira".
+    if(SONGS.length){
+      $("syncPill").textContent=navigator.onLine?"Données locales • vérification...":"Offline • données locales";
+      $("libraryStatus").textContent="Données locales disponibles";
+      renderAll();
+    }else{
+      $("syncPill").textContent=navigator.onLine?"Connexion au catalogue...":"Première connexion requise";
+      $("libraryStatus").textContent="Aucune donnée locale";
+      renderAll();
+    }
   }
 }
-
 async function syncOfflineLibrary({manual=false,initial=false}={}){
   if(syncInProgress)return false;
   syncInProgress=true;
@@ -222,24 +251,15 @@ async function syncOfflineLibrary({manual=false,initial=false}={}){
 
   let stageName=null;
   try{
-    // This request is deliberately NETWORK ONLY. The service worker must not return a cached copy.
     let versionResponse;
     try{
       versionResponse=await networkFetch("version.json",{timeout:9000});
     }catch{
       const state=readJSON(SYNC_STATE_KEY,null);
-      if(initial&&!state?.complete){
-        setSyncOverlay(true,{
-          title:"Connexion nécessaire",
-          message:"Ampifandraiso amin'ny Internet indray mandeha ny finday mba hisintonana sy hitahiry ny votoaty rehetra.",
-          retry:true
-        });
-        $("syncRetry").onclick=()=>syncOfflineLibrary({manual:true,initial:true});
-      }else{
-        setSyncOverlay(false);
-        if(manual)toast("Tsy misy connexion. Ny données offline dia voatahiry tsara.");
-        $("syncPill").textContent=state?.complete?"Offline prêt • hors connexion":"Première connexion requise";
-      }
+      setSyncOverlay(false);
+      if(manual)toast("Tsy misy connexion. Ny données offline dia tsy voakitika.");
+      $("syncPill").textContent=SONGS.length?"Offline • données locales":"Première connexion requise";
+      $("libraryStatus").textContent=SONGS.length?"Données locales disponibles":"Aucune donnée locale";
       return false;
     }
 
@@ -247,6 +267,7 @@ async function syncOfflineLibrary({manual=false,initial=false}={}){
     const catalogPath=remoteVersion.catalog||"data/songs.json";
     const announcementsPath=remoteVersion.announcements||"data/announcements.json";
 
+    // Core metadata first. These files are small and should never wait for MP3 downloads.
     const [catalogResponse,announcementsResponse]=await Promise.all([
       networkFetch(catalogPath,{timeout:15000}),
       networkFetch(announcementsPath,{timeout:15000})
@@ -255,6 +276,8 @@ async function syncOfflineLibrary({manual=false,initial=false}={}){
     const remoteCatalog=await catalogResponse.clone().json();
     const remoteAnnouncements=await announcementsResponse.clone().json();
     const remoteSongs=remoteCatalog.songs||[];
+
+    if(!remoteSongs.length)throw new Error("catalog empty");
 
     const oldCatalog=readJSON(CATALOG_SNAPSHOT_KEY,{songs:[]});
     const oldSongs=songMap(oldCatalog);
@@ -268,34 +291,34 @@ async function syncOfflineLibrary({manual=false,initial=false}={}){
         if(!now)continue;
         const before=resourceDescriptor(oldSong,kind);
         const cached=await getAnyCached(now.path);
-
         if(!cached||!sameDescriptor(now,before)){
-          if(!changedResources.some(x=>x.path===now.path))changedResources.push({...now,kind,songId:song.id});
+          if(!changedResources.some(x=>x.path===now.path)){
+            changedResources.push({...now,kind,songId:song.id});
+          }
         }
       }
     }
 
-    // Small application files are checked every time. This allows interface updates
-    // without forcing a new APK. Large audio files are fetched only if new/changed/missing.
-    const total=SHELL_FILES.length+3+changedResources.length;
+    const totalCore=SHELL_FILES.length+3;
+    const total=totalCore+changedResources.length;
     let done=0;
 
-    setSyncOverlay(initial||manual,{
-      title:initial?"Fanomanana offline":"Mise à jour",
-      message:initial
-        ?"Alaina indray mandeha ny paroles, solfas, playbacks ary ny votoaty hafa."
-        :"Jerena izay vaovao na niova. Tsy hovaina ny tahiry taloha raha misy erreur.",
-      done,total
-    });
+    if(initial||manual){
+      setSyncOverlay(true,{
+        title:initial?"Fanomanana offline":"Mise à jour",
+        message:"Chargement du catalogue et de l'interface...",
+        done,total
+      });
+    }
 
-    $("syncPill").textContent=initial?"Téléchargement offline...":"Vérification...";
+    $("syncPill").textContent="Mise à jour du catalogue...";
     $("libraryStatus").textContent="Synchronisation";
 
+    // Stage only the critical small files atomically.
     stageName=`${STAGING_PREFIX}${Date.now()}`;
     const stage=await caches.open(stageName);
     let shellChanged=false;
 
-    // Stage version/catalog/announcements already fetched from the real network.
     await putStage(stage,"version.json",versionResponse); done++;
     setSyncOverlay(initial||manual,{done,total});
     await putStage(stage,catalogPath,catalogResponse); done++;
@@ -303,66 +326,82 @@ async function syncOfflineLibrary({manual=false,initial=false}={}){
     await putStage(stage,announcementsPath,announcementsResponse); done++;
     setSyncOverlay(initial||manual,{done,total});
 
-    // Stage the small UI files. Nothing in the active cache is changed yet.
     for(const path of SHELL_FILES){
-      const fresh=await networkFetch(path,{timeout:30000});
-      const old=await getAnyCached(path);
-      if(await responseDifferent(old,fresh))shellChanged=true;
-      await putStage(stage,path,fresh);
+      try{
+        const fresh=await networkFetch(path,{timeout:20000});
+        const old=await getAnyCached(path);
+        if(await responseDifferent(old,fresh))shellChanged=true;
+        await putStage(stage,path,fresh);
+      }catch{
+        // One optional shell refresh must not erase the current app.
+      }
       done++;
       setSyncOverlay(initial||manual,{done,total});
     }
 
-    // Stage only song resources that are actually missing or whose revision changed.
-    for(const item of changedResources){
-      const fresh=await networkFetch(item.path,{timeout:240000});
-      await putStage(stage,item.path,fresh);
-      done++;
-      setSyncOverlay(initial||manual,{
-        done,total,
-        message:initial
-          ?`Téléchargement offline en cours • ${item.kind}`
-          :`Mise à jour du contenu • ${item.kind}`
-      });
-    }
-
-    // All network downloads succeeded. Only now do we replace the active offline cache.
+    // Promote core/catalog now. The song list becomes usable immediately.
     const stagedRequests=await stage.keys();
     for(const request of stagedRequests){
       const response=await stage.match(request);
       if(response)await main.put(request,response.clone());
     }
 
-    // Store canonical base-path copies as well, so query strings are never required offline.
-    const canonical=[
-      ["version.json",versionResponse],
-      [catalogPath,catalogResponse],
-      [announcementsPath,announcementsResponse]
-    ];
-    for(const [path,response] of canonical)await main.put(reqFor(path),response.clone());
-
-    writeJSON(CATALOG_SNAPSHOT_KEY,remoteCatalog);
-    writeJSON(SYNC_STATE_KEY,{
-      complete:true,
-      contentVersion:remoteVersion.contentVersion||0,
-      updatedAt:new Date().toISOString(),
-      songCount:remoteSongs.length
-    });
+    await main.put(reqFor("version.json"),versionResponse.clone());
+    await main.put(reqFor(catalogPath),catalogResponse.clone());
+    await main.put(reqFor(announcementsPath),announcementsResponse.clone());
 
     APP_VERSION=remoteVersion;
     SONGS=remoteSongs;
     ANNOUNCEMENTS=remoteAnnouncements.announcements||[];
+    writeJSON(CATALOG_SNAPSHOT_KEY,remoteCatalog);
     renderAll();
 
-    $("syncPill").textContent=`Offline prêt • v${remoteVersion.contentVersion||""}`.replace(/ • v$/,"");
-    $("libraryStatus").textContent="Données locales prêtes";
+    $("syncPill").textContent=changedResources.length
+      ?`Préparation offline • 0/${changedResources.length}`
+      :`Offline prêt • v${remoteVersion.contentVersion||""}`.replace(/ • v$/,"");
+    $("libraryStatus").textContent="Catalogue disponible";
 
-    // Ask Android/browser storage to keep the offline data when possible.
+    // From this point on, each media/lyrics file is independent.
+    // A missing MP3 must not cancel Lyrics, catalogue, or all other songs.
+    let completedMedia=0;
+    let failedMedia=0;
+
+    for(const item of changedResources){
+      try{
+        const fresh=await networkFetch(item.path,{
+          timeout:item.kind==="instrumental"?180000:30000
+        });
+        await main.put(reqFor(item.path),fresh.clone());
+      }catch{
+        failedMedia++;
+      }
+
+      completedMedia++;
+      done++;
+      $("syncPill").textContent=`Préparation offline • ${completedMedia}/${changedResources.length}`;
+      $("libraryStatus").textContent=failedMedia
+        ?`${failedMedia} fichier${failedMedia>1?"s":""} à reprendre`
+        :"Téléchargement des contenus";
+
+      setSyncOverlay(initial||manual,{
+        done,total,
+        message:`Téléchargement des contenus • ${completedMedia}/${changedResources.length}`
+      });
+    }
+
+    // The catalog update is valid even if one media file could not be cached.
+    writeJSON(SYNC_STATE_KEY,{
+      complete:failedMedia===0,
+      contentVersion:remoteVersion.contentVersion||0,
+      updatedAt:new Date().toISOString(),
+      songCount:remoteSongs.length,
+      pendingFiles:failedMedia
+    });
+
     try{
       if(navigator.storage?.persist)await navigator.storage.persist();
     }catch{}
 
-    // Refresh service worker metadata, but never unregister it and never delete the offline cache.
     try{
       if("serviceWorker" in navigator){
         const reg=await navigator.serviceWorker.getRegistration();
@@ -371,33 +410,30 @@ async function syncOfflineLibrary({manual=false,initial=false}={}){
     }catch{}
 
     setSyncOverlay(false);
-    if(manual||initial||changedResources.length||shellChanged){
-      toast(changedResources.length||shellChanged?"Mise à jour terminée • Offline prêt":"Déjà à jour • Offline prêt");
+
+    if(failedMedia){
+      $("syncPill").textContent=`${remoteSongs.length} hira • ${failedMedia} fichier${failedMedia>1?"s":""} à reprendre`;
+      $("libraryStatus").textContent="Catalogue prêt • synchronisation partielle";
+      if(manual||initial)toast("Catalogue mis à jour. Certains fichiers seront repris à la prochaine connexion.");
+    }else{
+      $("syncPill").textContent=`Offline prêt • v${remoteVersion.contentVersion||""}`.replace(/ • v$/,"");
+      $("libraryStatus").textContent="Données locales prêtes";
+      if(manual||initial)toast("Mise à jour terminée • Offline prêt");
     }
 
-    // If HTML/CSS/JS changed, reload from the newly cached shell.
     if(shellChanged&&!initial){
       setTimeout(()=>location.reload(),650);
     }
     return true;
   }catch(err){
-    // Atomic rule: staging is discarded. The previous working cache stays untouched.
-    if(stageName)try{await caches.delete(stageName)}catch{}
-    const state=readJSON(SYNC_STATE_KEY,null);
-
-    if(initial&&!state?.complete){
-      setSyncOverlay(true,{
-        title:"Téléchargement interrompu",
-        message:"Ny données taloha dia tsy voafafa. Avereno rehefa misy connexion tsara.",
-        retry:true
-      });
-      $("syncRetry").onclick=()=>syncOfflineLibrary({manual:true,initial:true});
-    }else{
-      setSyncOverlay(false);
-      if(manual)toast("Mise à jour non effectuée. Les données offline restent intactes.");
-      $("syncPill").textContent=state?.complete?"Offline prêt":"Données locales";
-      $("libraryStatus").textContent=state?.complete?"Données locales prêtes":"Données partielles";
+    // Never blank the library on a synchronization error.
+    if(SONGS.length){
+      $("syncPill").textContent="Données locales disponibles";
+      $("libraryStatus").textContent="Mise à jour à reprendre";
+      renderAll();
     }
+    setSyncOverlay(false);
+    if(manual)toast("Mise à jour interrompue. La bibliothèque actuelle reste disponible.");
     return false;
   }finally{
     if(stageName)try{await caches.delete(stageName)}catch{}
@@ -405,7 +441,6 @@ async function syncOfflineLibrary({manual=false,initial=false}={}){
     setUpdateButtonLoading(false);
   }
 }
-
 function renderAll(){
   $("homeSongCount").textContent=`${SONGS.length} hira`;renderRecent();renderSongs();renderAnnouncements();
 }
@@ -1514,7 +1549,7 @@ async function boot(){
   await loadCatalog();
 
   const state=readJSON(SYNC_STATE_KEY,null);
-  const initial=!state?.complete;
+  const initial=!state?.complete||!SONGS.length;
   syncOfflineLibrary({manual:false,initial}).catch(()=>{});
 }
 boot();
