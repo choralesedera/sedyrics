@@ -1,5 +1,6 @@
 {
-  "schemaVersion": 12,
+  "schemaVersion": 13,
+  "appVersion": "2.0",
   "files": [
     {
       "path": "AUDIT-LyriCSED-v11.md",
@@ -20,6 +21,11 @@
       "path": "AUDIT-LyriCSED-v9.md",
       "size": 1624,
       "sha256": "64f0a2beab7bb03ca5c87e383fd59aae3209102b12dc434d275367f91885ccc7"
+    },
+    {
+      "path": "CORRECTIF-v2.0.txt",
+      "size": 866,
+      "sha256": "a818d25312fb5aa4bb1e93df47f626e548f161549147c43ad605889e80c082da"
     },
     {
       "path": "KODULAR-v12-INTEGRATION.txt",
@@ -43,8 +49,8 @@
     },
     {
       "path": "assets/js/app.js",
-      "size": 61822,
-      "sha256": "fdf40aa8be34b050e5421f51d09f3f59153eacc52b08a49eb7627afd0a162599"
+      "size": 62794,
+      "sha256": "9f833132c79a5da3ad4c86d5bd7c7c479c59739b6766661abc8a5e0c9ee499bb"
     },
     {
       "path": "data/songs.json",
@@ -193,8 +199,8 @@
     },
     {
       "path": "version.json",
-      "size": 528,
-      "sha256": "4841891f0fab97115bd096c4480afcc4c4fd3c4e22bd79cef376861e6941ab6f"
+      "size": 575,
+      "sha256": "584851ef7846b9457db018369d39d3d29e42ba09c8434dfb6bb55572666ae952"
     }
   ]
 }

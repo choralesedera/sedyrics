@@ -1,0 +1,17 @@
+LYRICSED v2.0 - CORRECTIF DEMARRAGE / SYNCHRONISATION
+
+Problème corrigé :
+- l'application pouvait rester sur "0 hira / Fanomanana..." pendant qu'une requête réseau
+  ou un gros fichier audio bloquait la synchronisation ;
+- une seule ressource lente pouvait retarder toute la bibliothèque.
+
+Nouveau comportement :
+1. le dernier catalogue local est affiché immédiatement ;
+2. le nouveau songs.json est chargé et affiché avant le téléchargement des MP3 ;
+3. les Lyrics/Solfas/Playbacks sont ensuite mis en cache individuellement ;
+4. un MP3 indisponible ne bloque plus les 28 chants ni les Lyrics ;
+5. les requêtes de démarrage ont maintenant un délai maximum ;
+6. l'état "Préparation offline X/Y" indique réellement la progression ;
+7. si un fichier échoue, il sera repris à la prochaine connexion.
+
+Le fonctionnement Offline First reste conservé.
