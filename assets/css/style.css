@@ -318,3 +318,95 @@
   .delay-settings select{width:100%}
   .nav-item span{font-size:7px}
 }
+
+
+/* LyriCSED v8 - fusion complète, zoom HTML et lecteur compact */
+.segment.disabled,.segment:disabled{opacity:.38;pointer-events:none;filter:grayscale(.35)}
+.reader-zoom-bar{
+  margin:10px 0 12px;padding:9px 10px;border:1px solid #D8EAF2;border-radius:16px;background:rgba(255,255,255,.94);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 6px 18px rgba(8,47,73,.04)
+}
+.reader-zoom-bar.hidden{display:none}
+.reader-zoom-bar>span{display:flex;align-items:center;gap:6px;color:#64808D;font-size:10px;font-weight:800}
+.reader-zoom-bar>span svg{width:15px;height:15px;color:#1689B5}
+.reader-zoom-actions{display:flex;align-items:center;gap:5px}
+.reader-zoom-actions button{
+  min-width:36px;height:34px;border:1px solid #D5E7EF;border-radius:11px;background:linear-gradient(145deg,#fff,#EFF8FC);
+  color:#0B536F;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 4px 11px rgba(8,47,73,.05);transition:.14s
+}
+.reader-zoom-actions button:active{transform:scale(.93);background:#E3F4FB}
+.reader-zoom-actions button svg{width:15px;height:15px}
+.reader-zoom-actions .zoom-reset{min-width:68px;padding:0 8px}
+.reader-zoom-actions .zoom-reset strong{font-size:9px}
+.solfa-view{overflow:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.solfa-view img{transition:width .18s ease;margin:0 auto}
+
+/* Compact player, always separated above Liturgie/Concert */
+.global-event-player{
+  padding:9px 12px 10px!important;border-radius:0 0 18px 18px;background:linear-gradient(145deg,rgba(6,54,78,.99),rgba(7,101,139,.99))!important
+}
+.global-event-player .event-player-head{position:relative;padding-right:122px;min-height:36px}
+.global-event-player .event-player-head>div{min-width:0}
+.global-event-player .event-player-head>div>span{font-size:7px!important}
+.global-event-player .event-player-head strong{display:block;font-size:12px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.global-event-player .event-player-head small{font-size:8px!important;margin-top:2px!important}
+.global-event-player .event-stop{position:absolute;right:0;top:1px;width:29px;height:29px}
+.global-event-player .event-player-controls{position:absolute;right:35px;top:8px;margin:0!important;gap:3px!important}
+.global-event-player .event-player-controls button{width:28px;height:28px}
+.global-event-player .event-player-controls .event-main-play{width:34px!important;height:34px!important}
+.global-event-player .event-time-row{font-size:8px;margin-top:6px;margin-bottom:3px}
+.global-event-player .range{height:4px}
+.global-event-player .event-volume{display:grid;grid-template-columns:16px 1fr 34px;gap:5px;margin-top:4px!important;font-size:8px}
+.global-event-player .event-volume svg{width:14px}
+.global-event-player .event-countdown{margin-top:6px;padding:7px 8px;border-radius:11px}
+.global-event-player .event-countdown span{font-size:6px}.global-event-player .event-countdown strong{font-size:11px}
+.global-event-player .event-countdown button{padding:7px 8px;font-size:8px;border-radius:9px}
+.global-event-player .up-next{margin-top:6px;padding-top:6px}
+.global-event-player .up-next>span{font-size:6px;margin-bottom:3px}
+.global-event-player #eventUpcomingList{display:flex;gap:5px;overflow:auto;padding-bottom:1px}
+.global-event-player .up-next-item{flex:0 0 auto;display:flex;gap:5px;max-width:180px;padding:4px 7px;border-radius:9px;background:rgba(255,255,255,.08)}
+.global-event-player .up-next-item span{width:18px;height:18px;border-radius:6px;font-size:6px}
+.global-event-player .up-next-item strong{font-size:8px;max-width:130px}
+.global-event-player .event-queue-meta{margin-top:5px;font-size:7px!important}
+
+/* Header playback indicator: compact, visible for song playback and event playlist */
+.header-playback{max-width:170px!important}
+.header-playback-copy strong{font-size:9px!important}
+.header-playback.playing .header-disc{animation:discSpin 2.1s linear infinite}
+.header-playback:not(.playing) .header-disc{animation-play-state:paused}
+
+/* About links */
+.about-link{text-decoration:none;color:inherit;cursor:pointer}
+.about-link-icon{width:42px;height:42px;border-radius:14px;background:#EEF8FC;color:#0B668F;display:grid!important;place-items:center}
+.about-link-icon svg{width:19px;height:19px}
+.about-socials{display:grid;gap:8px;margin-top:10px}
+.social-link{min-height:48px;border:1px solid var(--line);border-radius:16px;background:#fff;color:var(--navy2);display:flex;align-items:center;gap:11px;padding:0 13px;text-align:left;box-shadow:0 5px 14px rgba(8,47,73,.035)}
+.social-link svg{width:20px;height:20px;color:#1877F2;fill:currentColor;stroke:none}
+.social-link strong{font-size:11px}
+.pending-social{opacity:.72}
+
+/* Readability */
+.song-card p,.playlist-track-copy>span,.quick-card small,.about-hero p{font-size:11px!important}
+.song-card h3{font-size:15px!important}
+.lyrics-text{line-height:1.78}
+
+@media(max-width:420px){
+  .header-playback{max-width:128px!important}
+  .reader-zoom-bar>span{font-size:9px}
+  .reader-zoom-actions button{min-width:34px;height:32px}
+  .global-event-player .event-player-head{padding-right:112px}
+}
+
+
+/* LyriCSED v9 - comptes officiels */
+.about-social-heading{
+  margin-top:16px;padding:0 3px 4px;display:flex;align-items:end;justify-content:space-between;gap:12px
+}
+.about-social-heading span{
+  font-size:8px;letter-spacing:1.2px;font-weight:900;color:#3497BC
+}
+.about-social-heading strong{
+  font-size:10px;color:var(--navy2);text-align:right
+}
+.social-link{text-decoration:none}
+.social-link:active{transform:scale(.985)}
