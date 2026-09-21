@@ -1,0 +1,946 @@
+const OFFLINE_CACHE="lyricsed-offline-v1";
+const CONTENT_CACHE=OFFLINE_CACHE;
+const STAGING_PREFIX="lyricsed-staging-";
+const SYNC_STATE_KEY="lyricsedOfflineSyncStateV1";
+const CATALOG_SNAPSHOT_KEY="lyricsedCatalogSnapshotV1";
+const SHELL_FILES=[
+  "index.html",
+  "assets/css/style.css",
+  "assets/js/app.js",
+  "assets/images/icon-sedera.png",
+  "assets/images/ankino-logo.webp",
+  "manifest.webmanifest",
+  "sw.js"
+];
+
+const $=id=>document.getElementById(id);
+const $$=sel=>[...document.querySelectorAll(sel)];
+let SONGS=[],ANNOUNCEMENTS=[],APP_VERSION=null,currentSong=null,currentView="home",songFilter="all",
+favorites=readJSON("sedyricsFavorites",[]).map(Number),
+fontSize=Number(localStorage.getItem("sedyricsFontSize")||18),
+audioObjectUrl=null,loopA=null,loopB=null,loopEnabled=false,toastTimer=null,syncInProgress=false;
+const audio=$("audio");
+
+function readJSON(k,fallback){try{const v=JSON.parse(localStorage.getItem(k));return v??fallback}catch{return fallback}}
+function writeJSON(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function normalize(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+function withRevision(path,rev=1){return path||null}
+function icon(id){return `<svg><use href="#${id}"/></svg>`}
+function fmt(sec){if(!Number.isFinite(sec))return"0:00";return `${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,"0")}`}
+function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2200)}
+function cleanPath(path){return String(path||"").split("?")[0].replace(/^\.?\//,"")}
+function reqFor(path){return new Request(new URL(cleanPath(path),location.href).toString(),{method:"GET"})}
+
+async function getAnyCached(path){
+  const key=reqFor(path);
+  const main=await caches.open(OFFLINE_CACHE);
+  let hit=await main.match(key,{ignoreSearch:true});
+  if(hit)return hit;
+
+  try{
+    hit=await caches.match(key,{ignoreSearch:true});
+    if(hit){
+      try{await main.put(key,hit.clone())}catch{}
+      return hit;
+    }
+  }catch{}
+  return null;
+}
+
+async function getCached(path){
+  const key=reqFor(path);
+  const main=await caches.open(OFFLINE_CACHE);
+  const cached=await getAnyCached(path);
+  if(cached)return cached;
+
+  const r=await fetch(cleanPath(path),{cache:"no-store"});
+  if(!r.ok)throw new Error("resource unavailable");
+  await main.put(key,r.clone());
+  return r;
+}
+
+async function networkFetch(path,{timeout=120000}={}){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),timeout);
+  try{
+    const base=cleanPath(path);
+    const url=new URL(base,location.href);
+    url.searchParams.set("__network",Date.now().toString());
+    const r=await fetch(url.toString(),{cache:"no-store",signal:controller.signal});
+    if(!r.ok)throw new Error("network unavailable");
+    return r;
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+function resourceRevision(song,kind){
+  if(song?.revisions && song.revisions[kind]!==undefined)return Number(song.revisions[kind]||0);
+  const legacy=`${kind}Revision`;
+  if(song && song[legacy]!==undefined)return Number(song[legacy]||0);
+  return Number(song?.revision||1);
+}
+
+function resourceDescriptor(song,kind){
+  const path=song?.[kind];
+  if(!path)return null;
+  return {path:cleanPath(path),revision:resourceRevision(song,kind)};
+}
+
+function sameDescriptor(a,b){
+  return !!a&&!!b&&cleanPath(a.path)===cleanPath(b.path)&&Number(a.revision||0)===Number(b.revision||0);
+}
+
+function songMap(doc){
+  const out=new Map();
+  for(const s of (doc?.songs||[]))out.set(String(s.id),s);
+  return out;
+}
+
+function setSyncOverlay(show,{title,message,done=0,total=0,retry=false}={}){
+  const overlay=$("syncOverlay");
+  if(!overlay)return;
+  overlay.classList.toggle("hidden",!show);
+  if(!show)return;
+
+  if(title)$("syncTitle").textContent=title;
+  if(message)$("syncMessage").textContent=message;
+
+  const safeTotal=Math.max(0,Number(total)||0);
+  const safeDone=Math.max(0,Math.min(Number(done)||0,safeTotal||0));
+  const percent=safeTotal?Math.round((safeDone/safeTotal)*100):0;
+  $("syncProgress").style.width=`${percent}%`;
+  $("syncCount").textContent=safeTotal?`${safeDone} / ${safeTotal}`:"";
+  $("syncPercent").textContent=safeTotal?`${percent}%`:"";
+  $("syncRetry").classList.toggle("hidden",!retry);
+}
+
+function setUpdateButtonLoading(loading){
+  const btn=$("updateBtn");
+  if(!btn)return;
+  btn.classList.toggle("loading",loading);
+  btn.disabled=loading;
+  const label=btn.querySelector("span");
+  if(label)label.textContent=loading?"Mise à jour":"Actualiser";
+}
+
+async function responseDifferent(oldResponse,newResponse){
+  if(!oldResponse)return true;
+  try{
+    const [a,b]=await Promise.all([oldResponse.clone().arrayBuffer(),newResponse.clone().arrayBuffer()]);
+    if(a.byteLength!==b.byteLength)return true;
+    const aa=new Uint8Array(a),bb=new Uint8Array(b);
+    for(let i=0;i<aa.length;i++)if(aa[i]!==bb[i])return true;
+    return false;
+  }catch{
+    return true;
+  }
+}
+
+async function putStage(stage,path,response){
+  await stage.put(reqFor(path),response.clone());
+}
+
+async function forceAppUpdate(){
+  await syncOfflineLibrary({manual:true,initial:false});
+}
+
+async function loadCatalog(){
+  try{
+    const vr=await getCached("version.json");
+    APP_VERSION=await vr.json();
+
+    const catalogPath=APP_VERSION.catalog||"data/songs.json";
+    const cr=await getCached(catalogPath);
+    SONGS=(await cr.json()).songs||[];
+
+    try{
+      const ar=await getCached(APP_VERSION.announcements||"data/announcements.json");
+      ANNOUNCEMENTS=(await ar.json()).announcements||[];
+    }catch{
+      ANNOUNCEMENTS=[];
+    }
+
+    const state=readJSON(SYNC_STATE_KEY,null);
+    if(state?.complete){
+      $("syncPill").textContent=navigator.onLine?`Offline prêt • v${state.contentVersion||APP_VERSION.contentVersion}`:"Offline prêt • hors connexion";
+      $("libraryStatus").textContent=navigator.onLine?"Données locales prêtes":"Mode hors connexion";
+    }else{
+      $("syncPill").textContent=navigator.onLine?"Téléchargement initial requis":"Première connexion requise";
+      $("libraryStatus").textContent=SONGS.length?"Données partielles":"Aucune donnée locale";
+    }
+    renderAll();
+  }catch{
+    $("syncPill").textContent="Première connexion requise";
+    $("libraryStatus").textContent="Aucune donnée locale";
+    renderAll();
+  }
+}
+
+async function syncOfflineLibrary({manual=false,initial=false}={}){
+  if(syncInProgress)return false;
+  syncInProgress=true;
+  setUpdateButtonLoading(true);
+
+  let stageName=null;
+  try{
+    // This request is deliberately NETWORK ONLY. The service worker must not return a cached copy.
+    let versionResponse;
+    try{
+      versionResponse=await networkFetch("version.json",{timeout:9000});
+    }catch{
+      const state=readJSON(SYNC_STATE_KEY,null);
+      if(initial&&!state?.complete){
+        setSyncOverlay(true,{
+          title:"Connexion nécessaire",
+          message:"Ampifandraiso amin'ny Internet indray mandeha ny finday mba hisintonana sy hitahiry ny votoaty rehetra.",
+          retry:true
+        });
+        $("syncRetry").onclick=()=>syncOfflineLibrary({manual:true,initial:true});
+      }else{
+        setSyncOverlay(false);
+        if(manual)toast("Tsy misy connexion. Ny données offline dia voatahiry tsara.");
+        $("syncPill").textContent=state?.complete?"Offline prêt • hors connexion":"Première connexion requise";
+      }
+      return false;
+    }
+
+    const remoteVersion=await versionResponse.clone().json();
+    const catalogPath=remoteVersion.catalog||"data/songs.json";
+    const announcementsPath=remoteVersion.announcements||"data/announcements.json";
+
+    const [catalogResponse,announcementsResponse]=await Promise.all([
+      networkFetch(catalogPath,{timeout:15000}),
+      networkFetch(announcementsPath,{timeout:15000})
+    ]);
+
+    const remoteCatalog=await catalogResponse.clone().json();
+    const remoteAnnouncements=await announcementsResponse.clone().json();
+    const remoteSongs=remoteCatalog.songs||[];
+
+    const oldCatalog=readJSON(CATALOG_SNAPSHOT_KEY,{songs:[]});
+    const oldSongs=songMap(oldCatalog);
+    const main=await caches.open(OFFLINE_CACHE);
+
+    const changedResources=[];
+    for(const song of remoteSongs){
+      const oldSong=oldSongs.get(String(song.id));
+      for(const kind of ["lyrics","solfa","instrumental","image"]){
+        const now=resourceDescriptor(song,kind);
+        if(!now)continue;
+        const before=resourceDescriptor(oldSong,kind);
+        const cached=await getAnyCached(now.path);
+
+        if(!cached||!sameDescriptor(now,before)){
+          if(!changedResources.some(x=>x.path===now.path))changedResources.push({...now,kind,songId:song.id});
+        }
+      }
+    }
+
+    // Small application files are checked every time. This allows interface updates
+    // without forcing a new APK. Large audio files are fetched only if new/changed/missing.
+    const total=SHELL_FILES.length+3+changedResources.length;
+    let done=0;
+
+    setSyncOverlay(initial||manual,{
+      title:initial?"Fanomanana offline":"Mise à jour",
+      message:initial
+        ?"Alaina indray mandeha ny paroles, solfas, playbacks ary ny votoaty hafa."
+        :"Jerena izay vaovao na niova. Tsy hovaina ny tahiry taloha raha misy erreur.",
+      done,total
+    });
+
+    $("syncPill").textContent=initial?"Téléchargement offline...":"Vérification...";
+    $("libraryStatus").textContent="Synchronisation";
+
+    stageName=`${STAGING_PREFIX}${Date.now()}`;
+    const stage=await caches.open(stageName);
+    let shellChanged=false;
+
+    // Stage version/catalog/announcements already fetched from the real network.
+    await putStage(stage,"version.json",versionResponse); done++;
+    setSyncOverlay(initial||manual,{done,total});
+    await putStage(stage,catalogPath,catalogResponse); done++;
+    setSyncOverlay(initial||manual,{done,total});
+    await putStage(stage,announcementsPath,announcementsResponse); done++;
+    setSyncOverlay(initial||manual,{done,total});
+
+    // Stage the small UI files. Nothing in the active cache is changed yet.
+    for(const path of SHELL_FILES){
+      const fresh=await networkFetch(path,{timeout:30000});
+      const old=await getAnyCached(path);
+      if(await responseDifferent(old,fresh))shellChanged=true;
+      await putStage(stage,path,fresh);
+      done++;
+      setSyncOverlay(initial||manual,{done,total});
+    }
+
+    // Stage only song resources that are actually missing or whose revision changed.
+    for(const item of changedResources){
+      const fresh=await networkFetch(item.path,{timeout:240000});
+      await putStage(stage,item.path,fresh);
+      done++;
+      setSyncOverlay(initial||manual,{
+        done,total,
+        message:initial
+          ?`Téléchargement offline en cours • ${item.kind}`
+          :`Mise à jour du contenu • ${item.kind}`
+      });
+    }
+
+    // All network downloads succeeded. Only now do we replace the active offline cache.
+    const stagedRequests=await stage.keys();
+    for(const request of stagedRequests){
+      const response=await stage.match(request);
+      if(response)await main.put(request,response.clone());
+    }
+
+    // Store canonical base-path copies as well, so query strings are never required offline.
+    const canonical=[
+      ["version.json",versionResponse],
+      [catalogPath,catalogResponse],
+      [announcementsPath,announcementsResponse]
+    ];
+    for(const [path,response] of canonical)await main.put(reqFor(path),response.clone());
+
+    writeJSON(CATALOG_SNAPSHOT_KEY,remoteCatalog);
+    writeJSON(SYNC_STATE_KEY,{
+      complete:true,
+      contentVersion:remoteVersion.contentVersion||0,
+      updatedAt:new Date().toISOString(),
+      songCount:remoteSongs.length
+    });
+
+    APP_VERSION=remoteVersion;
+    SONGS=remoteSongs;
+    ANNOUNCEMENTS=remoteAnnouncements.announcements||[];
+    renderAll();
+
+    $("syncPill").textContent=`Offline prêt • v${remoteVersion.contentVersion||""}`.replace(/ • v$/,"");
+    $("libraryStatus").textContent="Données locales prêtes";
+
+    // Ask Android/browser storage to keep the offline data when possible.
+    try{
+      if(navigator.storage?.persist)await navigator.storage.persist();
+    }catch{}
+
+    // Refresh service worker metadata, but never unregister it and never delete the offline cache.
+    try{
+      if("serviceWorker" in navigator){
+        const reg=await navigator.serviceWorker.getRegistration();
+        if(reg)await reg.update();
+      }
+    }catch{}
+
+    setSyncOverlay(false);
+    if(manual||initial||changedResources.length||shellChanged){
+      toast(changedResources.length||shellChanged?"Mise à jour terminée • Offline prêt":"Déjà à jour • Offline prêt");
+    }
+
+    // If HTML/CSS/JS changed, reload from the newly cached shell.
+    if(shellChanged&&!initial){
+      setTimeout(()=>location.reload(),650);
+    }
+    return true;
+  }catch(err){
+    // Atomic rule: staging is discarded. The previous working cache stays untouched.
+    if(stageName)try{await caches.delete(stageName)}catch{}
+    const state=readJSON(SYNC_STATE_KEY,null);
+
+    if(initial&&!state?.complete){
+      setSyncOverlay(true,{
+        title:"Téléchargement interrompu",
+        message:"Ny données taloha dia tsy voafafa. Avereno rehefa misy connexion tsara.",
+        retry:true
+      });
+      $("syncRetry").onclick=()=>syncOfflineLibrary({manual:true,initial:true});
+    }else{
+      setSyncOverlay(false);
+      if(manual)toast("Mise à jour non effectuée. Les données offline restent intactes.");
+      $("syncPill").textContent=state?.complete?"Offline prêt":"Données locales";
+      $("libraryStatus").textContent=state?.complete?"Données locales prêtes":"Données partielles";
+    }
+    return false;
+  }finally{
+    if(stageName)try{await caches.delete(stageName)}catch{}
+    syncInProgress=false;
+    setUpdateButtonLoading(false);
+  }
+}
+
+function renderAll(){
+  $("homeSongCount").textContent=`${SONGS.length} hira`;renderRecent();renderSongs();renderAnnouncements();
+}
+function recentIds(){return readJSON("sedyricsRecent",[])}
+function pushRecent(id){const ids=recentIds().filter(x=>Number(x)!==Number(id));ids.unshift(Number(id));writeJSON("sedyricsRecent",ids.slice(0,5));renderRecent()}
+function renderRecent(){
+  const host=$("recentSongs");host.innerHTML="";let list=recentIds().map(id=>SONGS.find(s=>Number(s.id)===Number(id))).filter(Boolean);if(!list.length)list=SONGS.slice(0,3);
+  if(!list.length){host.innerHTML='<div class="empty-announcement">Tsy mbola misy hira.</div>';return}
+  list.slice(0,3).forEach(s=>{const b=document.createElement("button");b.className="recent-song";b.innerHTML=`<span class="num">${String(s.id).padStart(2,"0")}</span><span><strong>${escapeHtml(s.title)}</strong><span>${s.solfa?"Solfa • ":""}${s.instrumental?"Playback":"Lyrics"}</span></span>${icon("i-chevron")}`;b.onclick=()=>openSong(s.id);host.appendChild(b)})
+}
+function isFav(id){return favorites.includes(Number(id))}
+function toggleFav(){if(!currentSong)return;const id=Number(currentSong.id);favorites=isFav(id)?favorites.filter(x=>x!==id):[...favorites,id];writeJSON("sedyricsFavorites",favorites);refreshFavorite();renderSongs();toast(isFav(id)?"Favori ajouté":"Favori retiré")}
+function getFilteredSongs(){const q=normalize($("songSearch").value.trim());return SONGS.filter(s=>{const pass=songFilter==="all"||(songFilter==="favorites"&&isFav(s.id))||(songFilter==="solfa"&&s.solfa)||(songFilter==="instrumental"&&s.instrumental);return pass&&(!q||normalize(s.title).includes(q)||normalize(s.artist).includes(q)||String(s.id).includes(q))})}
+function renderSongs(){
+  const list=getFilteredSongs(),host=$("songGrid");host.innerHTML="";$("libraryCount").textContent=`${list.length} hira`;
+  if(!list.length){host.innerHTML='<div class="empty-announcement">Tsy misy hira hita.</div>';return}
+  list.forEach(s=>{const b=document.createElement("button");b.className="song-card";const tags=[s.lyrics?'<span class="tiny-tag">LYRICS</span>':'',s.solfa?'<span class="tiny-tag">SOLFA</span>':'',s.instrumental?'<span class="tiny-tag">PLAYBACK</span>':''].join('');b.innerHTML=`<span class="song-num">${String(s.id).padStart(2,"0")}</span><span><h3>${isFav(s.id)?"♥ ":""}${escapeHtml(s.title)}</h3><p>${escapeHtml(s.artist||"")}</p><span class="song-tags">${tags}</span></span><svg class="chev"><use href="#i-chevron"/></svg>`;b.onclick=()=>openSong(s.id);host.appendChild(b)})
+}
+function renderAnnouncements(){
+  const host=$("announcementList");host.innerHTML="";
+  if(!ANNOUNCEMENTS.length){host.innerHTML=`<div class="empty-announcement">${icon("i-bell")}<h3>Tsy mbola misy Filazan-draharaha</h3><p>Eto no hiseho ireo vaovao mahakasika ny activité ato amin-tsika.</p></div>`;return}
+  ANNOUNCEMENTS.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))).forEach(a=>{const el=document.createElement("article");el.className="announcement-card";el.innerHTML=`<span class="date">${escapeHtml(a.date||"")}</span><h3>${escapeHtml(a.title||"")}</h3><p>${escapeHtml(a.body||"")}</p>`;host.appendChild(el)})
+}
+
+function setView(name,{push=true}={}){
+  currentView=name;$$('.view').forEach(v=>v.classList.toggle('active',v.dataset.view===name));
+  if(name==='playlists')renderPlaylistUI();
+  $("mainHeader").style.display=name==='song'?'none':'flex';$("bottomNav").style.display=name==='song'?'none':'grid';
+  $$('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.nav===name));
+  if(push)history.pushState({view:name,songId:currentSong?.id||null},"",`#${name}${name==='song'&&currentSong?'-'+currentSong.id:''}`);
+  window.scrollTo(0,0);
+}
+function restoreState(state){if(state?.view==='song'&&state.songId){openSong(state.songId,{push:false})}else setView(state?.view||'home',{push:false})}
+
+async function openSong(id,{push=true}={}){
+  stopPlaylistPlayback(true);
+  const s=SONGS.find(x=>Number(x.id)===Number(id));if(!s)return;currentSong=s;pushRecent(s.id);pauseAudio(false);resetLoop();
+  $("detailNumber").textContent=`HIRA ${String(s.id).padStart(2,'0')}`;$("detailMiniTitle").textContent=s.title;$("detailTitle").textContent=s.title;$("detailArtist").textContent=s.artist||"Chorale Sedera Ambalavato";$("audioTitle").textContent=`${s.title} • Playback`;$("miniTrackTitle").textContent=s.title;
+  $("availabilityBadge").textContent=["LYRICS",s.solfa?"SOLFA":"",s.instrumental?"PLAYBACK":""].filter(Boolean).join(" • ");refreshFavorite();applyFont();setSongTab('lyrics');loadSongNote();setView('song',{push});
+  $("lyricsText").innerHTML='<div class="loading-line"></div><br><div class="loading-line"></div><br><div class="loading-line"></div>';
+  try{const r=await getCached(withRevision(s.lyrics,s.revision));$("lyricsText").textContent=(await r.text()).trim()}catch{$("lyricsText").textContent="Tsy mbola voatahiry ato amin'ny finday ity tononkira ity."}
+  const c=$("creditsCard");c.textContent=s.credits||"";c.style.display=s.credits?"block":"none";
+  loadSolfa();loadInstrumental();renderMarkers();
+}
+function refreshFavorite(){if(!currentSong)return;$("favoriteBtn").classList.toggle('active',isFav(currentSong.id))}
+function applyFont(){fontSize=Math.min(30,Math.max(15,fontSize));$("lyricsText").style.fontSize=`${fontSize}px`;$("fontSizeValue").textContent=fontSize;localStorage.setItem('sedyricsFontSize',fontSize)}
+function setSongTab(tab){$$('[data-song-tab]').forEach(b=>b.classList.toggle('active',b.dataset.songTab===tab));['lyrics','solfa','instrumental'].forEach(x=>$(x+'Panel').classList.toggle('active',x===tab));if(tab==='instrumental')setTimeout(()=>$("advancedPlayer").scrollIntoView({behavior:'smooth',block:'nearest'}),60)}
+
+async function loadSolfa(){
+  const host=$("solfaContent");if(!currentSong?.solfa){host.innerHTML=`<div class="empty-panel"><span class="empty-icon">${icon("i-note")}</span><h3>Solfa à venir</h3><p>Mbola tsy misy solfa ho an'ity hira ity.</p></div>`;return}
+  host.innerHTML='<div class="loading-line"></div>';
+  try{const r=await getCached(withRevision(currentSong.solfa,currentSong.revision));const blob=await r.blob();host.innerHTML=`<div class="solfa-view"><img alt="Solfa ${escapeHtml(currentSong.title)}"></div>`;host.querySelector('img').src=URL.createObjectURL(blob)}catch{host.innerHTML=`<div class="empty-panel"><h3>Solfa tsy azo vakiana offline</h3></div>`}
+}
+
+async function loadInstrumental(){
+  const player=$("advancedPlayer"),empty=$("instrumentalEmpty"),mini=$("persistentPlayer");
+  if(audioObjectUrl){URL.revokeObjectURL(audioObjectUrl);audioObjectUrl=null}audio.removeAttribute('src');audio.load();
+  if(!currentSong?.instrumental){player.classList.remove('active');empty.classList.remove('hidden');mini.classList.remove('active');return}
+  player.classList.add('active');empty.classList.add('hidden');mini.classList.add('active');$("audioCacheBadge").textContent='Chargement...';
+  try{const url=withRevision(currentSong.instrumental,currentSong.revision);const cache=await caches.open(CONTENT_CACHE);const wasCached=!!(await cache.match(url));const r=await getCached(url);const blob=await r.blob();audioObjectUrl=URL.createObjectURL(blob);audio.src=audioObjectUrl;audio.load();$("audioCacheBadge").textContent=wasCached?'Offline prêt':'Téléchargé';}
+  catch{$("audioCacheBadge").textContent='Indisponible';player.classList.remove('active');empty.classList.remove('hidden');mini.classList.remove('active')}
+}
+function playPause(){if(!audio.src)return;if(audio.paused)audio.play().catch(()=>{});else audio.pause()}
+function seekBy(delta){if(Number.isFinite(audio.duration))audio.currentTime=Math.max(0,Math.min(audio.duration,audio.currentTime+delta))}
+function updateAudioUI(){const playing=!audio.paused;const use=playing?'i-pause':'i-play';$("mainPlayBtn").innerHTML=icon(use);$("miniPlay").innerHTML=icon(use);$("playingBars").classList.toggle('active',playing);$("elapsed").textContent=fmt(audio.currentTime);$("duration").textContent=fmt(audio.duration);$("miniTrackTime").textContent=`${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;if(Number.isFinite(audio.duration)&&audio.duration>0)$("seekBar").value=Math.round(audio.currentTime/audio.duration*1000)}
+function pauseAudio(reset=false){audio.pause();if(reset&&Number.isFinite(audio.duration))audio.currentTime=0;updateAudioUI()}
+function resetLoop(){loopA=null;loopB=null;loopEnabled=false;$("aTime").textContent='--:--';$("bTime").textContent='--:--';$("toggleLoop").classList.remove('active')}
+function markerKey(){return currentSong?`sedyricsMarkers:${currentSong.id}`:'sedyricsMarkers:none'}
+function hiddenMarkerKey(){return currentSong?`sedyricsHiddenMarkers:${currentSong.id}`:'sedyricsHiddenMarkers:none'}
+function markerSignature(m){return `${String(m.label||'')}|${Number(m.time)||0}`}
+function localMarkers(){return readJSON(markerKey(),[])}
+function hiddenMarkers(){return readJSON(hiddenMarkerKey(),[])}
+function removeMarker(marker){
+  if(!currentSong)return;
+  const sig=markerSignature(marker);
+
+  if(marker.source==='local'){
+    const next=localMarkers().filter(m=>markerSignature(m)!==sig);
+    writeJSON(markerKey(),next);
+  }else{
+    const hidden=hiddenMarkers();
+    if(!hidden.includes(sig))hidden.push(sig);
+    writeJSON(hiddenMarkerKey(),hidden);
+  }
+
+  renderMarkers();
+  toast('Repère supprimé');
+}
+function renderMarkers(){
+  const host=$("markerList");
+  host.innerHTML='';
+  const hidden=hiddenMarkers();
+  const cat=(currentSong?.markers||[])
+    .map(m=>({...m,source:'catalog'}))
+    .filter(m=>!hidden.includes(markerSignature(m)));
+  const local=localMarkers().map(m=>({...m,source:'local'}));
+  const all=[...cat,...local].sort((a,b)=>a.time-b.time);
+
+  if(!all.length){
+    host.innerHTML='<span style="color:#78909E;font-size:9px">Tsy mbola misy repère. Afaka manampy eto ambany ianao.</span>';
+    return;
+  }
+
+  all.forEach(m=>{
+    const wrap=document.createElement('span');
+    wrap.className='marker-item';
+
+    const jump=document.createElement('button');
+    jump.className='marker-chip';
+    jump.innerHTML=`${escapeHtml(m.label)} <small>${fmt(Number(m.time))}</small>`;
+    jump.onclick=()=>{audio.currentTime=Number(m.time)||0;toast(`Repère: ${m.label}`)};
+
+    const del=document.createElement('button');
+    del.className='marker-delete';
+    del.type='button';
+    del.title='Supprimer ce repère';
+    del.setAttribute('aria-label',`Supprimer ${m.label}`);
+    del.innerHTML=icon('i-close');
+    del.onclick=e=>{e.stopPropagation();removeMarker(m)};
+
+    wrap.appendChild(jump);
+    wrap.appendChild(del);
+    host.appendChild(wrap);
+  });
+}
+function addMarker(){
+  if(!currentSong)return;
+  const label=$("markerLabel").value.trim();
+  if(!label){toast('Ampidiro ny anaran\'ny repère');return}
+  const list=localMarkers();
+  list.push({label,time:Math.round(audio.currentTime*10)/10});
+  writeJSON(markerKey(),list);
+  $("markerLabel").value='';
+  renderMarkers();
+  toast('Repère voatahiry');
+}
+function noteKey(){return currentSong?`sedyricsSongNote:${currentSong.id}`:'none'}
+function loadSongNote(){$("songNote").value=localStorage.getItem(noteKey())||'';$("songNoteSaved").textContent='Voatahiry'}
+function autosave(el,key,status){localStorage.setItem(key,el.value);status.textContent='Voatahiry';status.style.color='#059669'}
+
+function escapeHtml(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+
+// ---------- Playlists & planning ----------
+const PLAYLIST_KEY='lyricsedEventPlaylistsV1';
+const LOCAL_AUDIO_DB='lyricsed-local-audio-v1';
+const LOCAL_AUDIO_STORE='audio';
+const playlistAudio=$("playlistAudio");
+let plannerType='liturgy';
+let playlistTarget=null;
+let playlistQueue=[];
+let playlistIndex=-1;
+let playlistObjectUrl=null;
+
+function defaultPlaylists(){
+  return {
+    liturgy:{prelude:[],interlude:[],rakitra:[]},
+    concert:{part1:[],part2:[],part3:[]}
+  };
+}
+function getPlaylists(){
+  const saved=readJSON(PLAYLIST_KEY,null);
+  const base=defaultPlaylists();
+  if(!saved)return base;
+  for(const type of Object.keys(base)){
+    for(const section of Object.keys(base[type])){
+      if(Array.isArray(saved?.[type]?.[section]))base[type][section]=saved[type][section];
+    }
+  }
+  return base;
+}
+function savePlaylists(data){writeJSON(PLAYLIST_KEY,data)}
+function parsePlaylistTarget(value){
+  const [type,section]=String(value||'').split(':');
+  if(!type||!section)return null;
+  return {type,section};
+}
+function playlistSectionLabel(type,section){
+  const labels={
+    'liturgy:prelude':'PRÉLUDE',
+    'liturgy:interlude':'INTERLUDE',
+    'liturgy:rakitra':'RAKITRA',
+    'concert:part1':'PARTIE I',
+    'concert:part2':'PARTIE II',
+    'concert:part3':'PARTIE III'
+  };
+  return labels[`${type}:${section}`]||'PLAYLIST';
+}
+function playlistSectionOrder(type){
+  return type==='liturgy'?['prelude','interlude','rakitra']:['part1','part2','part3'];
+}
+function createPlaylistItemId(prefix='item'){
+  try{return `${prefix}-${crypto.randomUUID()}`}catch{return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`}
+}
+function humanFileSize(bytes){
+  const n=Number(bytes)||0;
+  if(n<1024*1024)return `${Math.max(1,Math.round(n/1024))} Ko`;
+  return `${(n/1024/1024).toFixed(1)} Mo`;
+}
+function renderPlaylistUI(){
+  $$('.planner-tab').forEach(b=>b.classList.toggle('active',b.dataset.plannerType===plannerType));
+  $("liturgyPlanner").classList.toggle('active',plannerType==='liturgy');
+  $("concertPlanner").classList.toggle('active',plannerType==='concert');
+
+  const data=getPlaylists();
+  for(const type of ['liturgy','concert']){
+    for(const section of playlistSectionOrder(type)){
+      renderPlaylistSection(type,section,data[type][section]||[]);
+    }
+  }
+}
+function renderPlaylistSection(type,section,items){
+  const host=$(`playlist-${type}-${section}`);
+  if(!host)return;
+  host.innerHTML='';
+  if(!items.length){
+    host.innerHTML='<div class="playlist-empty">Tsy mbola misy playback voafidy.</div>';
+    return;
+  }
+  items.forEach((item,index)=>{
+    const row=document.createElement('div');
+    row.className='playlist-track';
+    const source=item.source==='local'?'Téléphone':'LyriCSED';
+    const detail=item.source==='local'
+      ?`${source} • ${humanFileSize(item.size)}`
+      :`${source}${item.artist?` • ${escapeHtml(item.artist)}`:''}`;
+    row.innerHTML=`
+      <span class="playlist-track-num">${String(index+1).padStart(2,'0')}</span>
+      <span class="playlist-track-copy"><strong>${escapeHtml(item.title||'Playback')}</strong><span>${detail}</span></span>
+      <span class="playlist-track-actions">
+        <button type="button" data-track-action="up" title="Monter">${icon('i-up')}</button>
+        <button type="button" data-track-action="down" title="Descendre">${icon('i-down')}</button>
+        <button type="button" class="remove-track" data-track-action="remove" title="Supprimer">${icon('i-trash')}</button>
+      </span>`;
+    row.querySelector('[data-track-action="up"]').onclick=()=>movePlaylistItem(type,section,index,-1);
+    row.querySelector('[data-track-action="down"]').onclick=()=>movePlaylistItem(type,section,index,1);
+    row.querySelector('[data-track-action="remove"]').onclick=()=>removePlaylistItem(type,section,index);
+    host.appendChild(row);
+  });
+}
+function movePlaylistItem(type,section,index,delta){
+  const data=getPlaylists();
+  const list=data[type][section];
+  const next=index+delta;
+  if(next<0||next>=list.length)return;
+  [list[index],list[next]]=[list[next],list[index]];
+  savePlaylists(data);
+  renderPlaylistUI();
+}
+async function removePlaylistItem(type,section,index){
+  const data=getPlaylists();
+  const list=data[type][section];
+  const [removed]=list.splice(index,1);
+  savePlaylists(data);
+  renderPlaylistUI();
+  if(removed?.source==='local'&&removed.blobId){
+    const stillUsed=Object.values(getPlaylists()).some(group=>
+      Object.values(group).some(items=>items.some(x=>x.source==='local'&&x.blobId===removed.blobId))
+    );
+    if(!stillUsed)try{await deleteLocalAudio(removed.blobId)}catch{}
+  }
+  toast('Playback supprimé de la playlist');
+}
+
+function openLocalAudioDB(){
+  return new Promise((resolve,reject)=>{
+    const request=indexedDB.open(LOCAL_AUDIO_DB,1);
+    request.onupgradeneeded=()=>{
+      const db=request.result;
+      if(!db.objectStoreNames.contains(LOCAL_AUDIO_STORE))db.createObjectStore(LOCAL_AUDIO_STORE,{keyPath:'id'});
+    };
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error);
+  });
+}
+async function putLocalAudio(record){
+  const db=await openLocalAudioDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(LOCAL_AUDIO_STORE,'readwrite');
+    tx.objectStore(LOCAL_AUDIO_STORE).put(record);
+    tx.oncomplete=()=>{db.close();resolve(true)};
+    tx.onerror=()=>{db.close();reject(tx.error)};
+  });
+}
+async function getLocalAudio(id){
+  const db=await openLocalAudioDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(LOCAL_AUDIO_STORE,'readonly');
+    const req=tx.objectStore(LOCAL_AUDIO_STORE).get(id);
+    req.onsuccess=()=>{db.close();resolve(req.result||null)};
+    req.onerror=()=>{db.close();reject(req.error)};
+  });
+}
+async function deleteLocalAudio(id){
+  const db=await openLocalAudioDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(LOCAL_AUDIO_STORE,'readwrite');
+    tx.objectStore(LOCAL_AUDIO_STORE).delete(id);
+    tx.oncomplete=()=>{db.close();resolve(true)};
+    tx.onerror=()=>{db.close();reject(tx.error)};
+  });
+}
+function openLibraryPicker(target){
+  playlistTarget=parsePlaylistTarget(target);
+  if(!playlistTarget)return;
+  $("playlistLibrarySearch").value='';
+  renderLibraryPicker();
+  $("libraryPicker").classList.remove('hidden');
+  $("libraryPicker").setAttribute('aria-hidden','false');
+}
+function closeLibraryPicker(){
+  $("libraryPicker").classList.add('hidden');
+  $("libraryPicker").setAttribute('aria-hidden','true');
+}
+function renderLibraryPicker(){
+  const q=normalize($("playlistLibrarySearch").value.trim());
+  const host=$("playlistLibraryList");
+  host.innerHTML='';
+  const available=SONGS.filter(s=>s.instrumental&&(!q||normalize(s.title).includes(q)||normalize(s.artist).includes(q)||String(s.id).includes(q)));
+  if(!available.length){
+    host.innerHTML='<div class="playlist-empty">Tsy misy playback hita.</div>';
+    return;
+  }
+  available.forEach(song=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='picker-song';
+    b.innerHTML=`<span class="picker-num">${String(song.id).padStart(2,'0')}</span><span><strong>${escapeHtml(song.title)}</strong><small>${escapeHtml(song.artist||'')}</small></span>${icon('i-plus')}`;
+    b.onclick=()=>addLibraryTrack(song);
+    host.appendChild(b);
+  });
+}
+function addLibraryTrack(song){
+  if(!playlistTarget||!song?.instrumental)return;
+  const data=getPlaylists();
+  data[playlistTarget.type][playlistTarget.section].push({
+    id:createPlaylistItemId('lib'),
+    source:'library',
+    songId:Number(song.id),
+    title:song.title,
+    artist:song.artist||'',
+    instrumental:song.instrumental
+  });
+  savePlaylists(data);
+  renderPlaylistUI();
+  closeLibraryPicker();
+  toast('Playback ajouté');
+}
+async function importLocalFiles(files){
+  if(!playlistTarget||!files?.length)return;
+  const data=getPlaylists();
+  const dest=data[playlistTarget.type][playlistTarget.section];
+  let added=0;
+
+  for(const file of [...files]){
+    const ext=(file.name.split('.').pop()||'').toLowerCase();
+    const allowed=['mp3','wav','mpeg','mpga','m4a','aac','ogg','flac'];
+    if(!(String(file.type||'').startsWith('audio/')||allowed.includes(ext)))continue;
+
+    const blobId=createPlaylistItemId('audio');
+    try{
+      await putLocalAudio({
+        id:blobId,
+        name:file.name,
+        type:file.type||'audio/*',
+        size:file.size,
+        addedAt:Date.now(),
+        blob:file
+      });
+      dest.push({
+        id:createPlaylistItemId('local'),
+        source:'local',
+        blobId,
+        title:file.name.replace(/\.[^.]+$/,''),
+        filename:file.name,
+        size:file.size,
+        type:file.type||''
+      });
+      added++;
+    }catch{
+      toast('Impossible de stocker un fichier audio');
+    }
+  }
+
+  if(added){
+    savePlaylists(data);
+    renderPlaylistUI();
+    toast(`${added} playback${added>1?'s':''} ajouté${added>1?'s':''} et enregistré${added>1?'s':''} localement`);
+  }
+  $("localAudioPicker").value='';
+}
+
+function buildPlaylistQueue(type,onlySection=null){
+  const data=getPlaylists();
+  const sections=onlySection?[onlySection]:playlistSectionOrder(type);
+  const queue=[];
+  for(const section of sections){
+    for(const item of data[type][section]||[]){
+      queue.push({...item,_type:type,_section:section,_sectionLabel:playlistSectionLabel(type,section)});
+    }
+  }
+  return queue;
+}
+async function playEvent(type,section=null){
+  const queue=buildPlaylistQueue(type,section);
+  if(!queue.length){toast('Tsy mbola misy playback ao amin’ity playlist ity');return}
+  pauseAudio(false);
+  playlistQueue=queue;
+  playlistIndex=0;
+  $("eventPlayer").classList.add('active');
+  await loadPlaylistQueueItem(0,true);
+}
+async function loadPlaylistQueueItem(index,autoplay=true){
+  if(index<0||index>=playlistQueue.length)return;
+  playlistIndex=index;
+  const item=playlistQueue[index];
+
+  playlistAudio.pause();
+  if(playlistObjectUrl){URL.revokeObjectURL(playlistObjectUrl);playlistObjectUrl=null}
+  playlistAudio.removeAttribute('src');
+  playlistAudio.load();
+
+  $("eventPlayer").classList.add('active');
+  $("eventPlayerSection").textContent=item._sectionLabel||'PLAYLIST';
+  $("eventPlayerTitle").textContent=item.title||'Playback';
+  $("eventQueuePosition").textContent=`${index+1} / ${playlistQueue.length}`;
+  $("eventElapsed").textContent='0:00';
+  $("eventDuration").textContent='0:00';
+  $("eventSeek").value=0;
+
+  try{
+    let blob;
+    if(item.source==='local'){
+      const record=await getLocalAudio(item.blobId);
+      if(!record?.blob)throw new Error('local audio missing');
+      blob=record.blob;
+    }else{
+      const song=SONGS.find(s=>Number(s.id)===Number(item.songId));
+      const path=song?.instrumental||item.instrumental;
+      if(!path)throw new Error('library audio missing');
+      const response=await getCached(path);
+      blob=await response.blob();
+    }
+
+    playlistObjectUrl=URL.createObjectURL(blob);
+    playlistAudio.src=playlistObjectUrl;
+    playlistAudio.load();
+    if(autoplay)await playlistAudio.play();
+    updatePlaylistPlayerUI();
+  }catch{
+    toast('Playback indisponible. Vérifiez qu’il est bien enregistré offline.');
+    updatePlaylistPlayerUI();
+  }
+}
+function stopPlaylistPlayback(hide=true){
+  if(!playlistAudio)return;
+  playlistAudio.pause();
+  playlistAudio.removeAttribute('src');
+  playlistAudio.load();
+  if(playlistObjectUrl){URL.revokeObjectURL(playlistObjectUrl);playlistObjectUrl=null}
+  playlistQueue=[];
+  playlistIndex=-1;
+  if(hide&&$("eventPlayer"))$("eventPlayer").classList.remove('active');
+  updatePlaylistPlayerUI();
+}
+function playlistPlayPause(){
+  if(!playlistAudio.src)return;
+  if(playlistAudio.paused)playlistAudio.play().catch(()=>{});
+  else playlistAudio.pause();
+}
+function playlistNext(){
+  if(playlistIndex+1<playlistQueue.length)loadPlaylistQueueItem(playlistIndex+1,true);
+  else{playlistAudio.pause();toast('Fin de la playlist');updatePlaylistPlayerUI()}
+}
+function playlistPrev(){
+  if(playlistIndex>0)loadPlaylistQueueItem(playlistIndex-1,true);
+  else if(Number.isFinite(playlistAudio.duration))playlistAudio.currentTime=0;
+}
+function updatePlaylistPlayerUI(){
+  if(!$("eventPlayBtn"))return;
+  $("eventPlayBtn").innerHTML=icon(playlistAudio&&!playlistAudio.paused?'i-pause':'i-play');
+  $("eventElapsed").textContent=fmt(playlistAudio?.currentTime||0);
+  $("eventDuration").textContent=fmt(playlistAudio?.duration||0);
+  if(Number.isFinite(playlistAudio?.duration)&&playlistAudio.duration>0){
+    $("eventSeek").value=Math.round(playlistAudio.currentTime/playlistAudio.duration*1000);
+  }
+}
+
+$$('.planner-tab').forEach(b=>b.onclick=()=>{
+  plannerType=b.dataset.plannerType;
+  renderPlaylistUI();
+});
+$$('[data-add-library]').forEach(b=>b.onclick=()=>openLibraryPicker(b.dataset.addLibrary));
+$$('[data-add-phone]').forEach(b=>b.onclick=()=>{
+  playlistTarget=parsePlaylistTarget(b.dataset.addPhone);
+  if(!playlistTarget)return;
+  $("localAudioPicker").click();
+});
+$$('[data-play-event]').forEach(b=>b.onclick=()=>playEvent(b.dataset.playEvent));
+$$('[data-play-section]').forEach(b=>b.onclick=()=>{
+  const target=parsePlaylistTarget(b.dataset.playSection);
+  if(target)playEvent(target.type,target.section);
+});
+$("closeLibraryPicker").onclick=closeLibraryPicker;
+$("libraryPicker").addEventListener('click',e=>{if(e.target===$("libraryPicker"))closeLibraryPicker()});
+$("playlistLibrarySearch").oninput=renderLibraryPicker;
+$("localAudioPicker").addEventListener('change',e=>importLocalFiles(e.target.files));
+$("eventPlayBtn").onclick=playlistPlayPause;
+$("eventNextBtn").onclick=playlistNext;
+$("eventPrevBtn").onclick=playlistPrev;
+$("eventStopBtn").onclick=()=>stopPlaylistPlayback(true);
+$("eventSeek").oninput=()=>{
+  if(Number.isFinite(playlistAudio.duration))playlistAudio.currentTime=Number($("eventSeek").value)/1000*playlistAudio.duration;
+};
+$("eventVolume").oninput=()=>{
+  playlistAudio.volume=Number($("eventVolume").value)/100;
+  $("eventVolumeValue").textContent=`${$("eventVolume").value}%`;
+};
+playlistAudio.addEventListener('timeupdate',updatePlaylistPlayerUI);
+playlistAudio.addEventListener('play',updatePlaylistPlayerUI);
+playlistAudio.addEventListener('pause',updatePlaylistPlayerUI);
+playlistAudio.addEventListener('loadedmetadata',updatePlaylistPlayerUI);
+playlistAudio.addEventListener('ended',playlistNext);
+
+
+// Navigation
+$("updateBtn").onclick=forceAppUpdate;
+$$('[data-nav]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.nav)));
+$("songBack").onclick=()=>history.back();
+window.addEventListener('popstate',e=>restoreState(e.state||{view:'home'}));
+if(!history.state)history.replaceState({view:'home'},'',location.hash||'#home');
+
+// Search/filter
+$("globalSearch").addEventListener('input',e=>{const q=e.target.value.trim();if(q){$("songSearch").value=q;setView('songs');renderSongs()}});
+$("songSearch").oninput=renderSongs;
+$$('[data-filter]').forEach(b=>b.onclick=()=>{$$('[data-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');songFilter=b.dataset.filter;renderSongs()});
+
+// song controls
+$("favoriteBtn").onclick=toggleFav;$("fontDown").onclick=()=>{fontSize--;applyFont()};$("fontUp").onclick=()=>{fontSize++;applyFont()};$$('[data-song-tab]').forEach(b=>b.onclick=()=>setSongTab(b.dataset.songTab));
+
+// audio
+$("mainPlayBtn").onclick=playPause;$("miniPlay").onclick=playPause;$("rewindBtn").onclick=()=>seekBy(-10);$("miniRewind").onclick=()=>seekBy(-10);$("forwardBtn").onclick=()=>seekBy(10);$("miniForward").onclick=()=>seekBy(10);
+$("seekBar").oninput=()=>{if(Number.isFinite(audio.duration))audio.currentTime=Number($("seekBar").value)/1000*audio.duration};$("volumeBar").oninput=()=>{audio.volume=Number($("volumeBar").value)/100;$("volumeValue").textContent=`${$("volumeBar").value}%`};
+$("setA").onclick=()=>{loopA=audio.currentTime;$("aTime").textContent=fmt(loopA);toast('Point A défini')};$("setB").onclick=()=>{loopB=audio.currentTime;$("bTime").textContent=fmt(loopB);toast('Point B défini')};$("toggleLoop").onclick=()=>{if(loopA===null||loopB===null||loopB<=loopA){toast('Définissez A puis B');return}loopEnabled=!loopEnabled;$("toggleLoop").classList.toggle('active',loopEnabled);toast(loopEnabled?'Répétition A/B activée':'Répétition A/B désactivée')};$("clearLoop").onclick=resetLoop;$("addMarkerBtn").onclick=addMarker;
+audio.addEventListener('timeupdate',()=>{if(loopEnabled&&loopA!==null&&loopB!==null&&audio.currentTime>=loopB)audio.currentTime=loopA;updateAudioUI()});audio.addEventListener('play',updateAudioUI);audio.addEventListener('pause',updateAudioUI);audio.addEventListener('loadedmetadata',updateAudioUI);audio.addEventListener('ended',updateAudioUI);
+
+// notes autosave
+$("songNote").addEventListener('input',()=>{const s=$("songNoteSaved");s.textContent='Enregistrement...';clearTimeout($("songNote")._t);$("songNote")._t=setTimeout(()=>autosave($("songNote"),noteKey(),s),260)});
+$("generalNotes").value=localStorage.getItem('sedyricsGeneralNotes')||'';$("generalNotes").addEventListener('input',()=>{const s=$("generalSaved");s.textContent='Enregistrement...';clearTimeout($("generalNotes")._t);$("generalNotes")._t=setTimeout(()=>autosave($("generalNotes"),'sedyricsGeneralNotes',s),260)});
+
+window.addEventListener('online',()=>syncOfflineLibrary({manual:false,initial:false}).catch(()=>{}));
+window.addEventListener('offline',()=>{
+  const state=readJSON(SYNC_STATE_KEY,null);
+  if(state?.complete){
+    $("syncPill").textContent="Offline prêt • hors connexion";
+    $("libraryStatus").textContent="Mode hors connexion";
+  }
+});
+
+async function boot(){
+  if('serviceWorker' in navigator){
+    try{
+      const reg=await navigator.serviceWorker.register('sw.js');
+      try{await navigator.serviceWorker.ready}catch{}
+      try{await reg.update()}catch{}
+    }catch{}
+  }
+
+  restoreState(history.state||{view:'home'});
+  await loadCatalog();
+
+  const state=readJSON(SYNC_STATE_KEY,null);
+  const initial=!state?.complete;
+  syncOfflineLibrary({manual:false,initial}).catch(()=>{});
+}
+boot();
