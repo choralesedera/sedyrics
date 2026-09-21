@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "songs": [
     {
       "id": 1,
@@ -13,7 +13,13 @@
       "instrumental": "instrumentals/mino-anao-instrumental.mp3",
       "image": null,
       "markers": [],
-      "tags": []
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
     },
     {
       "id": 2,
@@ -27,7 +33,13 @@
       "instrumental": "instrumentals/ry-fanahy-masina-instrumental.mp3",
       "image": null,
       "markers": [],
-      "tags": []
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
     },
     {
       "id": 3,
@@ -41,7 +53,13 @@
       "instrumental": "instrumentals/noho-ny-helokao-instrumental.mp3",
       "image": null,
       "markers": [],
-      "tags": []
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
     },
     {
       "id": 4,
@@ -49,13 +67,19 @@
       "title": "Ho mpanomponao",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "T/F: Eden RAKOTOHASIMBOLA\n(c) Chorale Sedera Ambalavato",
-      "revision": 1,
+      "revision": 2,
       "lyrics": "lyrics/ho-mpanomponao.txt",
       "solfa": null,
       "instrumental": "instrumentals/ho-mpanomponao-instrumental.mp3",
       "image": null,
       "markers": [],
-      "tags": []
+      "tags": [],
+      "revisions": {
+        "lyrics": 2,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
     },
     {
       "id": 5,
@@ -69,7 +93,13 @@
       "instrumental": "instrumentals/zanahary-o-tahio-instrumental.mp3",
       "image": null,
       "markers": [],
-      "tags": []
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
     },
     {
       "id": 6,
@@ -83,7 +113,233 @@
       "instrumental": "instrumentals/anao-ny-dera-instrumental.mp3",
       "image": null,
       "markers": [],
-      "tags": []
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 1,
+        "instrumental": 1,
+        "image": 0
+      }
+    },
+    {
+      "id": 7,
+      "slug": "andriamanitra-o-henoy",
+      "title": "Andriamanitra o, henoy",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "(c) Rina Rnt",
+      "revision": 1,
+      "lyrics": "lyrics/andriamanitra-o-henoy.txt",
+      "solfa": null,
+      "instrumental": "instrumentals/andriamanitra-o-henoy.mp3",
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
+    },
+    {
+      "id": 8,
+      "slug": "famonjena-ho-ahy",
+      "title": "Famonjena ho ahy",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "A/C: Rina Rnt\n(c): Chorale Sedera Ambalavato",
+      "revision": 1,
+      "lyrics": "lyrics/famonjena-ho-ahy.txt",
+      "solfa": null,
+      "instrumental": null,
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 0,
+        "image": 0
+      }
+    },
+    {
+      "id": 9,
+      "slug": "ho-avy-ny-tomponao",
+      "title": "Ho avy ny Tomponao",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "A/C: Didy Alfa\n(c) Chorale Sedera Ambalavato",
+      "revision": 1,
+      "lyrics": "lyrics/ho-avy-ny-tomponao.txt",
+      "solfa": null,
+      "instrumental": null,
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 0,
+        "image": 0
+      }
+    },
+    {
+      "id": 10,
+      "slug": "inona-kosa",
+      "title": "Inona kosa",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "A/C: Vahatra R;",
+      "revision": 1,
+      "lyrics": "lyrics/inona-kosa.txt",
+      "solfa": null,
+      "instrumental": "instrumentals/inona-kosa-instrumental.mp3",
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
+    },
+    {
+      "id": 11,
+      "slug": "intoy-rolahy",
+      "title": "Intoy rolahy",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "A/C: Louisette Ernestine",
+      "revision": 1,
+      "lyrics": "lyrics/intoy-rolahy.txt",
+      "solfa": null,
+      "instrumental": "instrumentals/intoy-rolahy-instrumental.mp3",
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
+    },
+    {
+      "id": 12,
+      "slug": "lovasoa",
+      "title": "Lovasoa",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "T/F: Eden RAKOTOASIMBOLA",
+      "revision": 1,
+      "lyrics": "lyrics/lovasoa.txt",
+      "solfa": null,
+      "instrumental": "instrumentals/lovasoa-instrumental.mp3",
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
+    },
+    {
+      "id": 13,
+      "slug": "mbola-tsara",
+      "title": "Mbola tsara",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "A/C: Théodore Roose\n(c) Chorale Sedera Ambalavato",
+      "revision": 1,
+      "lyrics": "lyrics/mbola-tsara.txt",
+      "solfa": null,
+      "instrumental": "instrumentals/mbola-tsara-instrumental.mp3",
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
+    },
+    {
+      "id": 14,
+      "slug": "miandry-anao",
+      "title": "Miandry anao",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "A/C Hervé Rafanomezantsoa",
+      "revision": 1,
+      "lyrics": "lyrics/miandry-anao.txt",
+      "solfa": null,
+      "instrumental": "instrumentals/miandry-anao-instrumental.wma",
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
+    },
+    {
+      "id": 15,
+      "slug": "mpandresy",
+      "title": "Mpandresy",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "A/C: Rina Rnt\n(c): Chorale Sedera Ambalavato",
+      "revision": 1,
+      "lyrics": "lyrics/mpandresy.txt",
+      "solfa": null,
+      "instrumental": "instrumentals/mpandresy-instrumental.mp3",
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 1,
+        "image": 0
+      }
+    },
+    {
+      "id": 16,
+      "slug": "o-iraho-jeso",
+      "title": "Ô! Iraho Jeso",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "A/C: Raymond RAKOTOMALALA\n(C): Chorale Sedera Ambalavato",
+      "revision": 1,
+      "lyrics": "lyrics/o-iraho-jeso.txt",
+      "solfa": null,
+      "instrumental": null,
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 0,
+        "image": 0
+      }
+    },
+    {
+      "id": 17,
+      "slug": "zanaka-adala",
+      "title": "Zanaka Adala",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "A/C Vahatra",
+      "revision": 1,
+      "lyrics": "lyrics/zanaka-adala.txt",
+      "solfa": null,
+      "instrumental": null,
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 0,
+        "image": 0
+      }
     }
   ]
 }
