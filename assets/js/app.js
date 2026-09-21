@@ -17,8 +17,8 @@ const $=id=>document.getElementById(id);
 const $$=sel=>[...document.querySelectorAll(sel)];
 let SONGS=[],ANNOUNCEMENTS=[],APP_VERSION=null,currentSong=null,currentView="home",songFilter="all",
 favorites=readJSON("sedyricsFavorites",[]).map(Number),
-fontSize=Number(localStorage.getItem("sedyricsFontSize")||18),
-audioObjectUrl=null,loopA=null,loopB=null,loopEnabled=false,toastTimer=null,syncInProgress=false;
+readerZoom=Number(localStorage.getItem("lyricsedReaderZoom")||100),
+audioObjectUrl=null,loopA=null,loopB=null,loopEnabled=false,toastTimer=null,syncInProgress=false,headerPlaybackSource=null;
 const audio=$("audio");
 
 function readJSON(k,fallback){try{const v=JSON.parse(localStorage.getItem(k));return v??fallback}catch{return fallback}}
@@ -26,6 +26,7 @@ function writeJSON(k,v){localStorage.setItem(k,JSON.stringify(v))}
 function normalize(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
 function withRevision(path,rev=1){return path||null}
 function icon(id){return `<svg><use href="#${id}"/></svg>`}
+function songNo(s){return Number(s?.displayNumber||s?.id||0)}
 function fmt(sec){if(!Number.isFinite(sec))return"0:00";return `${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,"0")}`}
 function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2200)}
 function cleanPath(path){return String(path||"").split("?")[0].replace(/^\.?\//,"")}
@@ -376,15 +377,15 @@ function pushRecent(id){const ids=recentIds().filter(x=>Number(x)!==Number(id));
 function renderRecent(){
   const host=$("recentSongs");host.innerHTML="";let list=recentIds().map(id=>SONGS.find(s=>Number(s.id)===Number(id))).filter(Boolean);if(!list.length)list=SONGS.slice(0,3);
   if(!list.length){host.innerHTML='<div class="empty-announcement">Tsy mbola misy hira.</div>';return}
-  list.slice(0,3).forEach(s=>{const b=document.createElement("button");b.className="recent-song";b.innerHTML=`<span class="num">${String(s.id).padStart(2,"0")}</span><span><strong>${escapeHtml(s.title)}</strong><span>${s.solfa?"Solfa • ":""}${s.instrumental?"Playback":"Lyrics"}</span></span>${icon("i-chevron")}`;b.onclick=()=>openSong(s.id);host.appendChild(b)})
+  list.slice(0,3).forEach(s=>{const b=document.createElement("button");b.className="recent-song";b.innerHTML=`<span class="num">${String(songNo(s)).padStart(2,"0")}</span><span><strong>${escapeHtml(s.title)}</strong><span>${s.solfa?"Solfa • ":""}${s.instrumental?"Playback":"Lyrics"}</span></span>${icon("i-chevron")}`;b.onclick=()=>openSong(s.id);host.appendChild(b)})
 }
 function isFav(id){return favorites.includes(Number(id))}
 function toggleFav(){if(!currentSong)return;const id=Number(currentSong.id);favorites=isFav(id)?favorites.filter(x=>x!==id):[...favorites,id];writeJSON("sedyricsFavorites",favorites);refreshFavorite();renderSongs();toast(isFav(id)?"Favori ajouté":"Favori retiré")}
-function getFilteredSongs(){const q=normalize($("songSearch").value.trim());return SONGS.filter(s=>{const pass=songFilter==="all"||(songFilter==="favorites"&&isFav(s.id))||(songFilter==="solfa"&&s.solfa)||(songFilter==="instrumental"&&s.instrumental);return pass&&(!q||normalize(s.title).includes(q)||normalize(s.artist).includes(q)||String(s.id).includes(q))})}
+function getFilteredSongs(){const q=normalize($("songSearch").value.trim());return SONGS.filter(s=>{const pass=songFilter==="all"||(songFilter==="favorites"&&isFav(s.id))||(songFilter==="solfa"&&s.solfa)||(songFilter==="instrumental"&&s.instrumental);return pass&&(!q||normalize(s.title).includes(q)||normalize(s.artist).includes(q)||(String(songNo(s)).includes(q)||String(s.id).includes(q)))})}
 function renderSongs(){
   const list=getFilteredSongs(),host=$("songGrid");host.innerHTML="";$("libraryCount").textContent=`${list.length} hira`;
   if(!list.length){host.innerHTML='<div class="empty-announcement">Tsy misy hira hita.</div>';return}
-  list.forEach(s=>{const b=document.createElement("button");b.className="song-card";const tags=[s.lyrics?'<span class="tiny-tag">LYRICS</span>':'',s.solfa?'<span class="tiny-tag">SOLFA</span>':'',s.instrumental?'<span class="tiny-tag">PLAYBACK</span>':''].join('');b.innerHTML=`<span class="song-num">${String(s.id).padStart(2,"0")}</span><span><h3>${isFav(s.id)?"♥ ":""}${escapeHtml(s.title)}</h3><p>${escapeHtml(s.artist||"")}</p><span class="song-tags">${tags}</span></span><svg class="chev"><use href="#i-chevron"/></svg>`;b.onclick=()=>openSong(s.id);host.appendChild(b)})
+  list.forEach(s=>{const b=document.createElement("button");b.className="song-card";const tags=[s.lyrics?'<span class="tiny-tag">LYRICS</span>':'',s.solfa?'<span class="tiny-tag">SOLFA</span>':'',s.instrumental?'<span class="tiny-tag">PLAYBACK</span>':''].join('');b.innerHTML=`<span class="song-num">${String(songNo(s)).padStart(2,"0")}</span><span><h3>${isFav(s.id)?"♥ ":""}${escapeHtml(s.title)}</h3><p>${escapeHtml(s.artist||"")}</p><span class="song-tags">${tags}</span></span><svg class="chev"><use href="#i-chevron"/></svg>`;b.onclick=()=>openSong(s.id);host.appendChild(b)})
 }
 function renderAnnouncements(){
   const host=$("announcementList");host.innerHTML="";
@@ -406,22 +407,74 @@ function setView(name,{push=true}={}){
 function restoreState(state){if(state?.view==='song'&&state.songId){openSong(state.songId,{push:false})}else setView(state?.view||'home',{push:false})}
 
 async function openSong(id,{push=true}={}){
-  const s=SONGS.find(x=>Number(x.id)===Number(id));if(!s)return;currentSong=s;pushRecent(s.id);pauseAudio(false);resetLoop();
-  $("detailNumber").textContent=`HIRA ${String(s.id).padStart(2,'0')}`;$("detailMiniTitle").textContent=s.title;$("detailTitle").textContent=s.title;$("detailArtist").textContent=s.artist||"Chorale Sedera Ambalavato";$("audioTitle").textContent=`${s.title} • Playback`;$("miniTrackTitle").textContent=s.title;
-  $("availabilityBadge").textContent=["LYRICS",s.solfa?"SOLFA":"",s.instrumental?"PLAYBACK":""].filter(Boolean).join(" • ");refreshFavorite();applyFont();setSongTab('lyrics');loadSongNote();setView('song',{push});
-  $("lyricsText").innerHTML='<div class="loading-line"></div><br><div class="loading-line"></div><br><div class="loading-line"></div>';
-  try{const r=await getCached(withRevision(s.lyrics,s.revision));$("lyricsText").textContent=(await r.text()).trim()}catch{$("lyricsText").textContent="Tsy mbola voatahiry ato amin'ny finday ity tononkira ity."}
+  const s=SONGS.find(x=>Number(x.id)===Number(id));if(!s)return;
+  currentSong=s;pushRecent(s.id);pauseAudio(false);resetLoop();
+  $("detailNumber").textContent=`HIRA ${String(songNo(s)).padStart(2,'0')}`;
+  $("detailMiniTitle").textContent=s.title;
+  $("detailTitle").textContent=s.title;
+  $("detailArtist").textContent=s.artist||"Chorale Sedera Ambalavato";
+  $("audioTitle").textContent=`${s.title} • Playback`;
+  $("miniTrackTitle").textContent=s.title;
+
+  const available=[s.lyrics?"LYRICS":"",s.solfa?"SOLFA":"",s.instrumental?"PLAYBACK":""].filter(Boolean);
+  $("availabilityBadge").textContent=available.join(" • ")||"CONTENU À VENIR";
+  $$('[data-song-tab]').forEach(b=>{
+    const tab=b.dataset.songTab;
+    const enabled=tab==='lyrics'?!!s.lyrics:tab==='solfa'?!!s.solfa:!!s.instrumental;
+    b.disabled=!enabled;
+    b.classList.toggle('disabled',!enabled);
+  });
+
+  refreshFavorite();applyReaderZoom();loadSongNote();setView('song',{push});
+  const firstTab=s.lyrics?'lyrics':s.solfa?'solfa':s.instrumental?'instrumental':'lyrics';
+  setSongTab(firstTab);
+
   const c=$("creditsCard");c.textContent=s.credits||"";c.style.display=s.credits?"block":"none";
-  loadSolfa();loadInstrumental();renderMarkers();
+  if(s.lyrics){
+    $("lyricsText").innerHTML='<div class="loading-line"></div><br><div class="loading-line"></div><br><div class="loading-line"></div>';
+    try{const r=await getCached(withRevision(s.lyrics,resourceRevision(s,'lyrics')));$("lyricsText").textContent=(await r.text()).trim()}
+    catch{$("lyricsText").textContent="Tononkira tsy azo vakiana amin'izao fotoana izao."}
+  }else{
+    $("lyricsText").textContent="Tsy mbola misy Lyrics ho an'ity hira ity. Playback ihany no misy amin'izao fotoana izao.";
+  }
+  applyReaderZoom();loadSolfa();loadInstrumental();renderMarkers();updateHeaderPlayback();
 }
 function refreshFavorite(){if(!currentSong)return;$("favoriteBtn").classList.toggle('active',isFav(currentSong.id))}
-function applyFont(){fontSize=Math.min(30,Math.max(15,fontSize));$("lyricsText").style.fontSize=`${fontSize}px`;$("fontSizeValue").textContent=fontSize;localStorage.setItem('sedyricsFontSize',fontSize)}
-function setSongTab(tab){$$('[data-song-tab]').forEach(b=>b.classList.toggle('active',b.dataset.songTab===tab));['lyrics','solfa','instrumental'].forEach(x=>$(x+'Panel').classList.toggle('active',x===tab));if(tab==='instrumental')setTimeout(()=>$("advancedPlayer").scrollIntoView({behavior:'smooth',block:'nearest'}),60)}
+function applyReaderZoom(){
+  readerZoom=Math.min(180,Math.max(70,Number(readerZoom)||100));
+  const scale=readerZoom/100;
+  if($("lyricsText"))$("lyricsText").style.fontSize=`${(18*scale).toFixed(1)}px`;
+  const img=$("solfaContent")?.querySelector('img');
+  if(img){img.style.width=`${readerZoom}%`;img.style.maxWidth='none'}
+  if($("fontSizeValue"))$("fontSizeValue").textContent=`${readerZoom}%`;
+  localStorage.setItem('lyricsedReaderZoom',String(readerZoom));
+}
+function setSongTab(tab){
+  const btn=$(`[data-song-tab="${tab}"]`);
+  if(btn?.disabled)return;
+  $$('[data-song-tab]').forEach(b=>b.classList.toggle('active',b.dataset.songTab===tab));
+  ['lyrics','solfa','instrumental'].forEach(x=>$(x+'Panel').classList.toggle('active',x===tab));
+  $("readerZoomBar")?.classList.toggle('hidden',tab==='instrumental');
+  if(tab==='solfa')applyReaderZoom();
+  if(tab==='instrumental')setTimeout(()=>$("advancedPlayer").scrollIntoView({behavior:'smooth',block:'nearest'}),60)
+}
 
 async function loadSolfa(){
-  const host=$("solfaContent");if(!currentSong?.solfa){host.innerHTML=`<div class="empty-panel"><span class="empty-icon">${icon("i-note")}</span><h3>Solfa à venir</h3><p>Mbola tsy misy solfa ho an'ity hira ity.</p></div>`;return}
+  const host=$("solfaContent");
+  if(!currentSong?.solfa){
+    host.innerHTML=`<div class="empty-panel"><span class="empty-icon">${icon("i-note")}</span><h3>Solfa à venir</h3><p>Mbola tsy misy solfa ho an'ity hira ity.</p></div>`;
+    return;
+  }
   host.innerHTML='<div class="loading-line"></div>';
-  try{const r=await getCached(withRevision(currentSong.solfa,currentSong.revision));const blob=await r.blob();host.innerHTML=`<div class="solfa-view"><img alt="Solfa ${escapeHtml(currentSong.title)}"></div>`;host.querySelector('img').src=URL.createObjectURL(blob)}catch{host.innerHTML=`<div class="empty-panel"><h3>Solfa tsy azo vakiana offline</h3></div>`}
+  try{
+    const r=await getCached(withRevision(currentSong.solfa,resourceRevision(currentSong,'solfa')));
+    const blob=await r.blob();
+    host.innerHTML=`<div class="solfa-view"><img alt="Solfa ${escapeHtml(currentSong.title)}"></div>`;
+    host.querySelector('img').src=URL.createObjectURL(blob);
+    applyReaderZoom();
+  }catch{
+    host.innerHTML=`<div class="empty-panel"><h3>Solfa tsy azo vakiana offline</h3></div>`;
+  }
 }
 
 async function loadInstrumental(){
@@ -429,12 +482,12 @@ async function loadInstrumental(){
   if(audioObjectUrl){URL.revokeObjectURL(audioObjectUrl);audioObjectUrl=null}audio.removeAttribute('src');audio.load();
   if(!currentSong?.instrumental){player.classList.remove('active');empty.classList.remove('hidden');mini.classList.remove('active');return}
   player.classList.add('active');empty.classList.add('hidden');mini.classList.add('active');$("audioCacheBadge").textContent='Chargement...';
-  try{const url=withRevision(currentSong.instrumental,currentSong.revision);const cache=await caches.open(CONTENT_CACHE);const wasCached=!!(await cache.match(url));const r=await getCached(url);const blob=await r.blob();audioObjectUrl=URL.createObjectURL(blob);audio.src=audioObjectUrl;audio.load();$("audioCacheBadge").textContent=wasCached?'Offline prêt':'Téléchargé';}
+  try{const url=withRevision(currentSong.instrumental,resourceRevision(currentSong,'instrumental'));const cache=await caches.open(CONTENT_CACHE);const wasCached=!!(await cache.match(url));const r=await getCached(url);const blob=await r.blob();audioObjectUrl=URL.createObjectURL(blob);audio.src=audioObjectUrl;audio.load();$("audioCacheBadge").textContent=wasCached?'Offline prêt':'Téléchargé';}
   catch{$("audioCacheBadge").textContent='Indisponible';player.classList.remove('active');empty.classList.remove('hidden');mini.classList.remove('active')}
 }
 function playPause(){if(!audio.src)return;if(audio.paused)audio.play().catch(()=>{});else audio.pause()}
 function seekBy(delta){if(Number.isFinite(audio.duration))audio.currentTime=Math.max(0,Math.min(audio.duration,audio.currentTime+delta))}
-function updateAudioUI(){const playing=!audio.paused;const use=playing?'i-pause':'i-play';$("mainPlayBtn").innerHTML=icon(use);$("miniPlay").innerHTML=icon(use);$("playingBars").classList.toggle('active',playing);$("elapsed").textContent=fmt(audio.currentTime);$("duration").textContent=fmt(audio.duration);$("miniTrackTime").textContent=`${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;if(Number.isFinite(audio.duration)&&audio.duration>0)$("seekBar").value=Math.round(audio.currentTime/audio.duration*1000)}
+function updateAudioUI(){const playing=!audio.paused;const use=playing?'i-pause':'i-play';$("mainPlayBtn").innerHTML=icon(use);$("miniPlay").innerHTML=icon(use);$("playingBars").classList.toggle('active',playing);$("elapsed").textContent=fmt(audio.currentTime);$("duration").textContent=fmt(audio.duration);$("miniTrackTime").textContent=`${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;if(Number.isFinite(audio.duration)&&audio.duration>0)$("seekBar").value=Math.round(audio.currentTime/audio.duration*1000);updateHeaderPlayback()}
 function pauseAudio(reset=false){audio.pause();if(reset&&Number.isFinite(audio.duration))audio.currentTime=0;updateAudioUI()}
 function resetLoop(){loopA=null;loopB=null;loopEnabled=false;$("aTime").textContent='--:--';$("bTime").textContent='--:--';$("toggleLoop").classList.remove('active')}
 function markerKey(){return currentSong?`sedyricsMarkers:${currentSong.id}`:'sedyricsMarkers:none'}
@@ -792,7 +845,7 @@ function renderLibraryPicker(){
   const q=normalize($("playlistLibrarySearch").value.trim());
   const host=$("playlistLibraryList");
   host.innerHTML='';
-  const available=SONGS.filter(s=>s.instrumental&&(!q||normalize(s.title).includes(q)||normalize(s.artist).includes(q)||String(s.id).includes(q)));
+  const available=SONGS.filter(s=>s.instrumental&&(!q||normalize(s.title).includes(q)||normalize(s.artist).includes(q)||(String(songNo(s)).includes(q)||String(s.id).includes(q))));
 
   if(!available.length){
     host.innerHTML='<div class="playlist-empty">Tsy misy playback hita.</div>';
@@ -803,7 +856,7 @@ function renderLibraryPicker(){
     const b=document.createElement('button');
     b.type='button';
     b.className='picker-song';
-    b.innerHTML=`<span class="picker-num">${String(song.id).padStart(2,'0')}</span><span><strong>${escapeHtml(song.title)}</strong><small>${escapeHtml(song.artist||'')}</small></span>${icon('i-plus')}`;
+    b.innerHTML=`<span class="picker-num">${String(songNo(song)).padStart(2,'0')}</span><span><strong>${escapeHtml(song.title)}</strong><small>${escapeHtml(song.artist||'')}</small></span>${icon('i-plus')}`;
     b.onclick=()=>addLibraryTrack(song);
     host.appendChild(b);
   });
@@ -1010,10 +1063,10 @@ function stopPlaylistPlayback(hide=true){
   playlistQueue=[];
   playlistIndex=-1;
   playlistOriginType=null;
+  if(headerPlaybackSource==='event')headerPlaybackSource=null;
 
   if(hide){
     $("eventPlayer")?.classList.remove('active');
-    $("headerPlayback")?.classList.add('hidden');
     closeGlobalMiniPlayer();
   }
   updatePlaylistPlayerUI();
@@ -1070,33 +1123,31 @@ function updateEventPlayerVisibility(force=false){
   const player=$("eventPlayer");
   if(!player)return;
   const plannerVisible=currentView==='liturgy'||currentView==='concert';
-  const hasQueue=playlistIndex>=0&&playlistQueue.length>0;
-
-  player.classList.toggle('active',(plannerVisible&&hasQueue)||force);
-  if(!plannerVisible&&!force)player.classList.remove('active');
-
-  const header=$("headerPlayback");
-  if(header)header.classList.toggle('hidden',!hasQueue);
+  player.classList.toggle('active',plannerVisible||force);
 }
 
 function updateHeaderPlayback(){
-  const chip=$("headerPlayback");
-  if(!chip)return;
+  const chip=$("headerPlayback");if(!chip)return;
+  const eventItem=currentQueueItem();
+  const eventActive=headerPlaybackSource==='event'&&!!eventItem;
+  const songActive=headerPlaybackSource==='song'&&!!currentSong&&!!audio.src;
+  const active=eventActive||songActive;
+  chip.classList.toggle('hidden',!active);
+  if(!active)return;
 
-  const item=currentQueueItem();
-  const hasQueue=!!item;
-  chip.classList.toggle('hidden',!hasQueue);
-  if(!hasQueue)return;
-
-  const isPlaying=!playlistAudio.paused&&pendingNextIndex===null;
-  chip.classList.toggle('playing',isPlaying);
-  chip.classList.toggle('waiting',pendingNextIndex!==null);
-
-  $("headerPlaybackTitle").textContent=pendingNextIndex!==null
-    ?`Pause ${countdownRemaining}s • ${nextQueueItem()?.title||'Suivant'}`
-    :(item.title||'Playback');
-
-  $("headerPlaybackToggle").innerHTML=icon(isPlaying?'i-pause':'i-play');
+  let title='Playback',playing=false,waiting=false;
+  if(eventActive){
+    waiting=pendingNextIndex!==null;
+    playing=!playlistAudio.paused&&!waiting;
+    title=waiting?`Pause ${countdownRemaining}s • ${nextQueueItem()?.title||'Suivant'}`:(eventItem.title||'Playback');
+  }else{
+    playing=!audio.paused;
+    title=currentSong?.title||'Playback';
+  }
+  chip.classList.toggle('playing',playing);
+  chip.classList.toggle('waiting',waiting);
+  $("headerPlaybackTitle").textContent=title;
+  $("headerPlaybackToggle").innerHTML=icon(playing?'i-pause':'i-play');
 }
 
 function updateMiniPlayer(){
@@ -1182,10 +1233,14 @@ $("eventVolume").oninput=()=>{
   $("eventVolumeValue").textContent=`${$("eventVolume").value}%`;
 };
 
-$("headerPlayback").onclick=openGlobalMiniPlayer;
+$("headerPlayback").onclick=()=>{
+  if(headerPlaybackSource==='event')openGlobalMiniPlayer();
+  else if(headerPlaybackSource==='song'&&currentSong){setView('song');setSongTab('instrumental');setTimeout(()=>$("advancedPlayer")?.scrollIntoView({behavior:'smooth',block:'center'}),80)}
+};
 $("headerPlaybackToggle").onclick=e=>{
   e.stopPropagation();
-  playlistPlayPause();
+  if(headerPlaybackSource==='event')playlistPlayPause();
+  else if(headerPlaybackSource==='song')playPause();
 };
 $("closeGlobalMiniPlayer").onclick=closeGlobalMiniPlayer;
 $("globalMiniPlayer").addEventListener('click',e=>{if(e.target===$("globalMiniPlayer"))closeGlobalMiniPlayer()});
@@ -1198,8 +1253,8 @@ bindDelayControls('liturgy');
 bindDelayControls('concert');
 
 playlistAudio.addEventListener('timeupdate',updatePlaylistPlayerUI);
-playlistAudio.addEventListener('play',updatePlaylistPlayerUI);
-playlistAudio.addEventListener('pause',updatePlaylistPlayerUI);
+playlistAudio.addEventListener('play',()=>{headerPlaybackSource='event';if(audio&&!audio.paused)audio.pause();updatePlaylistPlayerUI();updateHeaderPlayback()});
+playlistAudio.addEventListener('pause',()=>{updatePlaylistPlayerUI();updateHeaderPlayback()});
 playlistAudio.addEventListener('loadedmetadata',updatePlaylistPlayerUI);
 playlistAudio.addEventListener('ended',handlePlaylistEnded);
 
@@ -1218,13 +1273,13 @@ $("songSearch").oninput=renderSongs;
 $$('[data-filter]').forEach(b=>b.onclick=()=>{$$('[data-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');songFilter=b.dataset.filter;renderSongs()});
 
 // song controls
-$("favoriteBtn").onclick=toggleFav;$("fontDown").onclick=()=>{fontSize--;applyFont()};$("fontUp").onclick=()=>{fontSize++;applyFont()};$$('[data-song-tab]').forEach(b=>b.onclick=()=>setSongTab(b.dataset.songTab));
+$("favoriteBtn").onclick=toggleFav;$("fontDown").onclick=()=>{readerZoom-=10;applyReaderZoom()};$("fontUp").onclick=()=>{readerZoom+=10;applyReaderZoom()};$("zoomReset").onclick=()=>{readerZoom=100;applyReaderZoom()};$$('[data-song-tab]').forEach(b=>b.onclick=()=>setSongTab(b.dataset.songTab));
 
 // audio
 $("mainPlayBtn").onclick=playPause;$("miniPlay").onclick=playPause;$("rewindBtn").onclick=()=>seekBy(-10);$("miniRewind").onclick=()=>seekBy(-10);$("forwardBtn").onclick=()=>seekBy(10);$("miniForward").onclick=()=>seekBy(10);
 $("seekBar").oninput=()=>{if(Number.isFinite(audio.duration))audio.currentTime=Number($("seekBar").value)/1000*audio.duration};$("volumeBar").oninput=()=>{audio.volume=Number($("volumeBar").value)/100;$("volumeValue").textContent=`${$("volumeBar").value}%`};
 $("setA").onclick=()=>{loopA=audio.currentTime;$("aTime").textContent=fmt(loopA);toast('Point A défini')};$("setB").onclick=()=>{loopB=audio.currentTime;$("bTime").textContent=fmt(loopB);toast('Point B défini')};$("toggleLoop").onclick=()=>{if(loopA===null||loopB===null||loopB<=loopA){toast('Définissez A puis B');return}loopEnabled=!loopEnabled;$("toggleLoop").classList.toggle('active',loopEnabled);toast(loopEnabled?'Répétition A/B activée':'Répétition A/B désactivée')};$("clearLoop").onclick=resetLoop;$("addMarkerBtn").onclick=addMarker;
-audio.addEventListener('timeupdate',()=>{if(loopEnabled&&loopA!==null&&loopB!==null&&audio.currentTime>=loopB)audio.currentTime=loopA;updateAudioUI()});audio.addEventListener('play',()=>{if(playlistAudio&&!playlistAudio.paused)playlistAudio.pause();updateAudioUI()});audio.addEventListener('pause',updateAudioUI);audio.addEventListener('loadedmetadata',updateAudioUI);audio.addEventListener('ended',updateAudioUI);
+audio.addEventListener('timeupdate',()=>{if(loopEnabled&&loopA!==null&&loopB!==null&&audio.currentTime>=loopB)audio.currentTime=loopA;updateAudioUI()});audio.addEventListener('play',()=>{headerPlaybackSource='song';if(playlistAudio&&!playlistAudio.paused)playlistAudio.pause();updateAudioUI();updateHeaderPlayback()});audio.addEventListener('pause',()=>{updateAudioUI();updateHeaderPlayback()});audio.addEventListener('loadedmetadata',updateAudioUI);audio.addEventListener('ended',()=>{updateAudioUI();updateHeaderPlayback()});
 
 // notes autosave
 $("songNote").addEventListener('input',()=>{const s=$("songNoteSaved");s.textContent='Enregistrement...';clearTimeout($("songNote")._t);$("songNote")._t=setTimeout(()=>autosave($("songNote"),noteKey(),s),260)});
