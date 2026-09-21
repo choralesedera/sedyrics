@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "path": ".nojekyll",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "README.md",
+      "sha256": "88e7e1f57dd7ce22de7bea517d0b60800d7ff304a688d1fe1f91023364a4ad1c",
+      "size": 780
+    },
+    {
+      "path": "assets/css/style.css",
+      "sha256": "7eb1059845833e15c633c1c03dc9a594097ac36083c0d8edd86bb5e602a0520b",
+      "size": 13436
+    },
+    {
+      "path": "assets/images/ankino-logo.webp",
+      "sha256": "dac9a83afc4f95633c9bcc9c4730d206376c9bd4146873f9c81f136fa4385069",
+      "size": 20666
+    },
+    {
+      "path": "assets/images/icon-sedera.png",
+      "sha256": "bc5ec50d30202a953e3a4be175773c12b3cca0453aec5f2d7b79fd5e964eeb27",
+      "size": 60445
+    },
+    {
+      "path": "assets/js/app.js",
+      "sha256": "4a84555ec538e927e1cb95c4806cb81b441aad83f86f6e03c9c0ae4f1fa1ab43",
+      "size": 11144
+    },
+    {
+      "path": "data/songs.json",
+      "sha256": "551066e23a7e5e22354fa7b22946b6f61c918f4259160a8f7fb166236ea484ea",
+      "size": 2278
+    },
+    {
+      "path": "index.html",
+      "sha256": "75e5f497e1feef3b4e942a0b80f7056101b61639adb18213a2d2e5f63119e50e",
+      "size": 6585
+    },
+    {
+      "path": "instrumentals/anao-ny-dera-instrumental.mp3",
+      "sha256": "b414351c32d500e0a8332685e38c71874c3c975f9719f29b230344be1b0cf36b",
+      "size": 6443925
+    },
+    {
+      "path": "instrumentals/ho-mpanomponao-instrumental.mp3",
+      "sha256": "a6f1c2849bad8d7108b1e1ee0875b6cc66db9063868295078e598c4f105ae9ca",
+      "size": 11312108
+    },
+    {
+      "path": "instrumentals/mino-anao-instrumental.mp3",
+      "sha256": "47309f78b14ba3b3510c8c3457de42f64e2ead3c36e71a22b023226924d726e0",
+      "size": 8404147
+    },
+    {
+      "path": "instrumentals/noho-ny-helokao-instrumental.mp3",
+      "sha256": "97a6a7c0f1a9562fe5b5512bcfae0dc41b4f20934e293ec0093fa016bb035240",
+      "size": 13025743
+    },
+    {
+      "path": "instrumentals/ry-fanahy-masina-instrumental.mp3",
+      "sha256": "50d45a767a78cdd46c2b699eb06455c81e31f67aaf897695abac6156bb2e4cfe",
+      "size": 12563932
+    },
+    {
+      "path": "instrumentals/zanahary-o-tahio-instrumental.mp3",
+      "sha256": "e8bd1feb9f5896dcae2c35a9dae9a435207e38b6ce856422cfcdc13fba611655",
+      "size": 11684128
+    },
+    {
+      "path": "lyrics/anao-ny-dera.txt",
+      "sha256": "3f94067debb44e0d3ff562cc36bf9878d5ead6bc78edb85370923b8cb5b6576e",
+      "size": 570
+    },
+    {
+      "path": "lyrics/ho-mpanomponao.txt",
+      "sha256": "c8396e54527d7d60db5628aba082365851e88ead2460ff9a90e6ddae344897d3",
+      "size": 627
+    },
+    {
+      "path": "lyrics/mino-anao-aho.txt",
+      "sha256": "95a8cd9221dbc9b82d26c5710d943352fd52cf0f768303ffe8f2a6aa055d25fe",
+      "size": 835
+    },
+    {
+      "path": "lyrics/noho-ny-helokao.txt",
+      "sha256": "b1b20bd3966654c3d1580dd46fee7f336b962b22a93c1fec25a9c1dd922b2d8e",
+      "size": 657
+    },
+    {
+      "path": "lyrics/ry-fanahy-masina.txt",
+      "sha256": "7bb19cfb2c48507a9d4235ced685cd0549118ad82cf1e6593dd7190105f9947c",
+      "size": 911
+    },
+    {
+      "path": "lyrics/zanahary-o-tahio.txt",
+      "sha256": "98b60aa5c0ae03092499f14b954017f29613ff6dbea83af7ec587f27c2258092",
+      "size": 501
+    },
+    {
+      "path": "manifest.webmanifest",
+      "sha256": "2201062833d2faa9f8fa2ef7b4c047317cecf0729203e8a92f9092fbe6bb4f41",
+      "size": 289
+    },
+    {
+      "path": "solfa/anao-ny-dera-solfa.png",
+      "sha256": "d7a2a439bd3a9bfc32a2799ef632698d7c62e2123c929783f4fb25eeb3e9c96b",
+      "size": 159448
+    },
+    {
+      "path": "sw.js",
+      "sha256": "0099f4caa7d0862b9d2fe0e063209b0d60a8ee398dec0fc8572e52d3efe294a3",
+      "size": 1334
+    },
+    {
+      "path": "version.json",
+      "sha256": "27e6bde0650640c8f8f73df072d4d56e6f9d6bf10662e4e7c5f23a7e20caa839",
+      "size": 211
+    }
+  ]
+}

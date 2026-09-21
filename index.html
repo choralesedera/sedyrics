@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="mg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#78C9F4">
+  <title>Sedyrics</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<main class="app-shell">
+  <section id="homePage" class="page active-page">
+    <header class="hero">
+      <div class="brand">
+        <div class="brand-logo-wrap"><img src="assets/images/icon-sedera.png" alt="Logo Chorale Sedera Ambalavato" class="brand-logo"></div>
+        <div class="brand-text"><div class="brand-title-row"><h1>Sedyrics</h1><span class="demo-badge">DEMO</span></div><p>Chorale Sedera Ambalavato</p></div>
+      </div>
+      <div class="hero-copy"><span class="eyebrow">HIRA SY TONONKIRA</span><h2>Hira mora tadiavina, mora vakiana.</h2><p>Safidio ny hira tianao ary vakio ny tononkira, na dia tsy misy internet aza.</p></div>
+    </header>
+    <section class="content">
+      <div class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="Karohy ny lohatenin-kira..." autocomplete="off"></div>
+      <div id="syncStatus" class="sync-status">Fanomanana...</div>
+      <div class="filter-row"><button id="allFilter" class="filter-btn active" type="button">Hira rehetra</button><button id="favoritesFilter" class="filter-btn" type="button">Favoris <span id="favoriteCount" class="filter-count">0</span></button></div>
+      <div class="list-header"><div><span class="section-label">HIRA</span><h3 id="listTitle">Tononkira rehetra</h3></div><span id="songCount" class="song-count"></span></div>
+      <div id="songList" class="song-list"></div>
+      <footer class="app-footer"><div class="demo-note"><strong>Sedyrics</strong><span>Version démo</span></div><div class="creator"><span>Créée par</span><img src="assets/images/ankino-logo.webp" alt="Ankino MG"><span class="creator-name">Ankino MG</span></div></footer>
+    </section>
+  </section>
+
+  <section id="lyricsPage" class="page">
+    <div class="lyrics-topbar"><button id="backButton" class="back-button" type="button"><span aria-hidden="true">‹</span>Hiverina</button><div class="top-actions"><button id="favoriteButton" class="icon-button favorite-button" type="button">♡</button><div class="mini-logo-wrap"><img src="assets/images/icon-sedera.png" alt="" class="mini-logo"></div></div></div>
+    <article class="lyrics-card"><div class="lyrics-meta-row"><span id="lyricsNumber" class="lyrics-number"></span><span class="lyrics-demo">VERSION DEMO</span></div><h1 id="lyricsTitle"></h1><p id="lyricsAuthor" class="lyrics-author"></p><div class="reader-tools"><span>Haben'ny soratra</span><div class="font-actions"><button id="fontMinus" type="button">A−</button><span id="fontSizeLabel">18</span><button id="fontPlus" type="button">A+</button></div></div><div class="mode-switch three"><button class="mode-btn active" type="button">Lyrics</button><button id="solfaTab" class="mode-btn" type="button">Solfa</button><button id="instrumentalTab" class="mode-btn" type="button">Instrumental</button></div><div class="divider"></div><div id="lyricsText" class="lyrics-text"></div><div id="lyricsCredits" class="lyrics-credits"></div><nav class="song-nav"><button id="previousSong" class="nav-song-btn" type="button"><span>‹</span><span><small>Hira teo aloha</small><strong id="previousTitle">...</strong></span></button><button id="nextSong" class="nav-song-btn next" type="button"><span><small>Hira manaraka</small><strong id="nextTitle">...</strong></span><span>›</span></button></nav></article>
+  </section>
+
+  <section id="solfaPage" class="page">
+    <div class="lyrics-topbar"><button id="backFromSolfa" class="back-button" type="button"><span>‹</span>Hiverina</button><div class="mini-logo-wrap"><img src="assets/images/icon-sedera.png" alt="" class="mini-logo"></div></div>
+    <article class="lyrics-card"><div class="lyrics-meta-row"><span id="solfaNumber" class="lyrics-number"></span><span class="lyrics-demo">SOLFA</span></div><h1 id="solfaTitle"></h1><p id="solfaAuthor" class="lyrics-author"></p><div class="mode-switch three"><button id="lyricsFromSolfa" class="mode-btn" type="button">Lyrics</button><button class="mode-btn active" type="button">Solfa</button><button id="instrumentalFromSolfa" class="mode-btn" type="button">Instrumental</button></div><div class="divider"></div><div id="solfaAvailableBox" class="solfa-box hidden"><img id="solfaImage" class="solfa-image" alt="Solfa"></div><div id="solfaComingBox" class="solfa-coming hidden"><div class="coming-badge">SOON</div><h3>Solfa à venir</h3></div></article>
+  </section>
+
+  <section id="instrumentalPage" class="page">
+    <div class="lyrics-topbar"><button id="backFromInstrumental" class="back-button" type="button"><span>‹</span>Hiverina</button><div class="mini-logo-wrap"><img src="assets/images/icon-sedera.png" alt="" class="mini-logo"></div></div>
+    <article class="lyrics-card"><div class="lyrics-meta-row"><span id="instrumentalNumber" class="lyrics-number"></span><span class="lyrics-demo">INSTRUMENTAL</span></div><h1 id="instrumentalTitle"></h1><p id="instrumentalAuthor" class="lyrics-author"></p><div class="mode-switch three"><button id="lyricsFromInstrumental" class="mode-btn" type="button">Lyrics</button><button id="solfaFromInstrumental" class="mode-btn" type="button">Solfa</button><button class="mode-btn active" type="button">Instrumental</button></div><div class="divider"></div><div id="instrumentalAvailableBox" class="instrumental-box hidden"><div class="player-card"><div class="player-icon">♪</div><div class="player-copy"><strong id="playerSongTitle">Instrumental</strong><span>Lecture dans Sedyrics</span></div><button id="playPauseButton" class="play-button" type="button">▶</button></div><div class="progress-wrap"><span id="currentTime">0:00</span><input id="audioProgress" type="range" min="0" max="1000" value="0"><span id="durationTime">0:00</span></div><audio id="instrumentalAudio" preload="metadata" controlsList="nodownload noplaybackrate" disablePictureInPicture oncontextmenu="return false;"></audio><p class="private-note">Audio utilisé dans Sedyrics. Aucun bouton de téléchargement ou de partage n'est affiché.</p></div><div id="instrumentalComingBox" class="solfa-coming hidden"><div class="coming-badge">SOON</div><h3>Instrumental à venir</h3></div></article>
+  </section>
+</main>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
