@@ -1397,9 +1397,12 @@ function openFacebookInside(){
   const url=pendingFacebookLink;
   closeFacebookChoice();
 
-  if(!nativeMessage('FACEBOOK_INSIDE',url)){
-    // Browser fallback when LyriCSED is viewed outside Kodular.
-    try{window.open(url,'_blank')}catch{}
+  // Open Facebook directly inside the current LyriCSED WebView,
+  // exactly like a normal website. No Kodular bridge is required.
+  try{
+    window.location.href=url;
+  }catch{
+    try{window.open(url,'_self')}catch{}
   }
 }
 
