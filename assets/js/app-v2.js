@@ -453,7 +453,7 @@ function renderRecent(){
 }
 function isFav(id){return favorites.includes(Number(id))}
 function toggleFav(){if(!currentSong)return;const id=Number(currentSong.id);favorites=isFav(id)?favorites.filter(x=>x!==id):[...favorites,id];writeJSON("sedyricsFavorites",favorites);refreshFavorite();renderSongs();toast(isFav(id)?"Favori ajouté":"Favori retiré")}
-function getFilteredSongs(){const q=normalize($("songSearch").value.trim());return SONGS.filter(s=>{const pass=songFilter==="all"||(songFilter==="favorites"&&isFav(s.id))||(songFilter==="solfa"&&s.solfa)||(songFilter==="instrumental"&&s.instrumental);return pass&&(!q||normalize(s.title).includes(q)||normalize(s.artist).includes(q)||(String(songNo(s)).includes(q)||String(s.id).includes(q)))})}
+function getFilteredSongs(){const q=normalize($("songSearch").value.trim());return SONGS.filter(s=>{const pass=songFilter==="all"||(songFilter==="favorites"&&isFav(s.id))||(songFilter==="lyrics"&&s.lyrics)||(songFilter==="solfa"&&s.solfa)||(songFilter==="instrumental"&&s.instrumental);return pass&&(!q||normalize(s.title).includes(q)||normalize(s.artist).includes(q)||(String(songNo(s)).includes(q)||String(s.id).includes(q)))})}
 function songAvailability(s){
   const items=[];
   if(s?.lyrics)items.push({key:'lyrics',label:'Lyrics'});
