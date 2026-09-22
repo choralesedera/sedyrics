@@ -1377,7 +1377,39 @@ function nativeMessage(action,value=''){
 }
 
 function normalizeFacebookUrl(url){
-  return String(url||'').replace('://web.facebook.com/', '://www.facebook.com/');
+  const raw=String(url||'').trim();
+  if(!raw)return "";
+  try{
+    const u=new URL(raw,location.href);
+    if(!/(^|\.)facebook\.com$/i.test(u.hostname))return raw;
+    u.protocol="https:";
+    u.hostname="www.facebook.com";
+    u.search="";
+    u.hash="";
+    return u.toString();
+  }catch{
+    return raw
+      .replace(/^fb:\/\//i,"https://www.facebook.com/")
+      .replace("://web.facebook.com/","://www.facebook.com/")
+      .replace("://m.facebook.com/","://www.facebook.com/");
+  }
+}
+
+function facebookWebOnlyUrl(url){
+  const normalized=normalizeFacebookUrl(url);
+  if(!normalized)return "";
+  try{
+    const u=new URL(normalized);
+    u.protocol="https:";
+    u.hostname="m.facebook.com";
+    u.search="";
+    u.hash="";
+    return u.toString();
+  }catch{
+    return normalized
+      .replace("://www.facebook.com/","://m.facebook.com/")
+      .replace("://web.facebook.com/","://m.facebook.com/");
+  }
 }
 
 function openFacebookChoice(url,name='Chorale Sedera Ambalavato'){
@@ -1394,13 +1426,14 @@ function closeFacebookChoice(){
 
 function openFacebookInside(){
   if(!pendingFacebookLink)return;
-  const url=pendingFacebookLink;
+  const url=facebookWebOnlyUrl(pendingFacebookLink);
   closeFacebookChoice();
 
-  // Open Facebook directly inside the current LyriCSED WebView,
-  // exactly like a normal website. No Kodular bridge is required.
+  // Force Facebook's mobile HTTPS website inside LyriCSED.
+  // Never send an fb:// URI to Android WebView from LyriCSED itself.
+  if(!url)return;
   try{
-    window.location.href=url;
+    window.location.assign(url);
   }catch{
     try{window.open(url,'_self')}catch{}
   }
