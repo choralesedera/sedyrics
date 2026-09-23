@@ -1,7 +1,7 @@
 {
   "schemaVersion": 11,
-  "contentVersion": 30,
-  "updatedAt": "2026-09-23T22:30:00Z",
+  "contentVersion": 31,
+  "updatedAt": "2026-09-23T22:55:00Z",
   "catalog": "data/songs-v2.json",
   "announcements": "data/announcements-v2.json",
   "prefetch": {
@@ -30,7 +30,9 @@
     "nativeSeek": true,
     "nativeVolume": true,
     "nativeABLoop": true,
-    "nativeMarkers": true
+    "nativeMarkers": true,
+    "nativeSeekStable": true,
+    "seekOnRelease": true
   },
   "appVersion": "2.0",
   "versionName": "2.0"
