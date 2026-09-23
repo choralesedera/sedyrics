@@ -149,8 +149,8 @@
         <div class="quick-grid">
           <button class="quick-card" data-nav="songs"><span class="quick-icon"><svg><use href="#i-music"/></svg></span><span><b>Hira rehetra</b><small>Lyrics, Solfa, Playback</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
           <button class="quick-card" data-nav="announcements"><span class="quick-icon"><svg><use href="#i-bell"/></svg></span><span><b>Filazan-draharaha</b><small>Vaovao sy fampahafantarana</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
-          <button class="quick-card" data-nav="liturgy"><span class="quick-icon"><svg><use href="#i-list"/></svg></span><span><b>LITURGIE</b><small>Prélude, Interlude, Rakitra, Postlude</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
-          <button class="quick-card" data-nav="concert"><span class="quick-icon"><svg><use href="#i-music"/></svg></span><span><b>PLANNING CONCERT</b><small>Concert / Antsam-panahy</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
+          <button class="quick-card" data-nav="liturgy"><span class="quick-icon"><svg><use href="#i-list"/></svg></span><span><b>Litorjia</b><small>Prélude, Interlude, Rakitra, Postlude</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
+          <button class="quick-card" data-nav="concert"><span class="quick-icon"><svg><use href="#i-music"/></svg></span><span><b>Planning Concert</b><small>Concert / Antsam-panahy</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
           <button class="quick-card" data-nav="notes"><span class="quick-icon"><svg><use href="#i-note"/></svg></span><span><b>Fanamarihana</b><small>Notes de répétition</small></span><svg class="chev"><use href="#i-chevron"/></svg></button>
         </div>
 
@@ -228,7 +228,7 @@
               </div>
 
               <div class="markers-card">
-                <div class="markers-head"><div><span class="mini-label">REPÈRES DE RÉPÉTITION</span><p>Tsindrio ny repère iray mba hitsambikina amin'io fotoana io.</p></div></div>
+                <div class="markers-head"><div><span class="mini-label">REPÈRES DE RÉPÉTITION</span><p>Afaka manisy marika ianao amin'ny playback mandeha.</p></div></div>
                 <div class="marker-list" id="markerList"></div>
                 <div class="marker-add"><input id="markerLabel" type="text" maxlength="32" placeholder="Ohatra: Refrain"><button id="addMarkerBtn"><svg><use href="#i-plus"/></svg>Mariho</button></div>
               </div>
@@ -245,15 +245,15 @@
 
       <section class="view" id="liturgyView" data-view="liturgy">
         <div class="page-title">
-          <span class="page-icon-label"><svg><use href="#i-liturgy"/></svg>Playback Liturgie</span>
-          <h1>Liturgie</h1>
-          <p>Préparez et organisez les playbacks de la liturgie. La lecture continue même si vous consultez une autre partie de LyriCSED.</p>
+          <span class="page-icon-label"><svg><use href="#i-liturgy"/></svg>Playback Litorjia</span>
+          <h1>Litorjia</h1>
+          <p>Afaka alamina eto ny hira hatao mandritra ny fotoam-pivavahana.</p>
         </div>
 
         <div class="delay-settings">
           <div>
             <span class="mini-label">Pause entre les playbacks</span>
-            <strong>Délai général de la liturgie</strong>
+            <strong>Fotoana iomanana mialoha ny playback manaraka</strong>
           </div>
           <select id="liturgyPauseSelect">
             <option value="0">Aucune pause</option>
@@ -271,7 +271,7 @@
 
         <div class="planner-intro">
           <span class="mini-label">Filaharan'ny playback</span>
-          <h2>Programme de la liturgie</h2>
+          <h2>Fandaminana ny hira hatao</h2>
           <p>Ajoutez les instrumentaux LyriCSED ou des fichiers audio enregistrés sur le téléphone.</p>
         </div>
 
@@ -325,7 +325,7 @@
 
         <button class="play-event-btn" data-play-event="liturgy">
           <svg><use href="#i-play"/></svg>
-          <span><strong>Lire toute la liturgie</strong><small>Prélude → Interlude → Rakitra → Postlude</small></span>
+          <span><strong>Henoina daholo</strong><small>Prélude → Interlude → Rakitra → Postlude</small></span>
         </button>
 
         <div class="playlist-storage-note">
@@ -338,13 +338,13 @@
         <div class="page-title">
           <span class="page-icon-label"><svg><use href="#i-concert"/></svg>Planning Concert / Antsam-panahy</span>
           <h1>Concert</h1>
-          <p>Organisez les playbacks de chaque partie dans l'ordre exact du concert ou de l'Antsam-panahy.</p>
+          <p>Afaka alamina eto ny playback an'ireo hira hatao mandritra ny concert na Antsam-panahy.</p>
         </div>
 
         <div class="delay-settings">
           <div>
             <span class="mini-label">Pause entre les playbacks</span>
-            <strong>Délai général du planning</strong>
+            <strong>Elan'elana isaky ny Playback</strong>
           </div>
           <select id="concertPauseSelect">
             <option value="0">Aucune pause</option>
@@ -362,8 +362,8 @@
 
         <div class="planner-intro">
           <span class="mini-label">Planning complet</span>
-          <h2>Concert / Antsam-panahy</h2>
-          <p>Ajoutez plusieurs playbacks par partie et modifiez facilement leur ordre de lecture.</p>
+          <h2>Concert na Antsam-panahy</h2>
+          <p>Ampidiro eto ny Playback isaky ny Partie. Marihina fa azo ovaina koa ny filaharany.</p>
         </div>
 
         <div class="playlist-section" data-playlist-type="concert" data-playlist-section="part1">
@@ -414,7 +414,7 @@
       </section>
 
       <section class="view" id="announcementsView" data-view="announcements">
-        <div class="page-title"><span>FILAZAN-DRAHARAHA</span><h1>Vaovao sy fampahafantarana</h1><p>Ny vaovao voaray farany dia tehirizina ho azo vakiana offline.</p></div>
+        <div class="page-title"><span>FILAZAN-DRAHARAHA</span><h1>Vaovao sy fampahafantarana</h1><p>Vaovao mahakasika ny hetsika manan-danja ataon'ny Chorale Sedera Ambalavato.</p></div>
         <div class="announcement-list" id="announcementList"></div>
       </section>
 
@@ -481,7 +481,7 @@
     <nav class="bottom-nav" id="bottomNav">
       <button class="nav-item active" data-nav="home"><svg><use href="#i-home"/></svg><span>Accueil</span></button>
       <button class="nav-item" data-nav="songs"><svg><use href="#i-music"/></svg><span>Hira</span></button>
-      <button class="nav-item" data-nav="liturgy"><svg><use href="#i-liturgy"/></svg><span>Liturgie</span></button>
+      <button class="nav-item" data-nav="liturgy"><svg><use href="#i-liturgy"/></svg><span>Litorjia</span></button>
       <button class="nav-item" data-nav="concert"><svg><use href="#i-concert"/></svg><span>Concert</span></button>
       <button class="nav-item" data-nav="announcements"><svg><use href="#i-bell"/></svg><span>Vaovao</span></button>
       <button class="nav-item" data-nav="about"><svg><use href="#i-info"/></svg><span>À propos</span></button>
