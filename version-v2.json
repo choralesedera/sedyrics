@@ -1,7 +1,7 @@
 {
   "schemaVersion": 11,
-  "contentVersion": 27,
-  "updatedAt": "2026-09-23T20:40:00Z",
+  "contentVersion": 30,
+  "updatedAt": "2026-09-23T22:30:00Z",
   "catalog": "data/songs-v2.json",
   "announcements": "data/announcements-v2.json",
   "prefetch": {
@@ -22,7 +22,15 @@
     "nativeKodularAudio": true,
     "mediaNotification": true,
     "nativePlaybackStateSync": true,
-    "aboutPremiumCredits": true
+    "aboutPremiumCredits": true,
+    "aboutAnimatedCredit": true,
+    "ankinoLogoCredit": true,
+    "facebookExternalOnly": true,
+    "externalLinksOutsideWebViewer": true,
+    "nativeSeek": true,
+    "nativeVolume": true,
+    "nativeABLoop": true,
+    "nativeMarkers": true
   },
   "appVersion": "2.0",
   "versionName": "2.0"

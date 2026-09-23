@@ -1,16 +1,18 @@
-LyriCSED v2.0 - Mise à jour finale À propos
+LyriCSED v2.0 - FINAL CONTROLES AUDIO NATIFS
 
-Remplacer sur GitHub uniquement :
-- index.html
-- assets/css/style-v2.css
-- assets/js/app-v2.js
-- version-v2.json
+Cette version conserve les correctifs précédents et ajoute :
+- saut +/- 10 s et barre de progression avec Lecteur1 natif
+- volume HTML -> Lecteur1 natif
+- répétition A/B avec Lecteur1 natif
+- repères Mariho utilisables avec le lecteur natif
 
-Le fichier app-v2.js est inclus pour conserver tous les derniers correctifs audio, retour Android et Facebook.
+IMPORTANT : il faut aussi ajouter dans Kodular les gestionnaires :
+1) LYRICSED::AUDIO_SEEK:: -> Lecteur1.SeekTo(ms)
+2) LYRICSED::AUDIO_VOLUME:: -> mettre Lecteur1.Volume à valeur
 
-À propos :
-- message réservé aux membres en haut ;
-- liens Facebook ;
-- HO VONINAHITR'ANDRIAMANITRA IRERY IHANY ;
-- équipes ayant réalisé le contenu ;
-- crédit Ankino MG discret et premium en pied de page.
+Fichiers à remplacer sur GitHub :
+index.html
+assets/css/style-v2.css
+assets/js/app-v2.js
+assets/images/ankino-logo.webp
+version-v2.json
