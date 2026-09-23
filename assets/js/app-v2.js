@@ -18,13 +18,70 @@ const $$=sel=>[...document.querySelectorAll(sel)];
 let SONGS=[],ANNOUNCEMENTS=[],APP_VERSION=null,currentSong=null,currentView="home",songFilter="all",
 favorites=readJSON("sedyricsFavorites",[]).map(Number),
 readerZoom=Number(localStorage.getItem("lyricsedReaderZoom")||100),
-audioObjectUrl=null,loopA=null,loopB=null,loopEnabled=false,toastTimer=null,syncInProgress=false,globalAudioMode=null,globalAudioSongId=null,globalAudioTitle="",globalAudioReturnView=null;
+audioObjectUrl=null,loopA=null,loopB=null,loopEnabled=false,toastTimer=null,syncInProgress=false,globalAudioMode=null,globalAudioSongId=null,globalAudioTitle="",globalAudioReturnView=null,
+nativeAudioActive=false,nativeAudioPlaying=false,nativeAudioCurrent=0,nativeAudioDuration=0,nativeAudioSource="";
 const audio=$("audio");
+const PROTECTED_AUDIO_EXT=/\.(?:mp3|wav|wma|m4a|aac|ogg|flac|mpeg|mpga)(?:[?#]|$)/i;
 
-function hasGlobalAudio(){return !!audio.getAttribute('src')}
+// Instrumentaux protégés : lecture dans LyriCSED uniquement.
+// Aucun téléchargement vers Music/Download, aucun partage ou ouverture directe du fichier.
+try{
+  if(audio){
+    audio.setAttribute('controlsList','nodownload noplaybackrate noremoteplayback');
+    audio.disableRemotePlayback=true;
+    audio.addEventListener('contextmenu',e=>e.preventDefault());
+    audio.addEventListener('dragstart',e=>e.preventDefault());
+  }
+}catch{}
+
+function isProtectedAudioUrl(value){
+  try{
+    const u=new URL(String(value||''),location.href);
+    return PROTECTED_AUDIO_EXT.test(u.pathname);
+  }catch{
+    return PROTECTED_AUDIO_EXT.test(String(value||''));
+  }
+}
+
+// Empêche toute navigation/téléchargement direct vers un fichier instrumental depuis l'interface.
+document.addEventListener('click',e=>{
+  const link=e.target?.closest?.('a[href]');
+  if(!link)return;
+  const href=link.getAttribute('href')||'';
+  if(!isProtectedAudioUrl(href))return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  toast('Playback disponible uniquement dans LyriCSED');
+},true);
+
+document.addEventListener('contextmenu',e=>{
+  const link=e.target?.closest?.('a[href]');
+  if(link&&isProtectedAudioUrl(link.getAttribute('href')||''))e.preventDefault();
+},true);
+
+function hasGlobalAudio(){return nativeAudioActive||!!audio.getAttribute('src')}
+function playbackCurrent(){return nativeAudioActive?Math.max(0,Number(nativeAudioCurrent)||0):(Number(audio.currentTime)||0)}
+function playbackDuration(){return nativeAudioActive?Math.max(0,Number(nativeAudioDuration)||0):(Number(audio.duration)||0)}
+function playbackPlaying(){return nativeAudioActive?!!nativeAudioPlaying:(hasGlobalAudio()&&!audio.paused)}
+function absoluteMediaUrl(path){try{return new URL(cleanPath(path),location.href).toString()}catch{return String(path||'')}}
+function setPlaybackPosition(seconds,{sendNative=true}={}){
+  const dur=playbackDuration();
+  const next=Math.max(0,dur>0?Math.min(dur,Number(seconds)||0):Number(seconds)||0);
+  if(nativeAudioActive){
+    nativeAudioCurrent=next;
+    if(sendNative)nativeMessage('AUDIO_SEEK',String(Math.round(next*1000)));
+    try{if(Number.isFinite(audio.duration))audio.currentTime=Math.min(audio.duration,next)}catch{}
+  }else if(Number.isFinite(audio.duration)){
+    audio.currentTime=Math.min(audio.duration,next);
+  }
+  updateGlobalAudioUI();
+}
 function isCurrentSongAudio(){return globalAudioMode==='song'&&currentSong&&Number(globalAudioSongId)===Number(currentSong.id)&&hasGlobalAudio()}
 function releaseAudioObjectUrl(){if(audioObjectUrl){try{URL.revokeObjectURL(audioObjectUrl)}catch{}audioObjectUrl=null}}
-async function setGlobalAudioBlob(blob,{mode,title,songId=null,returnView=null,autoplay=false}={}){
+async function setGlobalAudioBlob(blob,{mode,title,songId=null,returnView=null,autoplay=false,nativeSource=null}={}){
+  const canNative=!!nativeSource&&hasNativeAudioBridge()&&navigator.onLine;
+  const wasNative=nativeAudioActive;
+
   audio.pause();
   releaseAudioObjectUrl();
   audio.removeAttribute('src');audio.load();
@@ -35,11 +92,32 @@ async function setGlobalAudioBlob(blob,{mode,title,songId=null,returnView=null,a
   globalAudioTitle=title||'Playback';
   globalAudioReturnView=returnView||null;
   audio.load();
+
+  if(canNative){
+    nativeAudioActive=true;
+    nativeAudioPlaying=!!autoplay;
+    nativeAudioCurrent=0;
+    nativeAudioDuration=0;
+    nativeAudioSource=String(nativeSource);
+    audio.muted=true;
+    nativeMessage('AUDIO_SOURCE',nativeAudioSource);
+    nativeMessage('AUDIO_META',globalAudioTitle);
+    if(autoplay)nativeMessage('AUDIO_PLAY');
+    updateGlobalAudioUI();
+    return;
+  }
+
+  if(wasNative)nativeMessage('AUDIO_STOP');
+  nativeAudioActive=false;nativeAudioPlaying=false;nativeAudioCurrent=0;nativeAudioDuration=0;nativeAudioSource='';
+  audio.muted=false;
   updateGlobalAudioUI();
   if(autoplay)try{await audio.play()}catch{}
 }
 function clearGlobalAudio(){
+  if(nativeAudioActive)nativeMessage('AUDIO_STOP');
+  nativeAudioActive=false;nativeAudioPlaying=false;nativeAudioCurrent=0;nativeAudioDuration=0;nativeAudioSource='';
   audio.pause();
+  audio.muted=false;
   audio.removeAttribute('src');audio.load();
   releaseAudioObjectUrl();
   globalAudioMode=null;globalAudioSongId=null;globalAudioTitle='';globalAudioReturnView=null;
@@ -49,8 +127,15 @@ function clearGlobalAudio(){
 function globalPlayPause(){
   if(pendingNextIndex!==null&&globalAudioMode==='event'){launchPendingNextNow();return}
   if(!hasGlobalAudio())return;
+  if(nativeAudioActive){
+    if(nativeAudioPlaying){nativeMessage('AUDIO_PAUSE');nativeAudioPlaying=false}
+    else{nativeMessage('AUDIO_PLAY');nativeAudioPlaying=true}
+    updateGlobalAudioUI();
+    return;
+  }
   if(audio.paused)audio.play().catch(()=>{});else audio.pause();
 }
+
 function updateGlobalAudioUI(){
   updateAudioUI();
   updatePlaylistPlayerUI();
@@ -606,7 +691,10 @@ async function loadInstrumental(){
 async function ensureSongAudioLoaded(song,autoplay=false){
   if(!song?.instrumental)return false;
   if(globalAudioMode==='song'&&Number(globalAudioSongId)===Number(song.id)&&hasGlobalAudio()){
-    if(autoplay&&audio.paused)try{await audio.play()}catch{}
+    if(autoplay){
+      if(nativeAudioActive&&!nativeAudioPlaying){nativeMessage('AUDIO_PLAY');nativeAudioPlaying=true}
+      else if(!nativeAudioActive&&audio.paused)try{await audio.play()}catch{}
+    }
     updateGlobalAudioUI();return true;
   }
   cancelPlaylistCountdown();
@@ -618,7 +706,7 @@ async function ensureSongAudioLoaded(song,autoplay=false){
     const cached=await getAnyCached(path);
     const r=cached||await getCached(path);
     const blob=await r.blob();
-    await setGlobalAudioBlob(blob,{mode:'song',title:song.title,songId:song.id,returnView:'song',autoplay});
+    await setGlobalAudioBlob(blob,{mode:'song',title:song.title,songId:song.id,returnView:'song',autoplay,nativeSource:absoluteMediaUrl(path)});
     $("audioCacheBadge").textContent=cached?'Offline prêt':'Téléchargé';
     return true;
   }catch{
@@ -633,17 +721,17 @@ async function playPause(){
   globalPlayPause();
 }
 function seekBy(delta){
-  if(!isCurrentSongAudio()||!Number.isFinite(audio.duration))return;
-  audio.currentTime=Math.max(0,Math.min(audio.duration,audio.currentTime+delta));
+  if(!isCurrentSongAudio())return;
+  setPlaybackPosition(playbackCurrent()+delta);
 }
 function updateAudioUI(){
   const same=isCurrentSongAudio();
-  const playing=same&&!audio.paused;
+  const playing=same&&playbackPlaying();
   const use=playing?'i-pause':'i-play';
   if($("mainPlayBtn"))$("mainPlayBtn").innerHTML=icon(use);
   if($("miniPlay"))$("miniPlay").innerHTML=icon(use);
   if($("playingBars"))$("playingBars").classList.toggle('active',playing);
-  const now=same?audio.currentTime:0,dur=same?audio.duration:0;
+  const now=same?playbackCurrent():0,dur=same?playbackDuration():0;
   if($("elapsed"))$("elapsed").textContent=fmt(now);
   if($("duration"))$("duration").textContent=fmt(dur);
   if($("miniTrackTime"))$("miniTrackTime").textContent=same?`${fmt(now)} / ${fmt(dur)}`:'Prêt';
@@ -651,7 +739,11 @@ function updateAudioUI(){
   if($("audioTitle"))$("audioTitle").textContent=same?`${globalAudioTitle} • Playback`:`${currentSong?.title||'Instrumental'} • Playback`;
   if($("volumeBar"))$("volumeBar").value=Math.round(audio.volume*100);if($("volumeValue"))$("volumeValue").textContent=`${Math.round(audio.volume*100)}%`;
 }
-function pauseAudio(reset=false){audio.pause();if(reset&&Number.isFinite(audio.duration))audio.currentTime=0;updateGlobalAudioUI()}
+function pauseAudio(reset=false){
+  if(nativeAudioActive){nativeMessage('AUDIO_PAUSE');nativeAudioPlaying=false;if(reset)setPlaybackPosition(0)}
+  else{audio.pause();if(reset&&Number.isFinite(audio.duration))audio.currentTime=0}
+  updateGlobalAudioUI();
+}
 function resetLoop(){loopA=null;loopB=null;loopEnabled=false;$("aTime").textContent='--:--';$("bTime").textContent='--:--';$("toggleLoop").classList.remove('active')}
 function markerKey(){return currentSong?`sedyricsMarkers:${currentSong.id}`:'sedyricsMarkers:none'}
 function hiddenMarkerKey(){return currentSong?`sedyricsHiddenMarkers:${currentSong.id}`:'sedyricsHiddenMarkers:none'}
@@ -696,7 +788,7 @@ function renderMarkers(){
     const jump=document.createElement('button');
     jump.className='marker-chip';
     jump.innerHTML=`${escapeHtml(m.label)} <small>${fmt(Number(m.time))}</small>`;
-    jump.onclick=async()=>{if(!isCurrentSongAudio())await ensureSongAudioLoaded(currentSong,false);if(isCurrentSongAudio())audio.currentTime=Number(m.time)||0;toast(`Repère: ${m.label}`)};
+    jump.onclick=async()=>{if(!isCurrentSongAudio())await ensureSongAudioLoaded(currentSong,false);if(isCurrentSongAudio())setPlaybackPosition(Number(m.time)||0);toast(`Repère: ${m.label}`)};
 
     const del=document.createElement('button');
     del.className='marker-delete';
@@ -717,7 +809,7 @@ function addMarker(){
   if(!label){toast('Ampidiro ny anaran\'ny repère');return}
   if(!isCurrentSongAudio()){toast('Lancez d’abord ce playback.');return}
   const list=localMarkers();
-  list.push({label,time:Math.round(audio.currentTime*10)/10});
+  list.push({label,time:Math.round(playbackCurrent()*10)/10});
   writeJSON(markerKey(),list);
   $("markerLabel").value='';
   renderMarkers();
@@ -735,6 +827,7 @@ const PLAYLIST_KEY='lyricsedEventPlaylistsV1';
 const PLAYLIST_DELAY_KEY='lyricsedPlaylistDelaySettingsV2';
 const LOCAL_AUDIO_DB='lyricsed-local-audio-v1';
 const LOCAL_AUDIO_STORE='audio';
+// Les copies importées sont conservées dans IndexedDB privé du WebView, pas dans Music/Download.
 // Liturgie, Concert, Antsam-panahy et Playback utilisent tous le même élément audio global.
 
 let playlistTarget=null;
@@ -1119,7 +1212,7 @@ async function loadPlaylistQueueItem(index,autoplay=true){
   resetLoop();
 
   try{
-    let blob;
+    let blob,nativeSource=null;
     if(item.source==='local'){
       const record=await getLocalAudio(item.blobId);
       if(!record?.blob)throw new Error('local audio missing');
@@ -1130,8 +1223,9 @@ async function loadPlaylistQueueItem(index,autoplay=true){
       if(!path)throw new Error('library audio missing');
       const response=await getCached(path);
       blob=await response.blob();
+      nativeSource=absoluteMediaUrl(path);
     }
-    await setGlobalAudioBlob(blob,{mode:'event',title:item.title||'Playback',returnView:playlistOriginType||item._type,autoplay});
+    await setGlobalAudioBlob(blob,{mode:'event',title:item.title||'Playback',returnView:playlistOriginType||item._type,autoplay,nativeSource});
     updateGlobalAudioUI();
   }catch{
     toast('Playback indisponible. Vérifiez qu’il est bien enregistré offline.');
@@ -1179,7 +1273,7 @@ function startPlaylistCountdown(seconds,nextIndex){
 function handlePlaylistEnded(){
   if(playlistIndex+1>=playlistQueue.length){
     cancelPlaylistCountdown();
-    audio.pause();
+    if(nativeAudioActive){nativeAudioPlaying=false}else audio.pause();
     toast('Fin de la playlist');
     updateGlobalAudioUI();
     return;
@@ -1218,13 +1312,13 @@ function playlistNext(){
   if(globalAudioMode!=='event')return;
   cancelPlaylistCountdown();
   if(playlistIndex+1<playlistQueue.length)loadPlaylistQueueItem(playlistIndex+1,true);
-  else{audio.pause();toast('Fin de la playlist');updateGlobalAudioUI()}
+  else{if(nativeAudioActive){nativeMessage('AUDIO_PAUSE');nativeAudioPlaying=false}else audio.pause();toast('Fin de la playlist');updateGlobalAudioUI()}
 }
 function playlistPrev(){
   if(globalAudioMode!=='event')return;
   cancelPlaylistCountdown();
   if(playlistIndex>0)loadPlaylistQueueItem(playlistIndex-1,true);
-  else if(Number.isFinite(audio.duration))audio.currentTime=0;
+  else setPlaybackPosition(0);
 }
 
 function currentQueueItem(){return playlistQueue[playlistIndex]||null}
@@ -1252,23 +1346,23 @@ function updateHeaderPlayback(){
   const active=hasGlobalAudio()||pendingNextIndex!==null;
   chip.classList.toggle('hidden',!active);if(!active)return;
   const waiting=globalAudioMode==='event'&&pendingNextIndex!==null;
-  const playing=hasGlobalAudio()&&!audio.paused&&!waiting;
+  const playing=playbackPlaying()&&!waiting;
   const next=nextQueueItem();
   const title=waiting?`Pause ${countdownRemaining}s • ${next?.title||'Suivant'}`:(globalAudioTitle||'Playback');
   chip.classList.toggle('playing',playing);chip.classList.toggle('waiting',waiting);
   $("headerPlaybackTitle").textContent=title;
   $("headerPlaybackToggle").innerHTML=icon(playing?'i-pause':'i-play');
-  if($("headerPlaybackTime"))$("headerPlaybackTime").textContent=waiting?`${countdownRemaining}s`:`${fmt(audio.currentTime)} / ${fmt(audio.duration)}`;
+  if($("headerPlaybackTime"))$("headerPlaybackTime").textContent=waiting?`${countdownRemaining}s`:`${fmt(playbackCurrent())} / ${fmt(playbackDuration())}`;
 }
 function updateMiniPlayer(){
   if(!$("miniGlobalTitle"))return;
   const next=globalAudioMode==='event'?nextQueueItem():null;
   $("miniGlobalTitle").textContent=globalAudioTitle||'Aucun playback';
   $("miniGlobalNext").textContent=next?`Prochain : ${next.title}`:(globalAudioMode==='song'?'Playback global':'Prochain : aucun');
-  $("miniGlobalPlay").innerHTML=icon(!audio.paused&&hasGlobalAudio()?'i-pause':'i-play');
-  if($("miniGlobalElapsed"))$("miniGlobalElapsed").textContent=fmt(audio.currentTime);
-  if($("miniGlobalDuration"))$("miniGlobalDuration").textContent=fmt(audio.duration);
-  if($("miniGlobalSeek"))$("miniGlobalSeek").value=(Number.isFinite(audio.duration)&&audio.duration>0)?Math.round(audio.currentTime/audio.duration*1000):0;
+  $("miniGlobalPlay").innerHTML=icon(playbackPlaying()?'i-pause':'i-play');
+  if($("miniGlobalElapsed"))$("miniGlobalElapsed").textContent=fmt(playbackCurrent());
+  if($("miniGlobalDuration"))$("miniGlobalDuration").textContent=fmt(playbackDuration());
+  if($("miniGlobalSeek"))$("miniGlobalSeek").value=playbackDuration()>0?Math.round(playbackCurrent()/playbackDuration()*1000):0;
   const eventMode=globalAudioMode==='event';
   $("miniGlobalPrev").disabled=!eventMode;$("miniGlobalNextBtn").disabled=!eventMode;
 }
@@ -1277,10 +1371,10 @@ function updatePlaylistPlayerUI(){
   const eventMode=globalAudioMode==='event';
   const item=eventMode?currentQueueItem():null;
   const next=eventMode?nextQueueItem():null;
-  const playing=hasGlobalAudio()&&!audio.paused&&pendingNextIndex===null;
+  const playing=playbackPlaying()&&pendingNextIndex===null;
   $("eventPlayBtn").innerHTML=icon(playing?'i-pause':'i-play');
-  $("eventElapsed").textContent=fmt(audio.currentTime||0);$("eventDuration").textContent=fmt(audio.duration||0);
-  $("eventSeek").value=(Number.isFinite(audio.duration)&&audio.duration>0)?Math.round(audio.currentTime/audio.duration*1000):0;
+  $("eventElapsed").textContent=fmt(playbackCurrent());$("eventDuration").textContent=fmt(playbackDuration());
+  $("eventSeek").value=playbackDuration()>0?Math.round(playbackCurrent()/playbackDuration()*1000):0;
   $("eventPlayerSection").textContent=eventMode?(item?._sectionLabel||'Playlist'):'Playback';
   $("eventPlayerTitle").textContent=globalAudioTitle||'Aucun playback';
   $("eventNextTitle").textContent=next?`Prochain : ${next.title}`:'Prochain : aucun';
@@ -1332,7 +1426,7 @@ $("eventStopBtn").onclick=stopGlobalPlayback;
 $("playNextNow").onclick=launchPendingNextNow;
 
 $("eventSeek").oninput=()=>{
-  if(Number.isFinite(audio.duration))audio.currentTime=Number($("eventSeek").value)/1000*audio.duration;updateGlobalAudioUI();
+  const dur=playbackDuration();if(dur>0)setPlaybackPosition(Number($("eventSeek").value)/1000*dur);
 };
 $("eventVolume").oninput=()=>{
   audio.volume=Number($("eventVolume").value)/100;
@@ -1347,7 +1441,7 @@ $("miniGlobalPlay").onclick=globalPlayPause;
 $("miniGlobalNextBtn").onclick=playlistNext;
 $("miniGlobalPrev").onclick=playlistPrev;
 $("returnToPlayer").onclick=returnToPlaylistPlayer;
-$("miniGlobalSeek").oninput=()=>{if(Number.isFinite(audio.duration))audio.currentTime=Number($("miniGlobalSeek").value)/1000*audio.duration;updateGlobalAudioUI()};
+$("miniGlobalSeek").oninput=()=>{const dur=playbackDuration();if(dur>0)setPlaybackPosition(Number($("miniGlobalSeek").value)/1000*dur)};
 
 bindDelayControls('liturgy');
 bindDelayControls('concert');
@@ -1359,21 +1453,76 @@ bindDelayControls('concert');
 
 let pendingFacebookLink=null;
 
+function hasNativeAudioBridge(){
+  try{if(window.Kodular&&typeof window.Kodular.setWebViewString==='function')return true}catch{}
+  try{if(window.AppInventor&&typeof window.AppInventor.setWebViewString==='function')return true}catch{}
+  return false;
+}
 function nativeMessage(action,value=''){
-  const payload=`LYRICSED::${action}::${String(value||'')}`;
+  const hasValue=value!==undefined&&value!==null&&String(value)!=='';
+  const payload=hasValue?`LYRICSED::${action}::${String(value)}`:`LYRICSED::${action}`;
+  // AUDIO_* messages intentionally have no timestamp because the Kodular blocks
+  // compare/extract these exact strings. Other messages retain uniqueness.
+  // Kodular parses AUDIO_*, FACEBOOK_EXTERNAL and EXIT_APP with exact prefixes.
+  // Do not append a timestamp to external Facebook URLs, otherwise the URI becomes invalid.
+  const exactNativeAction=String(action).startsWith('AUDIO_') || action==='FACEBOOK_EXTERNAL' || action==='EXIT_APP';
+  const output=exactNativeAction?payload:`${payload}::${Date.now()}`;
   try{
     if(window.Kodular&&typeof window.Kodular.setWebViewString==='function'){
-      window.Kodular.setWebViewString(`${payload}::${Date.now()}`);
+      window.Kodular.setWebViewString(output);
       return true;
     }
   }catch{}
   try{
     if(window.AppInventor&&typeof window.AppInventor.setWebViewString==='function'){
-      window.AppInventor.setWebViewString(`${payload}::${Date.now()}`);
+      window.AppInventor.setWebViewString(output);
       return true;
     }
   }catch{}
   return false;
+}
+function nativeState(positionMs,durationMs,isPlaying){
+  if(!nativeAudioActive)return;
+  const pos=Math.max(0,Number(positionMs)||0)/1000;
+  const dur=Math.max(0,Number(durationMs)||0)/1000;
+  nativeAudioCurrent=pos;
+  if(dur>0)nativeAudioDuration=dur;
+  nativeAudioPlaying=isPlaying===true||isPlaying===1||String(isPlaying).toLowerCase()==='true';
+  try{
+    if(Number.isFinite(audio.duration)&&Math.abs((audio.currentTime||0)-pos)>1.5)audio.currentTime=Math.min(audio.duration,pos);
+  }catch{}
+  updateGlobalAudioUI();
+}
+function nativeSetPlaying(value){
+  if(!nativeAudioActive)return;
+  nativeAudioPlaying=value===true||value===1||String(value).toLowerCase()==='true';
+  updateGlobalAudioUI();
+}
+async function playAdjacentNativeSong(direction){
+  const playable=SONGS.filter(s=>s.instrumental);
+  if(!playable.length)return;
+  let index=playable.findIndex(s=>Number(s.id)===Number(globalAudioSongId));
+  if(index<0)index=0;
+  index=(index+(direction<0?-1:1)+playable.length)%playable.length;
+  const target=playable[index];
+  currentSong=target;
+  if(currentView==='song')await openSong(target.id,{push:false});
+  await ensureSongAudioLoaded(target,true);
+}
+function nativeNext(){
+  if(globalAudioMode==='event'){playlistNext();return}
+  if(globalAudioMode==='song')playAdjacentNativeSong(1);
+}
+function nativePrevious(){
+  if(globalAudioMode==='event'){playlistPrev();return}
+  if(globalAudioMode==='song')playAdjacentNativeSong(-1);
+}
+function nativeEnded(){
+  if(!nativeAudioActive)return;
+  nativeAudioPlaying=false;
+  if(nativeAudioDuration>0)nativeAudioCurrent=nativeAudioDuration;
+  if(globalAudioMode==='event')handlePlaylistEnded();
+  else updateGlobalAudioUI();
 }
 
 function normalizeFacebookUrl(url){
@@ -1508,7 +1657,12 @@ function handleAndroidBack(){
 window.LyriCSED=Object.assign(window.LyriCSED||{},{
   handleAndroidBack,
   showExitConfirmation,
-  hideExitConfirmation
+  hideExitConfirmation,
+  nativeNext,
+  nativePrevious,
+  nativeState,
+  nativeSetPlaying,
+  nativeEnded
 });
 
 $$('.smart-link').forEach(a=>a.addEventListener('click',e=>{
@@ -1551,13 +1705,18 @@ $("favoriteBtn").onclick=toggleFav;$("fontDown").onclick=()=>{readerZoom-=10;app
 
 // audio
 $("mainPlayBtn").onclick=playPause;$("miniPlay").onclick=playPause;$("rewindBtn").onclick=()=>seekBy(-10);$("miniRewind").onclick=()=>seekBy(-10);$("forwardBtn").onclick=()=>seekBy(10);$("miniForward").onclick=()=>seekBy(10);
-$("seekBar").oninput=()=>{if(isCurrentSongAudio()&&Number.isFinite(audio.duration))audio.currentTime=Number($("seekBar").value)/1000*audio.duration;updateGlobalAudioUI()};$("volumeBar").oninput=()=>{audio.volume=Number($("volumeBar").value)/100;$("volumeValue").textContent=`${$("volumeBar").value}%`};
-$("setA").onclick=()=>{if(!isCurrentSongAudio()){toast("Lancez d’abord ce playback.");return}loopA=audio.currentTime;$("aTime").textContent=fmt(loopA);toast('Point A défini')};$("setB").onclick=()=>{if(!isCurrentSongAudio()){toast("Lancez d’abord ce playback.");return}loopB=audio.currentTime;$("bTime").textContent=fmt(loopB);toast('Point B défini')};$("toggleLoop").onclick=()=>{if(loopA===null||loopB===null||loopB<=loopA){toast('Définissez A puis B');return}loopEnabled=!loopEnabled;$("toggleLoop").classList.toggle('active',loopEnabled);toast(loopEnabled?'Répétition A/B activée':'Répétition A/B désactivée')};$("clearLoop").onclick=resetLoop;$("addMarkerBtn").onclick=addMarker;
-audio.addEventListener('timeupdate',()=>{if(globalAudioMode==='song'&&loopEnabled&&loopA!==null&&loopB!==null&&audio.currentTime>=loopB)audio.currentTime=loopA;updateGlobalAudioUI()});
+$("seekBar").oninput=()=>{const dur=playbackDuration();if(isCurrentSongAudio()&&dur>0)setPlaybackPosition(Number($("seekBar").value)/1000*dur)};$("volumeBar").oninput=()=>{audio.volume=Number($("volumeBar").value)/100;$("volumeValue").textContent=`${$("volumeBar").value}%`};
+$("setA").onclick=()=>{if(!isCurrentSongAudio()){toast("Lancez d’abord ce playback.");return}loopA=playbackCurrent();$("aTime").textContent=fmt(loopA);toast('Point A défini')};$("setB").onclick=()=>{if(!isCurrentSongAudio()){toast("Lancez d’abord ce playback.");return}loopB=playbackCurrent();$("bTime").textContent=fmt(loopB);toast('Point B défini')};$("toggleLoop").onclick=()=>{if(loopA===null||loopB===null||loopB<=loopA){toast('Définissez A puis B');return}loopEnabled=!loopEnabled;$("toggleLoop").classList.toggle('active',loopEnabled);toast(loopEnabled?'Répétition A/B activée':'Répétition A/B désactivée')};$("clearLoop").onclick=resetLoop;$("addMarkerBtn").onclick=addMarker;
+audio.addEventListener('timeupdate',()=>{if(!nativeAudioActive&&globalAudioMode==='song'&&loopEnabled&&loopA!==null&&loopB!==null&&audio.currentTime>=loopB)audio.currentTime=loopA;if(!nativeAudioActive)updateGlobalAudioUI()});
 audio.addEventListener('play',updateGlobalAudioUI);
 audio.addEventListener('pause',updateGlobalAudioUI);
 audio.addEventListener('loadedmetadata',updateGlobalAudioUI);
 audio.addEventListener('ended',()=>{if(globalAudioMode==='event')handlePlaylistEnded();else updateGlobalAudioUI()});
+
+
+// Ask Kodular for the authoritative position whenever LyriCSED returns to foreground.
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&nativeAudioActive)nativeMessage('AUDIO_STATE_REQUEST')});
+window.addEventListener('focus',()=>{if(nativeAudioActive)nativeMessage('AUDIO_STATE_REQUEST')});
 
 // notes autosave
 $("songNote").addEventListener('input',()=>{const s=$("songNoteSaved");s.textContent='Enregistrement...';clearTimeout($("songNote")._t);$("songNote")._t=setTimeout(()=>autosave($("songNote"),noteKey(),s),260)});
