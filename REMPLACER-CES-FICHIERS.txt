@@ -1,0 +1,16 @@
+LyriCSED v2.0 - Mise à jour finale À propos
+
+Remplacer sur GitHub uniquement :
+- index.html
+- assets/css/style-v2.css
+- assets/js/app-v2.js
+- version-v2.json
+
+Le fichier app-v2.js est inclus pour conserver tous les derniers correctifs audio, retour Android et Facebook.
+
+À propos :
+- message réservé aux membres en haut ;
+- liens Facebook ;
+- HO VONINAHITR'ANDRIAMANITRA IRERY IHANY ;
+- équipes ayant réalisé le contenu ;
+- crédit Ankino MG discret et premium en pied de page.

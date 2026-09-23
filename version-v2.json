@@ -1,7 +1,7 @@
 {
   "schemaVersion": 11,
-  "contentVersion": 23,
-  "updatedAt": "2026-09-22T03:35:00+03:00",
+  "contentVersion": 27,
+  "updatedAt": "2026-09-23T20:40:00Z",
   "catalog": "data/songs-v2.json",
   "announcements": "data/announcements-v2.json",
   "prefetch": {
@@ -18,7 +18,11 @@
     "eventPlaylists": true,
     "localAudioImport": true,
     "localAudioIndexedDB": true,
-    "pitchShift": false
+    "pitchShift": false,
+    "nativeKodularAudio": true,
+    "mediaNotification": true,
+    "nativePlaybackStateSync": true,
+    "aboutPremiumCredits": true
   },
   "appVersion": "2.0",
   "versionName": "2.0"
