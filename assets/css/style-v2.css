@@ -568,3 +568,21 @@
 @media(min-width:650px){
   .native-choice-overlay{align-items:center}
 }
+
+
+/* LyriCSED v2.0 - À propos premium */
+.about-notice{margin-top:4px;padding:16px 17px;border:1px solid #D6EAF3;border-radius:20px;background:linear-gradient(145deg,#F8FCFE,#EEF8FC);box-shadow:0 7px 20px rgba(8,47,73,.035)}
+.about-notice>span{display:block;font-size:8px;letter-spacing:1.35px;font-weight:900;color:#3497BC}
+.about-notice p{margin:7px 0 0;color:#254A5D;font-size:12px;line-height:1.65;font-weight:650}
+.about-devotion{position:relative;margin-top:18px;padding:18px 15px;text-align:center;border-radius:20px;background:linear-gradient(145deg,#083A56,#0B5B82);box-shadow:0 12px 30px rgba(8,47,73,.14);overflow:hidden}
+.about-devotion:after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:-46px;top:-58px;background:rgba(186,230,253,.12)}
+.about-devotion span{position:relative;z-index:1;display:block;color:#9DDBF2;font-size:7px;letter-spacing:1.8px;font-weight:900}
+.about-devotion strong{position:relative;z-index:1;display:block;margin-top:6px;color:#fff;font-size:12px;line-height:1.5;letter-spacing:.35px}
+.about-team-card{margin-top:10px;padding:15px 16px;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:0 6px 18px rgba(8,47,73,.035)}
+.about-team-card>span{display:block;margin-bottom:9px;color:#3497BC;font-size:8px;letter-spacing:1.25px;font-weight:900}
+.about-team-card strong{display:block;padding:7px 0;color:var(--navy2);font-size:11px;line-height:1.45}
+.about-team-card strong+strong{border-top:1px solid #E8F1F5}
+.about-credit-footer{margin:20px 4px 4px;padding-top:13px;border-top:1px solid #DCEBF2;text-align:center}
+.about-credit-footer>span{display:block;color:#93A7B1;font-size:7px;letter-spacing:.8px;text-transform:uppercase}
+.about-credit-footer a{display:inline-block;margin-top:5px;color:#5D7785;text-decoration:none;font-size:9px;font-weight:800;letter-spacing:.15px}
+.about-credit-footer a:active{opacity:.65}
