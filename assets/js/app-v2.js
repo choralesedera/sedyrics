@@ -76,6 +76,15 @@ function setPlaybackPosition(seconds,{sendNative=true}={}){
   }
   updateGlobalAudioUI();
 }
+function setPlaybackVolume(percent,{sendNative=true}={}){
+  const value=Math.max(0,Math.min(100,Number(percent)||0));
+  audio.volume=value/100;
+  if(nativeAudioActive&&sendNative)nativeMessage('AUDIO_VOLUME',String(Math.round(value)));
+  if($("volumeBar"))$("volumeBar").value=Math.round(value);
+  if($("volumeValue"))$("volumeValue").textContent=`${Math.round(value)}%`;
+  if($("eventVolume"))$("eventVolume").value=Math.round(value);
+  if($("eventVolumeValue"))$("eventVolumeValue").textContent=`${Math.round(value)}%`;
+}
 function isCurrentSongAudio(){return globalAudioMode==='song'&&currentSong&&Number(globalAudioSongId)===Number(currentSong.id)&&hasGlobalAudio()}
 function releaseAudioObjectUrl(){if(audioObjectUrl){try{URL.revokeObjectURL(audioObjectUrl)}catch{}audioObjectUrl=null}}
 async function setGlobalAudioBlob(blob,{mode,title,songId=null,returnView=null,autoplay=false,nativeSource=null}={}){
@@ -102,6 +111,7 @@ async function setGlobalAudioBlob(blob,{mode,title,songId=null,returnView=null,a
     audio.muted=true;
     nativeMessage('AUDIO_SOURCE',nativeAudioSource);
     nativeMessage('AUDIO_META',globalAudioTitle);
+    nativeMessage('AUDIO_VOLUME',String(Math.round(audio.volume*100)));
     if(autoplay)nativeMessage('AUDIO_PLAY');
     updateGlobalAudioUI();
     return;
@@ -1429,8 +1439,7 @@ $("eventSeek").oninput=()=>{
   const dur=playbackDuration();if(dur>0)setPlaybackPosition(Number($("eventSeek").value)/1000*dur);
 };
 $("eventVolume").oninput=()=>{
-  audio.volume=Number($("eventVolume").value)/100;
-  $("eventVolumeValue").textContent=`${$("eventVolume").value}%`;
+  setPlaybackVolume(Number($("eventVolume").value));
 };
 
 $("headerPlayback").onclick=openGlobalMiniPlayer;
@@ -1451,8 +1460,6 @@ bindDelayControls('concert');
 
 
 
-let pendingFacebookLink=null;
-
 function hasNativeAudioBridge(){
   try{if(window.Kodular&&typeof window.Kodular.setWebViewString==='function')return true}catch{}
   try{if(window.AppInventor&&typeof window.AppInventor.setWebViewString==='function')return true}catch{}
@@ -1462,9 +1469,7 @@ function nativeMessage(action,value=''){
   const hasValue=value!==undefined&&value!==null&&String(value)!=='';
   const payload=hasValue?`LYRICSED::${action}::${String(value)}`:`LYRICSED::${action}`;
   // AUDIO_* messages intentionally have no timestamp because the Kodular blocks
-  // compare/extract these exact strings. Other messages retain uniqueness.
-  // Kodular parses AUDIO_*, FACEBOOK_EXTERNAL and EXIT_APP with exact prefixes.
-  // Do not append a timestamp to external Facebook URLs, otherwise the URI becomes invalid.
+  // compare/extract these exact strings. External URLs and EXIT_APP also stay exact.
   const exactNativeAction=String(action).startsWith('AUDIO_') || action==='FACEBOOK_EXTERNAL' || action==='EXIT_APP';
   const output=exactNativeAction?payload:`${payload}::${Date.now()}`;
   try{
@@ -1488,6 +1493,17 @@ function nativeState(positionMs,durationMs,isPlaying){
   nativeAudioCurrent=pos;
   if(dur>0)nativeAudioDuration=dur;
   nativeAudioPlaying=isPlaying===true||isPlaying===1||String(isPlaying).toLowerCase()==='true';
+
+  // Répétition A/B avec le lecteur natif Kodular.
+  // HorlogeAudio fournit la position réelle; quand B est atteint on renvoie le lecteur vers A.
+  if(globalAudioMode==='song'&&loopEnabled&&loopA!==null&&loopB!==null&&loopB>loopA&&pos>=loopB){
+    nativeAudioCurrent=loopA;
+    nativeMessage('AUDIO_SEEK',String(Math.round(loopA*1000)));
+    try{if(Number.isFinite(audio.duration))audio.currentTime=Math.min(audio.duration,loopA)}catch{}
+    updateGlobalAudioUI();
+    return;
+  }
+
   try{
     if(Number.isFinite(audio.duration)&&Math.abs((audio.currentTime||0)-pos)>1.5)audio.currentTime=Math.min(audio.duration,pos);
   }catch{}
@@ -1544,89 +1560,30 @@ function normalizeFacebookUrl(url){
   }
 }
 
-function facebookWebOnlyUrl(url){
-  const normalized=normalizeFacebookUrl(url);
-  if(!normalized)return "";
-  try{
-    const u=new URL(normalized);
-    u.protocol="https:";
-    u.hostname="m.facebook.com";
-    u.search="";
-    u.hash="";
-    return u.toString();
-  }catch{
-    return normalized
-      .replace("://www.facebook.com/","://m.facebook.com/")
-      .replace("://web.facebook.com/","://m.facebook.com/");
-  }
-}
-
-function openFacebookChoice(url,name='Chorale Sedera Ambalavato'){
-  pendingFacebookLink=normalizeFacebookUrl(url);
-  $("facebookChoiceName").textContent=name||'Chorale Sedera Ambalavato';
-  $("facebookChoiceModal").classList.remove('hidden');
-  $("facebookChoiceModal").setAttribute('aria-hidden','false');
-}
-
-function closeFacebookChoice(){
-  $("facebookChoiceModal").classList.add('hidden');
-  $("facebookChoiceModal").setAttribute('aria-hidden','true');
-}
-
-function openFacebookInside(){
-  if(!pendingFacebookLink)return;
-  const url=facebookWebOnlyUrl(pendingFacebookLink);
-  closeFacebookChoice();
-
-  // Force Facebook's mobile HTTPS website inside LyriCSED.
-  // Never send an fb:// URI to Android WebView from LyriCSED itself.
-  if(!url)return;
-  try{
-    window.location.assign(url);
-  }catch{
-    try{window.open(url,'_self')}catch{}
-  }
-}
-
-function openFacebookExternal(){
-  if(!pendingFacebookLink)return;
-  const url=pendingFacebookLink;
-  closeFacebookChoice();
-
-  if(!nativeMessage('FACEBOOK_EXTERNAL',url)){
-    try{window.open(url,'_blank')}catch{location.href=url}
-  }
-}
-
 function openSmartLink(url,kind='web',label=''){
   if(!url)return;
-  const target=kind==='facebook'?normalizeFacebookUrl(url):String(url);
+  const target=(kind==='facebook'?normalizeFacebookUrl(url):String(url).trim());
+  if(!target)return;
 
-  if(kind==='facebook'){
-    openFacebookChoice(target,label);
-    return;
-  }
-
-  // Normal website: keep the current LyriCSED behavior.
-  try{window.location.href=target}catch{
-    try{window.open(target,'_blank')}catch{}
+  // Tous les liens externes quittent uniquement le WebViewer, jamais LyriCSED lui-même.
+  // On réutilise le message déjà pris en charge par Déclencheuractivité1 dans Kodular.
+  if(!nativeMessage('FACEBOOK_EXTERNAL',target)){
+    try{window.open(target,'_blank')}catch{
+      try{location.href=target}catch{}
+    }
   }
 }
 
 function closeTransientUi(){
-  if(!$("facebookChoiceModal").classList.contains('hidden')){
-    closeFacebookChoice();
-    return true;
-  }
-  if(!$("globalMiniPlayer").classList.contains('hidden')){
+  if(!$('globalMiniPlayer').classList.contains('hidden')){
     closeGlobalMiniPlayer();
     return true;
   }
-  if(!$("libraryPicker").classList.contains('hidden')){
+  if(!$('libraryPicker').classList.contains('hidden')){
     closeLibraryPicker();
     return true;
   }
-  if(!$("exitConfirmModal").classList.contains('hidden')){
+  if(!$('exitConfirmModal').classList.contains('hidden')){
     hideExitConfirmation();
     return true;
   }
@@ -1670,13 +1627,6 @@ $$('.smart-link').forEach(a=>a.addEventListener('click',e=>{
   openSmartLink(a.href,a.dataset.smartLink||'web',a.textContent.trim());
 }));
 
-$("facebookOpenInside").onclick=openFacebookInside;
-$("facebookOpenExternal").onclick=openFacebookExternal;
-$("facebookChoiceCancel").onclick=closeFacebookChoice;
-$("facebookChoiceModal").addEventListener('click',e=>{
-  if(e.target===$("facebookChoiceModal"))closeFacebookChoice();
-});
-
 $("exitCancel").onclick=hideExitConfirmation;
 $("exitConfirm").onclick=()=>{
   hideExitConfirmation();
@@ -1705,7 +1655,7 @@ $("favoriteBtn").onclick=toggleFav;$("fontDown").onclick=()=>{readerZoom-=10;app
 
 // audio
 $("mainPlayBtn").onclick=playPause;$("miniPlay").onclick=playPause;$("rewindBtn").onclick=()=>seekBy(-10);$("miniRewind").onclick=()=>seekBy(-10);$("forwardBtn").onclick=()=>seekBy(10);$("miniForward").onclick=()=>seekBy(10);
-$("seekBar").oninput=()=>{const dur=playbackDuration();if(isCurrentSongAudio()&&dur>0)setPlaybackPosition(Number($("seekBar").value)/1000*dur)};$("volumeBar").oninput=()=>{audio.volume=Number($("volumeBar").value)/100;$("volumeValue").textContent=`${$("volumeBar").value}%`};
+$("seekBar").oninput=()=>{const dur=playbackDuration();if(isCurrentSongAudio()&&dur>0)setPlaybackPosition(Number($("seekBar").value)/1000*dur)};$("volumeBar").oninput=()=>{setPlaybackVolume(Number($("volumeBar").value))};
 $("setA").onclick=()=>{if(!isCurrentSongAudio()){toast("Lancez d’abord ce playback.");return}loopA=playbackCurrent();$("aTime").textContent=fmt(loopA);toast('Point A défini')};$("setB").onclick=()=>{if(!isCurrentSongAudio()){toast("Lancez d’abord ce playback.");return}loopB=playbackCurrent();$("bTime").textContent=fmt(loopB);toast('Point B défini')};$("toggleLoop").onclick=()=>{if(loopA===null||loopB===null||loopB<=loopA){toast('Définissez A puis B');return}loopEnabled=!loopEnabled;$("toggleLoop").classList.toggle('active',loopEnabled);toast(loopEnabled?'Répétition A/B activée':'Répétition A/B désactivée')};$("clearLoop").onclick=resetLoop;$("addMarkerBtn").onclick=addMarker;
 audio.addEventListener('timeupdate',()=>{if(!nativeAudioActive&&globalAudioMode==='song'&&loopEnabled&&loopA!==null&&loopB!==null&&audio.currentTime>=loopB)audio.currentTime=loopA;if(!nativeAudioActive)updateGlobalAudioUI()});
 audio.addEventListener('play',updateGlobalAudioUI);
