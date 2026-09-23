@@ -19,7 +19,8 @@ let SONGS=[],ANNOUNCEMENTS=[],APP_VERSION=null,currentSong=null,currentView="hom
 favorites=readJSON("sedyricsFavorites",[]).map(Number),
 readerZoom=Number(localStorage.getItem("lyricsedReaderZoom")||100),
 audioObjectUrl=null,loopA=null,loopB=null,loopEnabled=false,toastTimer=null,syncInProgress=false,globalAudioMode=null,globalAudioSongId=null,globalAudioTitle="",globalAudioReturnView=null,
-nativeAudioActive=false,nativeAudioPlaying=false,nativeAudioCurrent=0,nativeAudioDuration=0,nativeAudioSource="";
+nativeAudioActive=false,nativeAudioPlaying=false,nativeAudioCurrent=0,nativeAudioDuration=0,nativeAudioSource="",
+nativeSeekTarget=null,nativeSeekLockUntil=0,seekBarDragging=false;
 const audio=$("audio");
 const PROTECTED_AUDIO_EXT=/\.(?:mp3|wav|wma|m4a|aac|ogg|flac|mpeg|mpga)(?:[?#]|$)/i;
 
@@ -69,7 +70,13 @@ function setPlaybackPosition(seconds,{sendNative=true}={}){
   const next=Math.max(0,dur>0?Math.min(dur,Number(seconds)||0):Number(seconds)||0);
   if(nativeAudioActive){
     nativeAudioCurrent=next;
-    if(sendNative)nativeMessage('AUDIO_SEEK',String(Math.round(next*1000)));
+    if(sendNative){
+      // Verrou court : évite que le retour HorlogeAudio remette brièvement
+      // l'ancienne position pendant que le lecteur natif applique SeekTo.
+      nativeSeekTarget=next;
+      nativeSeekLockUntil=Date.now()+1800;
+      nativeMessage('AUDIO_SEEK',String(Math.round(next*1000)));
+    }
     try{if(Number.isFinite(audio.duration))audio.currentTime=Math.min(audio.duration,next)}catch{}
   }else if(Number.isFinite(audio.duration)){
     audio.currentTime=Math.min(audio.duration,next);
@@ -745,7 +752,7 @@ function updateAudioUI(){
   if($("elapsed"))$("elapsed").textContent=fmt(now);
   if($("duration"))$("duration").textContent=fmt(dur);
   if($("miniTrackTime"))$("miniTrackTime").textContent=same?`${fmt(now)} / ${fmt(dur)}`:'Prêt';
-  if($("seekBar"))$("seekBar").value=(same&&Number.isFinite(dur)&&dur>0)?Math.round(now/dur*1000):0;
+  if($("seekBar")&&!seekBarDragging)$("seekBar").value=(same&&Number.isFinite(dur)&&dur>0)?Math.round(now/dur*1000):0;
   if($("audioTitle"))$("audioTitle").textContent=same?`${globalAudioTitle} • Playback`:`${currentSong?.title||'Instrumental'} • Playback`;
   if($("volumeBar"))$("volumeBar").value=Math.round(audio.volume*100);if($("volumeValue"))$("volumeValue").textContent=`${Math.round(audio.volume*100)}%`;
 }
@@ -1490,17 +1497,24 @@ function nativeState(positionMs,durationMs,isPlaying){
   if(!nativeAudioActive)return;
   const pos=Math.max(0,Number(positionMs)||0)/1000;
   const dur=Math.max(0,Number(durationMs)||0)/1000;
-  nativeAudioCurrent=pos;
   if(dur>0)nativeAudioDuration=dur;
   nativeAudioPlaying=isPlaying===true||isPlaying===1||String(isPlaying).toLowerCase()==='true';
+
+  // Après un saut, le Clock peut encore renvoyer l'ancienne position pendant
+  // quelques instants. On l'ignore jusqu'à ce que SeekTo soit réellement appliqué.
+  if(nativeSeekTarget!==null&&Date.now()<nativeSeekLockUntil&&Math.abs(pos-nativeSeekTarget)>1.25){
+    nativeAudioCurrent=nativeSeekTarget;
+    updateGlobalAudioUI();
+    return;
+  }
+  nativeSeekTarget=null;
+  nativeSeekLockUntil=0;
+  nativeAudioCurrent=pos;
 
   // Répétition A/B avec le lecteur natif Kodular.
   // HorlogeAudio fournit la position réelle; quand B est atteint on renvoie le lecteur vers A.
   if(globalAudioMode==='song'&&loopEnabled&&loopA!==null&&loopB!==null&&loopB>loopA&&pos>=loopB){
-    nativeAudioCurrent=loopA;
-    nativeMessage('AUDIO_SEEK',String(Math.round(loopA*1000)));
-    try{if(Number.isFinite(audio.duration))audio.currentTime=Math.min(audio.duration,loopA)}catch{}
-    updateGlobalAudioUI();
+    setPlaybackPosition(loopA);
     return;
   }
 
@@ -1655,7 +1669,22 @@ $("favoriteBtn").onclick=toggleFav;$("fontDown").onclick=()=>{readerZoom-=10;app
 
 // audio
 $("mainPlayBtn").onclick=playPause;$("miniPlay").onclick=playPause;$("rewindBtn").onclick=()=>seekBy(-10);$("miniRewind").onclick=()=>seekBy(-10);$("forwardBtn").onclick=()=>seekBy(10);$("miniForward").onclick=()=>seekBy(10);
-$("seekBar").oninput=()=>{const dur=playbackDuration();if(isCurrentSongAudio()&&dur>0)setPlaybackPosition(Number($("seekBar").value)/1000*dur)};$("volumeBar").oninput=()=>{setPlaybackVolume(Number($("volumeBar").value))};
+// La barre de lecture ne bombarde plus Kodular de dizaines de SeekTo pendant le glissement.
+// Elle prévisualise la position, puis envoie un seul saut au relâchement.
+$("seekBar").onpointerdown=()=>{seekBarDragging=true};
+$("seekBar").oninput=()=>{
+  seekBarDragging=true;
+  const dur=playbackDuration();
+  if(isCurrentSongAudio()&&dur>0&&$("elapsed"))$("elapsed").textContent=fmt(Number($("seekBar").value)/1000*dur);
+};
+$("seekBar").onchange=()=>{
+  const dur=playbackDuration();
+  if(isCurrentSongAudio()&&dur>0)setPlaybackPosition(Number($("seekBar").value)/1000*dur);
+  seekBarDragging=false;
+};
+$("seekBar").onpointerup=()=>{seekBarDragging=false};
+$("seekBar").onpointercancel=()=>{seekBarDragging=false};
+$("volumeBar").oninput=()=>{setPlaybackVolume(Number($("volumeBar").value))};
 $("setA").onclick=()=>{if(!isCurrentSongAudio()){toast("Lancez d’abord ce playback.");return}loopA=playbackCurrent();$("aTime").textContent=fmt(loopA);toast('Point A défini')};$("setB").onclick=()=>{if(!isCurrentSongAudio()){toast("Lancez d’abord ce playback.");return}loopB=playbackCurrent();$("bTime").textContent=fmt(loopB);toast('Point B défini')};$("toggleLoop").onclick=()=>{if(loopA===null||loopB===null||loopB<=loopA){toast('Définissez A puis B');return}loopEnabled=!loopEnabled;$("toggleLoop").classList.toggle('active',loopEnabled);toast(loopEnabled?'Répétition A/B activée':'Répétition A/B désactivée')};$("clearLoop").onclick=resetLoop;$("addMarkerBtn").onclick=addMarker;
 audio.addEventListener('timeupdate',()=>{if(!nativeAudioActive&&globalAudioMode==='song'&&loopEnabled&&loopA!==null&&loopB!==null&&audio.currentTime>=loopB)audio.currentTime=loopA;if(!nativeAudioActive)updateGlobalAudioUI()});
 audio.addEventListener('play',updateGlobalAudioUI);
