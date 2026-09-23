@@ -586,3 +586,24 @@
 .about-credit-footer>span{display:block;color:#93A7B1;font-size:7px;letter-spacing:.8px;text-transform:uppercase}
 .about-credit-footer a{display:inline-block;margin-top:5px;color:#5D7785;text-decoration:none;font-size:9px;font-weight:800;letter-spacing:.15px}
 .about-credit-footer a:active{opacity:.65}
+
+
+/* LyriCSED v2.0 - À propos final credit update */
+.about-devotion{padding:18px 15px}
+.about-devotion strong{margin-top:0}
+.about-credit-footer{margin:22px 4px 5px;padding-top:15px}
+.about-credit-footer>span{margin-bottom:8px}
+.about-credit-brand{display:inline-flex!important;align-items:center;justify-content:center;gap:9px;max-width:100%;padding:7px 11px;border-radius:14px;text-decoration:none!important;color:inherit!important;background:rgba(255,255,255,.72);border:1px solid rgba(214,234,243,.9);box-shadow:0 5px 16px rgba(8,47,73,.035);transition:transform .2s ease,opacity .2s ease}
+.about-credit-brand:active{transform:scale(.98);opacity:.78}
+.about-credit-brand img{width:34px;height:34px;border-radius:50%;object-fit:cover;display:block;box-shadow:0 3px 10px rgba(8,47,73,.12)}
+.about-credit-copy{display:block;text-align:left;min-width:0}
+.about-credit-copy strong{display:block;color:#334F5E;font-size:9px;line-height:1.15;letter-spacing:.15px}
+.about-credit-copy small{display:block;margin-top:2px;color:#7C929D;font-size:7px;line-height:1.15}
+.about-credit-animation{position:relative;height:17px;margin:9px auto 0;max-width:170px;overflow:hidden;color:#91A4AD;font-size:7px;font-weight:800;letter-spacing:.65px;text-transform:none}
+.about-credit-animation span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(5px);animation:aboutCreditCycle 9s infinite}
+.about-credit-animation span:nth-child(1){animation-delay:0s}
+.about-credit-animation span:nth-child(2){animation-delay:3s}
+.about-credit-animation span:nth-child(3){animation-delay:6s}
+@keyframes aboutCreditCycle{0%{opacity:0;transform:translateY(5px)}8%,27%{opacity:1;transform:translateY(0)}33%,100%{opacity:0;transform:translateY(-5px)}}
+.about-socials .social-link{pointer-events:auto;cursor:pointer;touch-action:manipulation}
+.about-credit-brand{pointer-events:auto;cursor:pointer;touch-action:manipulation}
