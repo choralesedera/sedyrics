@@ -671,16 +671,20 @@
   33%,100%{opacity:0;transform:translateY(-7px)}
 }
 @media(max-width:520px){
-  .brand-lockup{gap:8px;min-width:0}
+  .brand-lockup{gap:8px;min-width:0;flex:1 1 auto}
   .brand-mark{width:38px;height:38px;border-radius:12px;flex:0 0 auto}
-  .brand-copy{max-width:150px}
+  .brand-copy{max-width:none;min-width:0;flex:1 1 auto}
   .brand-title{font-size:15px!important}
-  .brand-rotator{display:block!important;min-width:0;max-width:142px;height:12px;font-size:7.5px!important;line-height:12px;margin-top:3px!important}
-  .brand-rotator>span{display:block!important}
+  .brand-rotator{display:block!important;width:max-content;min-width:0;max-width:none;height:12px;font-size:7.5px!important;line-height:12px;margin-top:3px!important;overflow:visible}
+  .brand-rotator>span{display:block!important;overflow:visible;text-overflow:clip;white-space:nowrap}
+  .header-actions{flex:0 0 auto}
 }
 @media(max-width:390px){
-  .brand-copy{max-width:125px}
-  .brand-rotator{max-width:120px;font-size:7px!important}
+  .brand-rotator{font-size:7.2px!important;letter-spacing:-.05px}
+  .app-header .demo-pill{display:none}
+}
+@media(max-width:340px){
+  .brand-rotator{font-size:6.8px!important}
 }
 @media(prefers-reduced-motion:reduce){
   .brand-title,.brand-title::after,.brand-rotator>span{animation:none!important}
