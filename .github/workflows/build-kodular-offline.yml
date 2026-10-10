@@ -1,0 +1,32 @@
+name: Build LyriCSED Android offline HTML
+on:
+  push:
+    branches: [lyricsed-android-offline-kodular]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  kodular-html:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build offline HTML from this branch
+        run: python3 scripts/build-lyricsed-local.py .
+      - name: Validate generated package
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          h=Path('lyricsed-local.html').read_text(encoding='utf-8')
+          assert 'const IS_KODULAR_LOCAL=true' in h
+          assert 'EMBEDDED_DOCS=' in h
+          assert '<script id="lyricsed-inline-app">' in h
+          assert 'const SHELL_FILES=[]' in h
+          print('Checked LyriCSED HTML length:',len(h))
+          PY
+      - name: Upload for Kodular assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: LyriCSED-Android-Kodular-HTML
+          path: lyricsed-local.html
+          retention-days: 30
