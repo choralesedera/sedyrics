@@ -102,3 +102,42 @@ assert '<!doctype html>' in html.lower()
 dest.write_text(html,encoding='utf-8')
 print('LyriCSED local HTML:',dest.stat().st_size,'bytes,',len(catalog['songs']),'songs;',
       'seed files:',len(docs))
+
+# Add member activation only in this testing branch. Never alter the published website.
+gate_path=src/'kodular/lyricsed-access-gate.js'
+if gate_path.is_file():
+    gate_js=gate_path.read_text(encoding='utf-8-sig')
+    assert '</script>' not in gate_js
+    css='''<style id="lyricsed-access-css">
+html:not(.lyricsed-authorized) .app{visibility:hidden!important;pointer-events:none!important}
+#lyricsed-access-gate[hidden]{display:none!important}
+#lyricsed-access-gate{position:fixed;inset:0;z-index:2147483640;display:flex;align-items:center;justify-content:center;padding:22px;overflow:auto;background:linear-gradient(145deg,#082f49,#0c4a6e 65%,#087fa5);font-family:Roboto,Arial,sans-serif}
+#lyricsed-access-gate *{box-sizing:border-box}
+#lyricsed-access-gate .lyr-card{background:white;padding:32px 25px;border-radius:24px;max-width:390px;width:100%;text-align:center;box-shadow:0 26px 70px #0003}
+#lyricsed-access-gate .lyr-mark{width:64px;height:64px;margin:0 auto 14px;border-radius:18px;background:#e0f2fe;display:grid;place-items:center;font-size:26px;font-weight:900;color:#0c4a6e}
+#lyricsed-access-gate h1{font-size:24px;margin:8px 0;color:#082f49}
+#lyricsed-access-gate p{font-size:13px;line-height:1.7;color:#617b8d}
+#lyricsed-access-gate label{display:block;text-align:left;font-size:12px;color:#40586b;font-weight:700;margin-bottom:8px}
+#lyricsed-access-gate input{background:#f5f9fc;border:1.5px solid #b5cdd9;border-radius:12px;width:100%;height:48px;padding:0 14px;font-size:16px;color:#082f49}
+#lyricsed-access-gate button{margin-top:14px;background:#0c4a6e;color:white;border:0;border-radius:12px;height:48px;width:100%;font-size:15px;font-weight:750}
+#lyricsed-access-gate button:disabled{opacity:.65}
+#lyricsed-access-gate #lyrAccessMessage{font-size:12px;min-height:30px;margin:13px 0 0;line-height:1.5;color:#637986}
+#lyricsed-access-gate.lyr-error #lyrAccessMessage{color:#b42318}
+</style>'''
+    ui='''<div id="lyricsed-access-gate" role="dialog" aria-modal="true" aria-labelledby="lyrAccessTitle"><div class="lyr-card">
+<div class="lyr-mark">S</div><h1 id="lyrAccessTitle">LyriCSED</h1>
+<p>Accès réservé aux membres autorisés de la Chorale Sedera Ambalavato.</p>
+<label for="lyrLicenseCode">Code d'activation personnel</label>
+<input id="lyrLicenseCode" type="text" autocapitalize="characters" autocomplete="off" placeholder="LY-XXXX-XXXX" maxlength="45" />
+<button type="button" id="lyrActivationButton">Activer LyriCSED</button>
+<div id="lyrAccessMessage" role="status" aria-live="polite">Chargement...</div>
+<p style="font-size:11px">Première activation : Internet obligatoire.</p></div></div>'''
+    html=html.replace('</head>',css+'\n</head>',1)
+    html=html.replace('<body>','<body>\n'+ui,1)
+    html=html.replace(marker,'<script id="lyricsed-license-gate">\n'+gate_js+'\n</script>\n'+marker,1)
+    assert html.count('async function boot(){')==1
+    html=html.replace('async function boot(){','async function boot(){\n  await window.LyriCSEDGate.ready;',1)
+    assert html.count('id="lyricsed-access-gate"')==1
+    assert html.count('await window.LyriCSEDGate.ready;')==1
+    dest.write_text(html,encoding='utf-8')
+    print('Licensed HTML gate added; body remains blocked until valid PRO licence')
