@@ -1,17 +1,7 @@
 {
   "schemaVersion": 1,
   "liturgy": {
-    "prelude": [
-      {
-        "id": "dadf801b-d9c9-4741-a094-216e014ca566",
-        "source": "library",
-        "songId": 3,
-        "title": "Noho ny helokao",
-        "artist": "Chorale Sedera Ambalavato",
-        "instrumental": "instrumentals/noho-ny-helokao-instrumental.mp3",
-        "delayAfter": null
-      }
-    ],
+    "prelude": [],
     "interlude": [],
     "rakitra": [],
     "postlude": []
@@ -60,7 +50,7 @@
   },
   "meta": {
     "liturgy": {
-      "updatedAt": "2026-10-11T17:24:25.281Z",
+      "updatedAt": "2026-10-11T23:42:07.662Z",
       "updatedBy": "Fetra",
       "updatedById": "720068cc-364c-4553-a8c3-55166b51971f"
     },
