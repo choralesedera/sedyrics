@@ -1,0 +1,55 @@
+name: LyriCSED - Mise à jour automatique des chants
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lyrics/**'
+      - 'instrumentals/**'
+      - 'solfa/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lyricsed-auto-catalogue-main
+  cancel-in-progress: false
+
+jobs:
+  synchroniser-contenus:
+    if: github.repository == 'choralesedera/sedyrics'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Mettre à jour le dépôt et sélectionner les fichiers musicaux modifiés
+        shell: bash
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          git fetch origin main
+          git checkout -B main origin/main
+          if [[ "$BEFORE" =~ ^0{40}$ ]]; then
+            git diff-tree --no-commit-id --name-only --diff-filter=AM -r "$AFTER" -- lyrics/ instrumentals/ solfa/ > "$RUNNER_TEMP/lyricsed-changed.txt"
+          else
+            git diff --name-only --diff-filter=AM "$BEFORE" "$AFTER" -- lyrics/ instrumentals/ solfa/ > "$RUNNER_TEMP/lyricsed-changed.txt"
+          fi
+          cat "$RUNNER_TEMP/lyricsed-changed.txt"
+      - name: Vérifier et relier les nouveaux contenus
+        run: python3 scripts/auto-update-songs.py --changed-list "$RUNNER_TEMP/lyricsed-changed.txt"
+      - name: Publier uniquement catalogue et version
+        shell: bash
+        run: |
+          if git diff --quiet -- data/songs-v2.json data/songs.json version-v2.json; then
+            echo "Aucune mise à jour à publier."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- data/songs-v2.json data/songs.json version-v2.json
+          git commit -m 'chore(lyricsed): associer automatiquement paroles, solfas et instrumentaux'
+          git pull --rebase origin main
+          git push origin HEAD:main
