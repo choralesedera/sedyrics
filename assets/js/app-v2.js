@@ -20,7 +20,7 @@ favorites=readJSON("sedyricsFavorites",[]).map(Number),
 readerZoom=Number(localStorage.getItem("lyricsedReaderZoom")||100),
 audioObjectUrl=null,loopA=null,loopB=null,loopEnabled=false,toastTimer=null,syncInProgress=false,globalAudioMode=null,globalAudioSongId=null,globalAudioTitle="",globalAudioReturnView=null,
 nativeAudioActive=false,nativeAudioPlaying=false,nativeAudioCurrent=0,nativeAudioDuration=0,nativeAudioSource="",
-nativeSeekTarget=null,nativeSeekLockUntil=0,seekBarDragging=false;
+nativeSeekTarget=null,nativeSeekLockUntil=0,nativeSeekLastSentAt=0,nativeSeekAttempts=0,nativeSeekSerial=0,nativeAudioEnded=false,nativeReplayToken=0,nativeAudioPendingReplay=false,seekBarDragging=false,eventSeekDragging=false,miniGlobalSeekDragging=false;
 const audio=$("audio");
 const PROTECTED_AUDIO_EXT=/\.(?:mp3|wav|wma|m4a|aac|ogg|flac|mpeg|mpga)(?:[?#]|$)/i;
 
@@ -65,17 +65,26 @@ function playbackCurrent(){return nativeAudioActive?Math.max(0,Number(nativeAudi
 function playbackDuration(){return nativeAudioActive?Math.max(0,Number(nativeAudioDuration)||0):(Number(audio.duration)||0)}
 function playbackPlaying(){return nativeAudioActive?!!nativeAudioPlaying:(hasGlobalAudio()&&!audio.paused)}
 function absoluteMediaUrl(path){try{return new URL(cleanPath(path),location.href).toString()}catch{return String(path||'')}}
+function sendNativeSeek(seconds){
+  // L'événement Kodular WebViewStringChange doit reconnaître aussi les sauts répétés
+  // vers la même position. Un zéro initial change le texte, pas la valeur en millisecondes.
+  const ms=String(Math.max(0,Math.round(Number(seconds)*1000)||0));
+  nativeSeekSerial+=1;
+  return nativeMessage('AUDIO_SEEK',(nativeSeekSerial%2===0?'0':'')+ms);
+}
 function setPlaybackPosition(seconds,{sendNative=true}={}){
   const dur=playbackDuration();
   const next=Math.max(0,dur>0?Math.min(dur,Number(seconds)||0):Number(seconds)||0);
   if(nativeAudioActive){
     nativeAudioCurrent=next;
+    nativeAudioEnded=false;
     if(sendNative){
-      // Verrou court : évite que le retour HorlogeAudio remette brièvement
-      // l'ancienne position pendant que le lecteur natif applique SeekTo.
+      const now=Date.now();
       nativeSeekTarget=next;
-      nativeSeekLockUntil=Date.now()+1800;
-      nativeMessage('AUDIO_SEEK',String(Math.round(next*1000)));
+      nativeSeekLockUntil=now+6500;
+      nativeSeekLastSentAt=now;
+      nativeSeekAttempts=1;
+      sendNativeSeek(next);
     }
     try{if(Number.isFinite(audio.duration))audio.currentTime=Math.min(audio.duration,next)}catch{}
   }else if(Number.isFinite(audio.duration)){
@@ -114,6 +123,10 @@ async function setGlobalAudioBlob(blob,{mode,title,songId=null,returnView=null,a
     nativeAudioPlaying=!!autoplay;
     nativeAudioCurrent=0;
     nativeAudioDuration=0;
+    nativeAudioEnded=false;
+    nativeReplayToken++;nativeAudioPendingReplay=false;
+    nativeSeekTarget=null;
+    nativeSeekLockUntil=0;
     nativeAudioSource=String(nativeSource);
     audio.muted=true;
     nativeMessage('AUDIO_SOURCE',nativeAudioSource);
@@ -125,14 +138,14 @@ async function setGlobalAudioBlob(blob,{mode,title,songId=null,returnView=null,a
   }
 
   if(wasNative)nativeMessage('AUDIO_STOP');
-  nativeAudioActive=false;nativeAudioPlaying=false;nativeAudioCurrent=0;nativeAudioDuration=0;nativeAudioSource='';
+  nativeAudioActive=false;nativeAudioPlaying=false;nativeAudioCurrent=0;nativeAudioDuration=0;nativeAudioEnded=false;nativeReplayToken++;nativeAudioPendingReplay=false;nativeSeekTarget=null;nativeSeekLockUntil=0;nativeAudioSource='';
   audio.muted=false;
   updateGlobalAudioUI();
   if(autoplay)try{await audio.play()}catch{}
 }
 function clearGlobalAudio(){
   if(nativeAudioActive)nativeMessage('AUDIO_STOP');
-  nativeAudioActive=false;nativeAudioPlaying=false;nativeAudioCurrent=0;nativeAudioDuration=0;nativeAudioSource='';
+  nativeAudioActive=false;nativeAudioPlaying=false;nativeAudioCurrent=0;nativeAudioDuration=0;nativeAudioEnded=false;nativeReplayToken++;nativeAudioPendingReplay=false;nativeSeekTarget=null;nativeSeekLockUntil=0;nativeAudioSource='';
   audio.pause();
   audio.muted=false;
   audio.removeAttribute('src');audio.load();
@@ -145,12 +158,31 @@ function globalPlayPause(){
   if(pendingNextIndex!==null&&globalAudioMode==='event'){launchPendingNextNow();return}
   if(!hasGlobalAudio())return;
   if(nativeAudioActive){
-    if(nativeAudioPlaying){nativeMessage('AUDIO_PAUSE');nativeAudioPlaying=false}
-    else{nativeMessage('AUDIO_PLAY');nativeAudioPlaying=true}
+    if(nativeAudioPendingReplay){nativeReplayToken++;nativeAudioPendingReplay=false;nativeAudioPlaying=false}
+    else if(nativeAudioPlaying){nativeMessage('AUDIO_PAUSE');nativeAudioPlaying=false}
+    else if(nativeAudioEnded||(nativeAudioDuration>0&&nativeAudioCurrent>=nativeAudioDuration-0.5)){
+      const source=nativeAudioSource;
+      const replayToken=++nativeReplayToken;
+      setPlaybackPosition(0);
+      nativeAudioPendingReplay=true;
+      nativeAudioPlaying=true;
+      setTimeout(()=>{
+        if(replayToken!==nativeReplayToken)return;
+        nativeAudioPendingReplay=false;
+        if(nativeAudioActive&&nativeAudioSource===source){
+          nativeMessage('AUDIO_PLAY');
+          nativeAudioPlaying=true;
+          updateGlobalAudioUI();
+        }
+      },150);
+    }else{nativeMessage('AUDIO_PLAY');nativeAudioPlaying=true}
     updateGlobalAudioUI();
     return;
   }
-  if(audio.paused)audio.play().catch(()=>{});else audio.pause();
+  if(audio.paused){
+    try{if(audio.ended||(Number.isFinite(audio.duration)&&audio.currentTime>=audio.duration-0.25))audio.currentTime=0}catch{}
+    audio.play().catch(()=>{});
+  }else audio.pause();
 }
 
 function updateGlobalAudioUI(){
@@ -1379,7 +1411,7 @@ function updateMiniPlayer(){
   $("miniGlobalPlay").innerHTML=icon(playbackPlaying()?'i-pause':'i-play');
   if($("miniGlobalElapsed"))$("miniGlobalElapsed").textContent=fmt(playbackCurrent());
   if($("miniGlobalDuration"))$("miniGlobalDuration").textContent=fmt(playbackDuration());
-  if($("miniGlobalSeek"))$("miniGlobalSeek").value=playbackDuration()>0?Math.round(playbackCurrent()/playbackDuration()*1000):0;
+  if($("miniGlobalSeek")&&!miniGlobalSeekDragging)$("miniGlobalSeek").value=playbackDuration()>0?Math.round(playbackCurrent()/playbackDuration()*1000):0;
   const eventMode=globalAudioMode==='event';
   $("miniGlobalPrev").disabled=!eventMode;$("miniGlobalNextBtn").disabled=!eventMode;
 }
@@ -1391,7 +1423,7 @@ function updatePlaylistPlayerUI(){
   const playing=playbackPlaying()&&pendingNextIndex===null;
   $("eventPlayBtn").innerHTML=icon(playing?'i-pause':'i-play');
   $("eventElapsed").textContent=fmt(playbackCurrent());$("eventDuration").textContent=fmt(playbackDuration());
-  $("eventSeek").value=playbackDuration()>0?Math.round(playbackCurrent()/playbackDuration()*1000):0;
+  if(!eventSeekDragging)$("eventSeek").value=playbackDuration()>0?Math.round(playbackCurrent()/playbackDuration()*1000):0;
   $("eventPlayerSection").textContent=eventMode?(item?._sectionLabel||'Playlist'):'Playback';
   $("eventPlayerTitle").textContent=globalAudioTitle||'Aucun playback';
   $("eventNextTitle").textContent=next?`Prochain : ${next.title}`:'Prochain : aucun';
@@ -1442,9 +1474,17 @@ $("eventPrevBtn").onclick=playlistPrev;
 $("eventStopBtn").onclick=stopGlobalPlayback;
 $("playNextNow").onclick=launchPendingNextNow;
 
+$("eventSeek").onpointerdown=()=>{eventSeekDragging=true};
 $("eventSeek").oninput=()=>{
-  const dur=playbackDuration();if(dur>0)setPlaybackPosition(Number($("eventSeek").value)/1000*dur);
+  eventSeekDragging=true;
+  const dur=playbackDuration();if(dur>0)$("eventElapsed").textContent=fmt(Number($("eventSeek").value)/1000*dur);
 };
+$("eventSeek").onchange=()=>{
+  const dur=playbackDuration();if(dur>0)setPlaybackPosition(Number($("eventSeek").value)/1000*dur);
+  eventSeekDragging=false;
+};
+$("eventSeek").onpointerup=()=>{eventSeekDragging=false};
+$("eventSeek").onpointercancel=()=>{eventSeekDragging=false};
 $("eventVolume").oninput=()=>{
   setPlaybackVolume(Number($("eventVolume").value));
 };
@@ -1457,7 +1497,17 @@ $("miniGlobalPlay").onclick=globalPlayPause;
 $("miniGlobalNextBtn").onclick=playlistNext;
 $("miniGlobalPrev").onclick=playlistPrev;
 $("returnToPlayer").onclick=returnToPlaylistPlayer;
-$("miniGlobalSeek").oninput=()=>{const dur=playbackDuration();if(dur>0)setPlaybackPosition(Number($("miniGlobalSeek").value)/1000*dur)};
+$("miniGlobalSeek").onpointerdown=()=>{miniGlobalSeekDragging=true};
+$("miniGlobalSeek").oninput=()=>{
+  miniGlobalSeekDragging=true;
+  const dur=playbackDuration();if(dur>0)$("miniGlobalElapsed").textContent=fmt(Number($("miniGlobalSeek").value)/1000*dur);
+};
+$("miniGlobalSeek").onchange=()=>{
+  const dur=playbackDuration();if(dur>0)setPlaybackPosition(Number($("miniGlobalSeek").value)/1000*dur);
+  miniGlobalSeekDragging=false;
+};
+$("miniGlobalSeek").onpointerup=()=>{miniGlobalSeekDragging=false};
+$("miniGlobalSeek").onpointercancel=()=>{miniGlobalSeekDragging=false};
 
 bindDelayControls('liturgy');
 bindDelayControls('concert');
@@ -1500,15 +1550,27 @@ function nativeState(positionMs,durationMs,isPlaying){
   if(dur>0)nativeAudioDuration=dur;
   nativeAudioPlaying=isPlaying===true||isPlaying===1||String(isPlaying).toLowerCase()==='true';
 
-  // Après un saut, le Clock peut encore renvoyer l'ancienne position pendant
-  // quelques instants. On l'ignore jusqu'à ce que SeekTo soit réellement appliqué.
-  if(nativeSeekTarget!==null&&Date.now()<nativeSeekLockUntil&&Math.abs(pos-nativeSeekTarget)>1.25){
-    nativeAudioCurrent=nativeSeekTarget;
-    updateGlobalAudioUI();
-    return;
+  // Ne pas accepter l'ancienne position tant que le lecteur Android n'a pas
+  // confirmé le saut. Deux nouvelles tentatives sont permises en cas de latence.
+  if(nativeSeekTarget!==null){
+    const now=Date.now();
+    const age=Math.max(0,(now-nativeSeekLastSentAt)/1000);
+    const tolerance=nativeAudioPlaying?Math.min(3.5,1.5+age):1.5;
+    if(Math.abs(pos-nativeSeekTarget)>tolerance&&now<nativeSeekLockUntil){
+      if(age>=1.1&&nativeSeekAttempts<3){
+        nativeSeekAttempts++;
+        nativeSeekLastSentAt=now;
+        sendNativeSeek(nativeSeekTarget);
+      }
+      nativeAudioCurrent=nativeSeekTarget;
+      updateGlobalAudioUI();
+      return;
+    }
+    if(Math.abs(pos-nativeSeekTarget)>tolerance)toast('Saut non confirmé par Android. Réessayez.');
+    nativeSeekTarget=null;
+    nativeSeekLockUntil=0;
+    nativeSeekAttempts=0;
   }
-  nativeSeekTarget=null;
-  nativeSeekLockUntil=0;
   nativeAudioCurrent=pos;
 
   // Répétition A/B avec le lecteur natif Kodular.
@@ -1550,6 +1612,10 @@ function nativePrevious(){
 function nativeEnded(){
   if(!nativeAudioActive)return;
   nativeAudioPlaying=false;
+  nativeAudioEnded=true;
+  nativeReplayToken++;nativeAudioPendingReplay=false;
+  nativeSeekTarget=null;
+  nativeSeekLockUntil=0;
   if(nativeAudioDuration>0)nativeAudioCurrent=nativeAudioDuration;
   if(globalAudioMode==='event')handlePlaylistEnded();
   else updateGlobalAudioUI();
