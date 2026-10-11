@@ -1,7 +1,7 @@
 {
   "schemaVersion": 11,
-  "contentVersion": 35,
-  "updatedAt": "2026-10-11T10:25:54.618Z",
+  "contentVersion": 36,
+  "updatedAt": "2026-10-11T17:23:13.951Z",
   "catalog": "data/songs-v2.json",
   "announcements": "data/announcements-v2.json",
   "prefetch": {
@@ -35,5 +35,6 @@
     "seekOnRelease": true
   },
   "appVersion": "2.0",
-  "versionName": "2.0"
+  "versionName": "2.0",
+  "events": "data/events-v2.json"
 }
