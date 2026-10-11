@@ -33,9 +33,9 @@ jobs:
           git fetch origin main
           git checkout -B main origin/main
           if [[ "$BEFORE" =~ ^0{40}$ ]]; then
-            git diff-tree --no-commit-id --name-only --diff-filter=AM -r "$AFTER" -- lyrics/ instrumentals/ solfa/ > "$RUNNER_TEMP/lyricsed-changed.txt"
+            git diff-tree --no-commit-id --name-only --diff-filter=AMD -r "$AFTER" -- lyrics/ instrumentals/ solfa/ > "$RUNNER_TEMP/lyricsed-changed.txt"
           else
-            git diff --name-only --diff-filter=AM "$BEFORE" "$AFTER" -- lyrics/ instrumentals/ solfa/ > "$RUNNER_TEMP/lyricsed-changed.txt"
+            git diff --name-only --diff-filter=AMD "$BEFORE" "$AFTER" -- lyrics/ instrumentals/ solfa/ > "$RUNNER_TEMP/lyricsed-changed.txt"
           fi
           cat "$RUNNER_TEMP/lyricsed-changed.txt"
       - name: Vérifier et relier les nouveaux contenus
