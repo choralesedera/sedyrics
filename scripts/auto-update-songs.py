@@ -5,7 +5,6 @@ Usage: python3 scripts/auto-update-songs.py --changed-list /path/to/changed.txt
 Only paths newly added or modified in the triggering Git push are processed.
 """
 import argparse
-import hashlib
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -67,30 +66,6 @@ def song_matches(song, stem_key, changed_path):
     return any(key(value) == stem_key for value in (song.get('slug'), song.get('title')))
 
 
-def sha256(path):
-    h = hashlib.sha256()
-    with path.open('rb') as stream:
-        for block in iter(lambda: stream.read(1024 * 1024), b''):
-            h.update(block)
-    return h.digest()
-
-
-def is_duplicate_audio(path, songs):
-    """Avoid creating an invented new title for a byte-identical known recording."""
-    current = ROOT / path
-    if not current.is_file():
-        return False
-    for song in songs:
-        existing = song.get('instrumental')
-        if not existing or existing == path:
-            continue
-        previous = ROOT / existing
-        if previous.is_file() and previous.stat().st_size == current.stat().st_size:
-            if sha256(previous) == sha256(current):
-                return True
-    return False
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--changed-list', required=True, help='git diff --name-only --diff-filter=AM paths')
@@ -123,6 +98,21 @@ def main():
             candidates.append((path, kind))
         elif kind:
             deleted.add(path)
+    # Also recover valid older uploads not yet referenced in either catalogue.
+    # This repairs omissions without editing the player, assets, or licence logic.
+    registered = {song.get(kind) for song in songs for kind in KINDS if song.get(kind)}
+    for folder in ('lyrics', 'instrumentals', 'solfa'):
+        directory = ROOT / folder
+        if not directory.is_dir():
+            continue
+        for file in sorted(directory.iterdir()):
+            if not file.is_file():
+                continue
+            path = file.relative_to(ROOT).as_posix()
+            kind = classify(path)
+            if kind and path not in registered and path not in seen:
+                candidates.append((path, kind))
+                seen.add(path)
     if not candidates and not deleted:
         print('Aucun nouveau contenu reconnu. Rien à publier.')
         return 0
@@ -156,9 +146,8 @@ def main():
         if matches:
             song = matches[0]
         else:
-            if kind == 'instrumental' and is_duplicate_audio(path, songs):
-                warnings.append(f'{path}: audio identique à un chant existant, titre à confirmer. Ignoré.')
-                continue
+            # Distinct song titles may deliberately use identical audio bytes.
+            # Match songs by stable title/slug/path, never by audio checksum.
             new_slug = slug(name)
             if not new_slug or any(key(s.get('slug')) == key(new_slug) for s in songs):
                 warnings.append(f'{path}: titre non unique ou invalide. Ignoré.')
