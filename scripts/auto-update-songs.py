@@ -111,6 +111,7 @@ def main():
         raise SystemExit('STOP: contentVersion non numérique.')
 
     candidates = []
+    deleted = set()
     seen = set()
     for raw in Path(args.changed_list).read_text(encoding='utf-8').splitlines():
         path = raw.strip().replace('\\', '/')
@@ -120,7 +121,9 @@ def main():
         kind = classify(path)
         if kind and (ROOT / path).is_file():
             candidates.append((path, kind))
-    if not candidates:
+        elif kind:
+            deleted.add(path)
+    if not candidates and not deleted:
         print('Aucun nouveau contenu reconnu. Rien à publier.')
         return 0
 
@@ -130,6 +133,19 @@ def main():
     created = set()
     warnings = []
     next_id = max(ids) + 1
+
+    # A removed media file must no longer appear as an available Playback/Solfa/Lyrics.
+    # Leave the song and its other resources untouched, even if it now has no media.
+    for song in songs:
+        for kind in KINDS:
+            old_path = song.get(kind)
+            if old_path and old_path in deleted and not (ROOT / old_path).is_file():
+                song[kind] = None
+                revisions = song.setdefault('revisions', {})
+                revisions[kind] = max(0, int(revisions.get(kind, 0))) + 1
+                changed.add(song['id'])
+                print(f'SUPPRIMÉ: {song["title"]} / {kind}: {old_path}')
+
     for path, kind in sorted(candidates):
         name = base_title(path)
         name_key = key(name)
