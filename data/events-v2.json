@@ -17,7 +17,35 @@
     "postlude": []
   },
   "concert": {
-    "part1": [],
+    "part1": [
+      {
+        "id": "42fdc129-f5d7-4540-bb48-15e1c69bb41c",
+        "source": "library",
+        "songId": 6,
+        "title": "Anao ny dera",
+        "artist": "Chorale Sedera Ambalavato",
+        "instrumental": "instrumentals/anao-ny-dera-instrumental.mp3",
+        "delayAfter": null
+      },
+      {
+        "id": "e14e17e9-fc49-46c0-ae4c-9f7fb8b36fb8",
+        "source": "library",
+        "songId": 4,
+        "title": "Ho mpanomponao",
+        "artist": "Chorale Sedera Ambalavato",
+        "instrumental": "instrumentals/ho-mpanomponao-instrumental.mp3",
+        "delayAfter": null
+      },
+      {
+        "id": "ca04bfbe-2004-4d98-991d-4b11133e10ed",
+        "source": "library",
+        "songId": 29,
+        "title": "Ity Aho Ho Anao",
+        "artist": "Chorale Sedera Ambalavato",
+        "instrumental": "instrumentals/ity-aho-ho-anao.mp3",
+        "delayAfter": null
+      }
+    ],
     "part2": [],
     "part3": []
   },
@@ -27,6 +55,10 @@
       "updatedBy": "Fetra",
       "updatedById": "720068cc-364c-4553-a8c3-55166b51971f"
     },
-    "concert": null
+    "concert": {
+      "updatedAt": "2026-10-11T17:24:55.282Z",
+      "updatedBy": "Fetra",
+      "updatedById": "720068cc-364c-4553-a8c3-55166b51971f"
+    }
   }
 }
