@@ -70,17 +70,17 @@
       "title": "Fitiavan’i Jesosy",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "",
-      "revision": 2,
+      "revision": 3,
       "lyrics": "lyrics/fitiavani-jesosy.txt",
       "solfa": "solfa/fitiavan-i-jesosy.webp",
-      "instrumental": "instrumentals/fitiavan-i-jesosy.mp3",
+      "instrumental": null,
       "image": null,
       "markers": [],
       "tags": [],
       "revisions": {
         "lyrics": 1,
         "solfa": 1,
-        "instrumental": 1,
+        "instrumental": 2,
         "image": 0
       },
       "displayNumber": 4
