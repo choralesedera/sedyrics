@@ -65,6 +65,32 @@
       "displayNumber": 3
     },
     {
+      "id": 31,
+      "slug": "andriamanitro-o-henoy",
+      "title": "Andriamanitro o henoy",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "Chorale Sedera Ambalavato",
+      "revision": 1,
+      "lyrics": "lyrics/andriamanitro-o-henoy.txt",
+      "solfa": null,
+      "instrumental": null,
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 0,
+        "image": 0
+      },
+      "createdBy": "Mex",
+      "createdAt": "2026-10-12T03:20:09.142Z",
+      "updatedBy": "Mex",
+      "updatedAt": "2026-10-12T03:20:09.142Z",
+      "updatedById": "d8b60daf-c85b-4b47-83d6-daca668f22bf",
+      "displayNumber": 4
+    },
+    {
       "id": 8,
       "slug": "famonjena-ho-ahy",
       "title": "Famonjena ho ahy",
@@ -83,7 +109,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 4
+      "displayNumber": 5
     },
     {
       "id": 22,
@@ -104,7 +130,7 @@
         "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 5
+      "displayNumber": 6
     },
     {
       "id": 19,
@@ -125,7 +151,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 6
+      "displayNumber": 7
     },
     {
       "id": 9,
@@ -146,7 +172,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 7
+      "displayNumber": 8
     },
     {
       "id": 4,
@@ -167,7 +193,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 8
+      "displayNumber": 9
     },
     {
       "id": 10,
@@ -188,7 +214,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 9
+      "displayNumber": 10
     },
     {
       "id": 24,
@@ -209,7 +235,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 10
+      "displayNumber": 11
     },
     {
       "id": 11,
@@ -230,7 +256,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 11
+      "displayNumber": 12
     },
     {
       "id": 29,
@@ -251,7 +277,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 12,
+      "displayNumber": 13,
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-12T01:38:52.939Z",
       "updatedById": "720068cc-364c-4553-a8c3-55166b51971f"
@@ -275,7 +301,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 13
+      "displayNumber": 14
     },
     {
       "id": 12,
@@ -296,7 +322,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 14
+      "displayNumber": 15
     },
     {
       "id": 13,
@@ -317,7 +343,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 15
+      "displayNumber": 16
     },
     {
       "id": 14,
@@ -338,7 +364,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 16
+      "displayNumber": 17
     },
     {
       "id": 1,
@@ -359,7 +385,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 17
+      "displayNumber": 18
     },
     {
       "id": 27,
@@ -380,7 +406,7 @@
         "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 18,
+      "displayNumber": 19,
       "updatedBy": "Mex",
       "updatedById": "d8b60daf-c85b-4b47-83d6-daca668f22bf",
       "updatedAt": "2026-10-12T02:58:31.423Z"
@@ -404,7 +430,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 19
+      "displayNumber": 20
     },
     {
       "id": 25,
@@ -425,7 +451,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 20
+      "displayNumber": 21
     },
     {
       "id": 3,
@@ -446,7 +472,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 21
+      "displayNumber": 22
     },
     {
       "id": 23,
@@ -467,7 +493,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 22
+      "displayNumber": 23
     },
     {
       "id": 16,
@@ -488,7 +514,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 23
+      "displayNumber": 24
     },
     {
       "id": 2,
@@ -509,7 +535,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 24
+      "displayNumber": 25
     },
     {
       "id": 20,
@@ -530,7 +556,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 25
+      "displayNumber": 26
     },
     {
       "id": 21,
@@ -551,7 +577,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 26
+      "displayNumber": 27
     },
     {
       "id": 28,
@@ -572,7 +598,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 27
+      "displayNumber": 28
     },
     {
       "id": 30,
@@ -593,7 +619,7 @@
         "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 28,
+      "displayNumber": 29,
       "updatedBy": "Fetra",
       "updatedById": "720068cc-364c-4553-a8c3-55166b51971f",
       "updatedAt": "2026-10-12T02:45:26.526Z"
@@ -617,7 +643,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 29
+      "displayNumber": 30
     },
     {
       "id": 17,
@@ -638,7 +664,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 30
+      "displayNumber": 31
     }
   ],
   "sort": "alphabetical-title",
