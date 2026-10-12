@@ -606,23 +606,23 @@
       "title": "Verdi",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "",
-      "revision": 2,
+      "revision": 3,
       "lyrics": null,
       "solfa": null,
-      "instrumental": null,
+      "instrumental": "instrumentals/verdi.mp3",
       "image": null,
       "markers": [],
       "tags": [],
       "revisions": {
         "lyrics": 0,
         "solfa": 0,
-        "instrumental": 2,
+        "instrumental": 3,
         "image": 0
       },
       "displayNumber": 29,
-      "updatedBy": "Fetra",
-      "updatedById": "720068cc-364c-4553-a8c3-55166b51971f",
-      "updatedAt": "2026-10-12T02:45:26.526Z"
+      "updatedBy": "Mex",
+      "updatedById": "d8b60daf-c85b-4b47-83d6-daca668f22bf",
+      "updatedAt": "2026-10-12T03:20:43.828Z"
     },
     {
       "id": 5,
