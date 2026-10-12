@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "7e842a70-97a3-4d29-8819-cc3293e6ec40",
+      "songId": 30,
+      "title": "Verdi",
+      "kind": "instrumental",
+      "oldPath": "instrumentals/verdi.mp3",
+      "trashPath": "corbeille/lyricsed/instrumental/30/7e842a70-97a3-4d29-8819-cc3293e6ec40/verdi.mp3",
+      "blobSha": "8315474b271ecc81609fc0993c7ea66b59dd5ad1",
+      "shared": false,
+      "deletedAt": "2026-10-12T02:45:26.526Z",
+      "deletedBy": "Fetra",
+      "deletedById": "720068cc-364c-4553-a8c3-55166b51971f",
+      "deletedRole": "APP_ADMIN",
+      "restoredAt": null,
+      "restoredBy": null,
+      "restoredPath": null
+    }
+  ]
+}
