@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "7de4a9d1-9532-446c-b882-60fc2c7ba0d7",
+      "song": {
+        "id": 31,
+        "slug": "andriamanitro-o-henoy",
+        "title": "Andriamanitro o henoy",
+        "artist": "Chorale Sedera Ambalavato",
+        "credits": "Chorale Sedera Ambalavato",
+        "revision": 2,
+        "lyrics": "lyrics/andriamanitro-o-henoy.txt",
+        "solfa": null,
+        "instrumental": null,
+        "image": null,
+        "markers": [],
+        "tags": [],
+        "revisions": {
+          "lyrics": 2,
+          "solfa": 0,
+          "instrumental": 0,
+          "image": 0
+        },
+        "createdBy": "Mex",
+        "createdAt": "2026-10-12T03:20:09.142Z",
+        "updatedBy": "Mex",
+        "updatedAt": "2026-10-12T03:20:09.142Z",
+        "updatedById": "d8b60daf-c85b-4b47-83d6-daca668f22bf",
+        "displayNumber": 4
+      },
+      "assets": [
+        {
+          "kind": "lyrics",
+          "oldPath": "lyrics/andriamanitro-o-henoy.txt",
+          "trashPath": "corbeille/lyricsed/chants/7de4a9d1-9532-446c-b882-60fc2c7ba0d7/lyrics-andriamanitro-o-henoy.txt",
+          "blobSha": "0f10072c19c53c56a538a453297478d03d92931b",
+          "shared": false
+        }
+      ],
+      "deletedAt": "2026-10-13T09:21:06.007Z",
+      "deletedBy": "Fetra",
+      "deletedById": "720068cc-364c-4553-a8c3-55166b51971f",
+      "deletedRole": "APP_ADMIN",
+      "removedFromPrograms": {},
+      "restoredAt": null,
+      "restoredBy": null
+    }
+  ]
+}
