@@ -575,30 +575,6 @@
       "displayNumber": 27
     },
     {
-      "id": 30,
-      "slug": "verdi",
-      "title": "Verdi",
-      "artist": "Chorale Sedera Ambalavato",
-      "credits": "",
-      "revision": 3,
-      "lyrics": null,
-      "solfa": null,
-      "instrumental": "instrumentals/verdi.mp3",
-      "image": null,
-      "markers": [],
-      "tags": [],
-      "revisions": {
-        "lyrics": 0,
-        "solfa": 0,
-        "instrumental": 3,
-        "image": 0
-      },
-      "displayNumber": 28,
-      "updatedBy": "Mex",
-      "updatedById": "d8b60daf-c85b-4b47-83d6-daca668f22bf",
-      "updatedAt": "2026-10-12T03:20:43.828Z"
-    },
-    {
       "id": 5,
       "slug": "zanahary-o-tahio",
       "title": "Zanahary o tahio",
@@ -617,7 +593,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 29
+      "displayNumber": 28
     },
     {
       "id": 17,
@@ -638,7 +614,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 30
+      "displayNumber": 29
     }
   ],
   "sort": "alphabetical-title",

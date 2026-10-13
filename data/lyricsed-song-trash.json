@@ -45,6 +45,49 @@
       "removedFromPrograms": {},
       "restoredAt": null,
       "restoredBy": null
+    },
+    {
+      "id": "188ecb16-06dd-48b2-89d2-ed34e4630d69",
+      "song": {
+        "id": 30,
+        "slug": "verdi",
+        "title": "Verdi",
+        "artist": "Chorale Sedera Ambalavato",
+        "credits": "",
+        "revision": 3,
+        "lyrics": null,
+        "solfa": null,
+        "instrumental": "instrumentals/verdi.mp3",
+        "image": null,
+        "markers": [],
+        "tags": [],
+        "revisions": {
+          "lyrics": 0,
+          "solfa": 0,
+          "instrumental": 3,
+          "image": 0
+        },
+        "displayNumber": 28,
+        "updatedBy": "Mex",
+        "updatedById": "d8b60daf-c85b-4b47-83d6-daca668f22bf",
+        "updatedAt": "2026-10-12T03:20:43.828Z"
+      },
+      "assets": [
+        {
+          "kind": "instrumental",
+          "oldPath": "instrumentals/verdi.mp3",
+          "trashPath": "corbeille/lyricsed/chants/188ecb16-06dd-48b2-89d2-ed34e4630d69/instrumental-verdi.mp3",
+          "blobSha": "8315474b271ecc81609fc0993c7ea66b59dd5ad1",
+          "shared": false
+        }
+      ],
+      "deletedAt": "2026-10-13T09:45:15.493Z",
+      "deletedBy": "Fetra",
+      "deletedById": "720068cc-364c-4553-a8c3-55166b51971f",
+      "deletedRole": "APP_ADMIN",
+      "removedFromPrograms": {},
+      "restoredAt": null,
+      "restoredBy": null
     }
   ]
 }
