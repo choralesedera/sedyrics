@@ -604,20 +604,23 @@
       "title": "Zanaka adala",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "A/C: Vahatra",
-      "revision": 3,
+      "revision": 4,
       "lyrics": "lyrics/zanaka-adala.txt",
       "solfa": null,
-      "instrumental": "instrumentals/zanaka-adala.mp3",
+      "instrumental": null,
       "image": null,
       "markers": [],
       "tags": [],
       "revisions": {
         "lyrics": 2,
         "solfa": 0,
-        "instrumental": 1,
+        "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 29
+      "displayNumber": 29,
+      "updatedBy": "Fetra",
+      "updatedById": "720068cc-364c-4553-a8c3-55166b51971f",
+      "updatedAt": "2026-10-14T11:31:54.950Z"
     }
   ],
   "sort": "alphabetical-title",

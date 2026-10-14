@@ -18,6 +18,23 @@
       "restoredBy": "Mex",
       "restoredPath": "instrumentals/verdi.mp3",
       "restoredById": "d8b60daf-c85b-4b47-83d6-daca668f22bf"
+    },
+    {
+      "id": "37ca5ceb-d689-4e61-981b-d9abfdb8258e",
+      "songId": 17,
+      "title": "Zanaka adala",
+      "kind": "instrumental",
+      "oldPath": "instrumentals/zanaka-adala.mp3",
+      "trashPath": "corbeille/lyricsed/instrumental/17/37ca5ceb-d689-4e61-981b-d9abfdb8258e/zanaka-adala.mp3",
+      "blobSha": "80265d4a8f41161a60a6565f2acb441d9082a904",
+      "shared": false,
+      "deletedAt": "2026-10-14T11:31:54.950Z",
+      "deletedBy": "Fetra",
+      "deletedById": "720068cc-364c-4553-a8c3-55166b51971f",
+      "deletedRole": "APP_ADMIN",
+      "restoredAt": null,
+      "restoredBy": null,
+      "restoredPath": null
     }
   ]
 }
