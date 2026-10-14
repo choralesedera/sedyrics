@@ -112,20 +112,23 @@
       "title": "Getsemane",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "",
-      "revision": 1,
+      "revision": 2,
       "lyrics": "lyrics/getsemane.txt",
       "solfa": null,
-      "instrumental": null,
+      "instrumental": "instrumentals/getsemane-instrumental.mp3",
       "image": null,
       "markers": [],
       "tags": [],
       "revisions": {
         "lyrics": 1,
         "solfa": 0,
-        "instrumental": 0,
+        "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 6
+      "displayNumber": 6,
+      "updatedBy": "Fetra",
+      "updatedById": "720068cc-364c-4553-a8c3-55166b51971f",
+      "updatedAt": "2026-10-14T11:25:31.890Z"
     },
     {
       "id": 9,
