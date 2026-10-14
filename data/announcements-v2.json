@@ -1,16 +1,3 @@
 {
-  "announcements": [
-    {
-      "id": "01638d7f-cb25-4e9e-99cb-44a332bba6f8",
-      "title": "Bonjour",
-      "body": "Test vaovao",
-      "date": "2026-10-13",
-      "createdAt": "2026-10-13T07:55:33.190Z",
-      "createdBy": "Fetra",
-      "createdById": "720068cc-364c-4553-a8c3-55166b51971f",
-      "updatedAt": "2026-10-13T07:55:33.190Z",
-      "updatedBy": "Fetra",
-      "updatedById": "720068cc-364c-4553-a8c3-55166b51971f"
-    }
-  ]
+  "announcements": []
 }
