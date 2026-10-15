@@ -13,6 +13,23 @@ const SHELL_FILES=[
   "sw.js"
 ];
 
+// --- Médias R2 (Cloudflare) ---
+// GitHub/local reste pour HTML, CSS, JS, catalogue et version.
+// R2 sert uniquement pour lyrics/, solfa/, instrumentals/.
+const MEDIA_BASE = "https://sedera-media-api.chorale-sedera-ambalavato.workers.dev/media/";
+const MEDIA_PREFIXES = ["lyrics/", "solfa/", "instrumentals/"];
+
+function isMediaPath(path){
+  const p = String(path || "").replace(/^\.?\//, "");
+  return MEDIA_PREFIXES.some(prefix => p.startsWith(prefix));
+}
+
+function mediaUrl(path){
+  const clean = String(path || "").split("?")[0].replace(/^\.?\//, "");
+  if (isMediaPath(clean)) return MEDIA_BASE + clean;
+  try { return new URL(clean, location.href).toString(); } catch { return clean; }
+}
+
 const $=id=>document.getElementById(id);
 const $$=sel=>[...document.querySelectorAll(sel)];
 let SONGS=[],ANNOUNCEMENTS=[],APP_VERSION=null,currentSong=null,currentView="home",songFilter="all",
@@ -64,7 +81,7 @@ function hasGlobalAudio(){return nativeAudioActive||!!audio.getAttribute('src')}
 function playbackCurrent(){return nativeAudioActive?Math.max(0,Number(nativeAudioCurrent)||0):(Number(audio.currentTime)||0)}
 function playbackDuration(){return nativeAudioActive?Math.max(0,Number(nativeAudioDuration)||0):(Number(audio.duration)||0)}
 function playbackPlaying(){return nativeAudioActive?!!nativeAudioPlaying:(hasGlobalAudio()&&!audio.paused)}
-function absoluteMediaUrl(path){try{return new URL(cleanPath(path),location.href).toString()}catch{return String(path||'')}}
+function absoluteMediaUrl(path){try{return mediaUrl(path)}catch{return String(path||'')}}
 function sendNativeSeek(seconds){
   // L'événement Kodular WebViewStringChange doit reconnaître aussi les sauts répétés
   // vers la même position. Un zéro initial change le texte, pas la valeur en millisecondes.
@@ -201,7 +218,7 @@ function songNo(s){return Number(s?.displayNumber||s?.id||0)}
 function fmt(sec){if(!Number.isFinite(sec))return"0:00";return `${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,"0")}`}
 function toast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2200)}
 function cleanPath(path){return String(path||"").split("?")[0].replace(/^\.?\//,"")}
-function reqFor(path){return new Request(new URL(cleanPath(path),location.href).toString(),{method:"GET"})}
+function reqFor(path){return new Request(mediaUrl(path),{method:"GET"})}
 
 async function getAnyCached(path){
   const key=reqFor(path);
@@ -228,7 +245,7 @@ async function getCached(path,{timeout=10000}={}){
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),timeout);
   try{
-    const r=await fetch(cleanPath(path),{cache:"no-store",signal:controller.signal});
+    const r=await fetch(mediaUrl(path),{cache:"no-store",signal:controller.signal});
     if(!r.ok)throw new Error("resource unavailable");
     await main.put(key,r.clone());
     return r;
@@ -241,8 +258,7 @@ async function networkFetch(path,{timeout=120000}={}){
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),timeout);
   try{
-    const base=cleanPath(path);
-    const url=new URL(base,location.href);
+    const url=new URL(mediaUrl(path));
     url.searchParams.set("__network",Date.now().toString());
     const r=await fetch(url.toString(),{cache:"no-store",signal:controller.signal});
     if(!r.ok)throw new Error("network unavailable");
@@ -1048,7 +1064,7 @@ function renderPlaylistSection(type,section,items){
       <span class="playlist-track-actions">
         <button type="button" data-track-action="up" title="Monter">${icon('i-up')}</button>
         <button type="button" data-track-action="down" title="Descendre">${icon('i-down')}</button>
-        <button type="button" class="remove-track" data-track-action="remove" title="Supprimer">${icon('i-trash')}</button>
+        <button type="button" data-track-action="remove" title="Supprimer">${icon('i-trash')}</button>
       </span>`;
 
     row.querySelector('[data-track-action="up"]').onclick=()=>movePlaylistItem(type,section,index,-1);
