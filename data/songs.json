@@ -499,7 +499,7 @@
       "title": "Ravoravo",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "Mino Rakotomiandrisoa",
-      "revision": 3,
+      "revision": 4,
       "lyrics": "lyrics/ravoravo.txt",
       "solfa": null,
       "instrumental": null,
@@ -507,7 +507,7 @@
       "markers": [],
       "tags": [],
       "revisions": {
-        "lyrics": 3,
+        "lyrics": 4,
         "solfa": 0,
         "instrumental": 0,
         "image": 0
