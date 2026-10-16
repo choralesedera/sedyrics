@@ -494,6 +494,32 @@
       "displayNumber": 23
     },
     {
+      "id": 30,
+      "slug": "ravoravo",
+      "title": "Ravoravo",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "Mino Rakotomiandrisoa",
+      "revision": 1,
+      "lyrics": "lyrics/ravoravo.txt",
+      "solfa": null,
+      "instrumental": null,
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 0,
+        "image": 0
+      },
+      "createdBy": "Mex",
+      "createdAt": "2026-10-16T17:04:36.277Z",
+      "updatedBy": "Mex",
+      "updatedAt": "2026-10-16T17:04:36.277Z",
+      "updatedById": "d8b60daf-c85b-4b47-83d6-daca668f22bf",
+      "displayNumber": 24
+    },
+    {
       "id": 2,
       "slug": "ry-fanahy-masina",
       "title": "Ry Fanahy Masina",
@@ -512,7 +538,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 24
+      "displayNumber": 25
     },
     {
       "id": 20,
@@ -533,7 +559,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 25
+      "displayNumber": 26
     },
     {
       "id": 21,
@@ -554,7 +580,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 26
+      "displayNumber": 27
     },
     {
       "id": 28,
@@ -575,7 +601,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 27
+      "displayNumber": 28
     },
     {
       "id": 5,
@@ -596,7 +622,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 28
+      "displayNumber": 29
     },
     {
       "id": 17,
@@ -617,7 +643,7 @@
         "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 29,
+      "displayNumber": 30,
       "updatedBy": "Fetra",
       "updatedById": "720068cc-364c-4553-a8c3-55166b51971f",
       "updatedAt": "2026-10-14T11:31:54.950Z"
