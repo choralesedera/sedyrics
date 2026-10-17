@@ -436,7 +436,7 @@
       "title": "Noho ny helokao",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "A/C: Vahatra\n(c) Rina Rnt",
-      "revision": 1,
+      "revision": 2,
       "lyrics": "lyrics/noho-ny-helokao.txt",
       "solfa": null,
       "instrumental": "instrumentals/noho-ny-helokao-instrumental.mp3",
@@ -447,9 +447,14 @@
         "lyrics": 1,
         "solfa": 0,
         "instrumental": 1,
-        "image": 0
+        "image": 0,
+        "hira": 1
       },
-      "displayNumber": 21
+      "displayNumber": 21,
+      "hira": "hira/noho-ny-helokao-hira-r1-cae2b2590d1b463892164c1c774b9648.mp3",
+      "updatedBy": "Fetra",
+      "updatedById": "720068cc-364c-4553-a8c3-55166b51971f",
+      "updatedAt": "2026-10-17T16:05:01.616Z"
     },
     {
       "id": 23,
