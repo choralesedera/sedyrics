@@ -459,12 +459,12 @@
 /* LyriCSED v12 - contenu Hira adaptatif */
 .segmented-tabs[data-count="1"]{grid-template-columns:1fr}
 .segmented-tabs[data-count="2"]{grid-template-columns:repeat(2,1fr)}
-.segmented-tabs[data-count="3"]{grid-template-columns:repeat(3,1fr)}
+.segmented-tabs[data-count="3"]{grid-template-columns:repeat(3,1fr)}.segmented-tabs[data-count="4"]{grid-template-columns:repeat(4,minmax(0,1fr))}
 .segmented-tabs.no-tabs{display:none}
 .segment[hidden]{display:none!important}
 
 .tiny-tag.lyrics{background:#EAF7FC;color:#11658A}
-.tiny-tag.instrumental{background:#EDF7F1;color:#2B7651}
+.tiny-tag.instrumental{background:#EDF7F1;color:#2B7651}.tiny-tag.hira{background:#F4E8FD;color:#7543A3}
 .tiny-tag.solfa{background:#F2EEFC;color:#674AA0}
 
 /* LyriCSED v12 - dialogues intégrés */
