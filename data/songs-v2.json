@@ -567,6 +567,34 @@
       "displayNumber": 26
     },
     {
+      "id": 31,
+      "slug": "tonga-ka-tsenao",
+      "title": "Tonga ka tsenao",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "Chorale Sedera Ambalavato Antsirabe",
+      "revision": 1,
+      "lyrics": "lyrics/tonga-ka-tsenao-lyrics-r1-93f26301247148dea5147aa488031615.txt",
+      "solfa": null,
+      "instrumental": null,
+      "hira": null,
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 0,
+        "hira": 0,
+        "image": 0
+      },
+      "createdBy": "Fetra",
+      "createdAt": "2026-10-17T19:18:49.073Z",
+      "updatedBy": "Fetra",
+      "updatedAt": "2026-10-17T19:18:49.073Z",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "displayNumber": 27
+    },
+    {
       "id": 21,
       "slug": "tsy-mba-vola",
       "title": "Tsy mba vola",
@@ -585,7 +613,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 27
+      "displayNumber": 28
     },
     {
       "id": 28,
@@ -606,7 +634,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 28
+      "displayNumber": 29
     },
     {
       "id": 5,
@@ -627,7 +655,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 29
+      "displayNumber": 30
     },
     {
       "id": 17,
@@ -648,7 +676,7 @@
         "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 30,
+      "displayNumber": 31,
       "updatedBy": "Fetra",
       "updatedById": "720068cc-364c-4553-a8c3-55166b51971f",
       "updatedAt": "2026-10-14T11:31:54.950Z"
