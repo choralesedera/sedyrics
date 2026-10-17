@@ -2059,7 +2059,7 @@ function updateAudioUI(){
   if($("duration"))$("duration").textContent=fmt(dur);
   if($("miniTrackTime"))$("miniTrackTime").textContent=same?`${fmt(now)} / ${fmt(dur)}`:'Prêt';
   if($("seekBar")&&!seekBarDragging)$("seekBar").value=(same&&Number.isFinite(dur)&&dur>0)?Math.round(now/dur*1000):0;
-  if($("audioTitle"))$("audioTitle").textContent=same?`${globalAudioTitle} • Playback`:`${currentSong?.title||'Instrumental'} • Playback`;
+  if($("audioTitle"))$("audioTitle").textContent=same?globalAudioTitle:`${currentSong?.title||'Musique'} • ${selectedSongAudioKind==='hira'?'Hira':'Playback'}`;
   if($("volumeBar"))$("volumeBar").value=Math.round(audio.volume*100);if($("volumeValue"))$("volumeValue").textContent=`${Math.round(audio.volume*100)}%`;
 }
 function pauseAudio(reset=false){
