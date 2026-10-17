@@ -572,9 +572,9 @@
       "title": "Tonga ka tsenao",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "Chorale Sedera Ambalavato - FLM Antsirabe",
-      "revision": 2,
+      "revision": 3,
       "lyrics": "lyrics/tonga-ka-tsenao-lyrics-r1-93f26301247148dea5147aa488031615.txt",
-      "solfa": null,
+      "solfa": "solfa/tonga-ka-tsenao-solfa-r1-5dc5216208424fc3a5649a5c4942e2d6.jpg",
       "instrumental": null,
       "hira": null,
       "image": null,
@@ -582,7 +582,7 @@
       "tags": [],
       "revisions": {
         "lyrics": 1,
-        "solfa": 0,
+        "solfa": 1,
         "instrumental": 0,
         "hira": 0,
         "image": 0
@@ -590,7 +590,7 @@
       "createdBy": "Fetra",
       "createdAt": "2026-10-17T19:18:49.073Z",
       "updatedBy": "Fetra",
-      "updatedAt": "2026-10-17T19:22:47.611Z",
+      "updatedAt": "2026-10-17T19:26:27.919Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
       "displayNumber": 27
     },
