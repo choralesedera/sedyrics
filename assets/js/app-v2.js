@@ -17,7 +17,7 @@ const SHELL_FILES=[
 // GitHub/local reste pour HTML, CSS, JS, catalogue et version.
 // R2 sert uniquement pour lyrics/, solfa/, instrumentals/.
 const MEDIA_BASE = "https://sedera-media-api.chorale-sedera-ambalavato.workers.dev/media/";
-const MEDIA_PREFIXES = ["lyrics/", "solfa/", "instrumentals/"];
+const MEDIA_PREFIXES = ["lyrics/", "solfa/", "instrumentals/", "hira/"];
 
 function isMediaPath(path){
   const p = String(path || "").replace(/^\.?\//, "");
@@ -436,7 +436,7 @@ async function syncOfflineLibrary({manual=false,initial=false}={}){
     const changedResources=[];
     for(const song of remoteSongs){
       const oldSong=oldSongs.get(String(song.id));
-      for(const kind of ["lyrics","solfa","instrumental","image"]){
+      for(const kind of ["lyrics","solfa","instrumental","hira","image"]){
         const now=resourceDescriptor(song,kind);
         if(!now)continue;
         const before=resourceDescriptor(oldSong,kind);
@@ -609,6 +609,7 @@ function songAvailability(s){
   if(s?.lyrics)items.push({key:'lyrics',label:'Lyrics'});
   if(s?.instrumental)items.push({key:'instrumental',label:'Playback'});
   if(s?.solfa)items.push({key:'solfa',label:'Solfa'});
+  if(s?.hira)items.push({key:'hira',label:'Hira'});
   return items;
 }
 function availabilityTags(s){
@@ -657,7 +658,7 @@ function restoreState(state){if(state?.view==='song'&&state.songId){openSong(sta
 
 async function openSong(id,{push=true}={}){
   const s=SONGS.find(x=>Number(x.id)===Number(id));if(!s)return;
-  currentSong=s;pushRecent(s.id);
+  currentSong=s;selectedSongAudioKind='instrumental';pushRecent(s.id);
   $("detailNumber").textContent=`HIRA ${String(songNo(s)).padStart(2,'0')}`;
   $("detailMiniTitle").textContent=s.title;
   $("detailTitle").textContent=s.title;
@@ -672,7 +673,7 @@ async function openSong(id,{push=true}={}){
 
   $$('[data-song-tab]').forEach(b=>{
     const tab=b.dataset.songTab;
-    const enabled=tab==='lyrics'?!!s.lyrics:tab==='solfa'?!!s.solfa:!!s.instrumental;
+    const enabled=tab==='lyrics'?!!s.lyrics:tab==='solfa'?!!s.solfa:tab==='hira'?!!s.hira:!!s.instrumental;
     b.disabled=!enabled;
     b.hidden=!enabled;
     b.classList.toggle('disabled',!enabled);
@@ -687,7 +688,7 @@ async function openSong(id,{push=true}={}){
   }
 
   refreshFavorite();applyReaderZoom();loadSongNote();setView('song',{push});
-  const firstTab=s.lyrics?'lyrics':s.solfa?'solfa':s.instrumental?'instrumental':'lyrics';
+  const firstTab=s.lyrics?'lyrics':s.solfa?'solfa':s.instrumental?'instrumental':s.hira?'hira':'lyrics';
   setSongTab(firstTab);
 
   const c=$("creditsCard");c.textContent=s.credits||"";c.style.display=s.credits?"block":"none";
@@ -712,14 +713,17 @@ function applyReaderZoom(){
   if($("fontSizeValue"))$("fontSizeValue").textContent=`${readerZoom}%`;
   localStorage.setItem('lyricsedReaderZoom',String(readerZoom));
 }
+let selectedSongAudioKind='instrumental',loadedSongAudioKind='instrumental';
+function songAudioSelectionMatches(){return isCurrentSongAudio()&&selectedSongAudioKind===loadedSongAudioKind;}
 function setSongTab(tab){
   const btn=$(`[data-song-tab="${tab}"]`);
   if(btn?.disabled)return;
   $$('[data-song-tab]').forEach(b=>b.classList.toggle('active',b.dataset.songTab===tab));
-  ['lyrics','solfa','instrumental'].forEach(x=>$(x+'Panel').classList.toggle('active',x===tab));
-  $("readerZoomBar")?.classList.toggle('hidden',tab==='instrumental');
+  ['lyrics','solfa','instrumental'].forEach(x=>$(x+'Panel').classList.toggle('active',x===(tab==='hira'?'instrumental':tab)));
+  if(tab==='hira'||tab==='instrumental'){selectedSongAudioKind=tab;const label=$('audioKindLabel');if(label)label.textContent=tab==='hira'?'Hira':'Playback';loadInstrumental().catch(()=>{});}
+  $("readerZoomBar")?.classList.toggle('hidden',(tab==='instrumental'||tab==='hira'));
   if(tab==='solfa')applyReaderZoom();
-  if(tab==='instrumental')setTimeout(()=>$("advancedPlayer").scrollIntoView({behavior:'smooth',block:'nearest'}),60)
+  if(tab==='instrumental'||tab==='hira')setTimeout(()=>$("advancedPlayer").scrollIntoView({behavior:'smooth',block:'nearest'}),60)
 }
 
 async function loadSolfa(){
@@ -742,20 +746,20 @@ async function loadSolfa(){
 
 async function loadInstrumental(){
   const player=$("advancedPlayer"),empty=$("instrumentalEmpty"),mini=$("persistentPlayer");
-  if(!currentSong?.instrumental){
+  if(!currentSong?.[selectedSongAudioKind]){
     player.classList.remove('active');empty.classList.remove('hidden');mini.classList.remove('active');
     updateAudioUI();return;
   }
   player.classList.add('active');empty.classList.add('hidden');mini.classList.add('active');
   try{
-    const cached=await getAnyCached(withRevision(currentSong.instrumental,resourceRevision(currentSong,'instrumental')));
+    const cached=await getAnyCached(withRevision(currentSong[selectedSongAudioKind],resourceRevision(currentSong,selectedSongAudioKind)));
     $("audioCacheBadge").textContent=isCurrentSongAudio()?'En cours':cached?'Offline prêt':'Prêt';
   }catch{$("audioCacheBadge").textContent='Prêt'}
   updateAudioUI();
 }
 async function ensureSongAudioLoaded(song,autoplay=false){
-  if(!song?.instrumental)return false;
-  if(globalAudioMode==='song'&&Number(globalAudioSongId)===Number(song.id)&&hasGlobalAudio()){
+  if(!song?.[selectedSongAudioKind])return false;
+  if(globalAudioMode==='song'&&Number(globalAudioSongId)===Number(song.id)&&hasGlobalAudio()&&songAudioSelectionMatches()){
     if(autoplay){
       if(nativeAudioActive&&!nativeAudioPlaying){nativeMessage('AUDIO_PLAY');nativeAudioPlaying=true}
       else if(!nativeAudioActive&&audio.paused)try{await audio.play()}catch{}
@@ -767,11 +771,12 @@ async function ensureSongAudioLoaded(song,autoplay=false){
   resetLoop();
   $("audioCacheBadge").textContent='Chargement...';
   try{
-    const path=withRevision(song.instrumental,resourceRevision(song,'instrumental'));
+    const path=withRevision(song[selectedSongAudioKind],resourceRevision(song,selectedSongAudioKind));
     const cached=await getAnyCached(path);
     const r=cached||await getCached(path);
     const blob=await r.blob();
-    await setGlobalAudioBlob(blob,{mode:'song',title:song.title,songId:song.id,returnView:'song',autoplay,nativeSource:absoluteMediaUrl(path)});
+    await setGlobalAudioBlob(blob,{mode:'song',title:song.title+(selectedSongAudioKind==='hira'?' • Hira':''),songId:song.id,returnView:'song',autoplay,nativeSource:absoluteMediaUrl(path)});
+    loadedSongAudioKind=selectedSongAudioKind;
     $("audioCacheBadge").textContent=cached?'Offline prêt':'Téléchargé';
     return true;
   }catch{
@@ -781,8 +786,8 @@ async function ensureSongAudioLoaded(song,autoplay=false){
   }
 }
 async function playPause(){
-  if(!currentSong?.instrumental)return;
-  if(!isCurrentSongAudio()){await ensureSongAudioLoaded(currentSong,true);return}
+  if(!currentSong?.[selectedSongAudioKind])return;
+  if(!songAudioSelectionMatches()){await ensureSongAudioLoaded(currentSong,true);return}
   globalPlayPause();
 }
 function seekBy(delta){
@@ -790,7 +795,7 @@ function seekBy(delta){
   setPlaybackPosition(playbackCurrent()+delta);
 }
 function updateAudioUI(){
-  const same=isCurrentSongAudio();
+  const same=songAudioSelectionMatches();
   const playing=same&&playbackPlaying();
   const use=playing?'i-pause':'i-play';
   if($("mainPlayBtn"))$("mainPlayBtn").innerHTML=icon(use);
