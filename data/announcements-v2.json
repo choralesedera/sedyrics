@@ -1,16 +1,3 @@
 {
-  "announcements": [
-    {
-      "id": "fb3b9eb1-5f90-4a55-9058-8398e86982d9",
-      "title": "Test Final",
-      "body": "Bonjour",
-      "date": "2026-10-18",
-      "createdAt": "2026-10-18T15:12:56.543Z",
-      "createdBy": "Fetra",
-      "createdById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "updatedAt": "2026-10-18T15:12:56.543Z",
-      "updatedBy": "Fetra",
-      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839"
-    }
-  ]
+  "announcements": []
 }
