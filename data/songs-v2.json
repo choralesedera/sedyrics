@@ -551,20 +551,23 @@
       "title": "Sedera o",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "",
-      "revision": 1,
+      "revision": 2,
       "lyrics": "lyrics/sedera-o.txt",
       "solfa": null,
-      "instrumental": null,
+      "instrumental": "instrumentals/sedera-o-instrumental-r1-532ef62d17c44392a3f93cb722e2ca3d.mp3",
       "image": null,
       "markers": [],
       "tags": [],
       "revisions": {
         "lyrics": 1,
         "solfa": 0,
-        "instrumental": 0,
+        "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 26
+      "displayNumber": 26,
+      "updatedBy": "Fetra",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "updatedAt": "2026-10-18T11:57:00.704Z"
     },
     {
       "id": 31,
