@@ -53,6 +53,24 @@
       "restoredAt": null,
       "restoredBy": null,
       "restoredPath": null
+    },
+    {
+      "id": "04faeb38-cd9a-44c9-b92b-39bbb662345d",
+      "songId": 20,
+      "title": "Sedera o",
+      "kind": "instrumental",
+      "oldPath": "instrumentals/sedera-o-instrumental-r1-532ef62d17c44392a3f93cb722e2ca3d.mp3",
+      "trashPath": "corbeille/lyricsed/instrumental/20/b9cd8c35-3f19-45af-835f-8754ce5698ac/sedera-o-instrumental-r1-532ef62d17c44392a3f93cb722e2ca3d.mp3",
+      "storage": "r2",
+      "blobSha": null,
+      "shared": false,
+      "deletedAt": "2026-10-18T16:39:27.603Z",
+      "deletedBy": "Fetra",
+      "deletedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "deletedRole": "APP_ADMIN",
+      "restoredAt": null,
+      "restoredBy": null,
+      "restoredPath": null
     }
   ]
 }
