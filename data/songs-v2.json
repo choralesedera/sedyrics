@@ -216,7 +216,7 @@
       "title": "Inona kosa",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "A/C: Vahatra R;",
-      "revision": 1,
+      "revision": 2,
       "lyrics": "lyrics/inona-kosa.txt",
       "solfa": null,
       "instrumental": "instrumentals/inona-kosa-instrumental.mp3",
@@ -227,9 +227,14 @@
         "lyrics": 1,
         "solfa": 0,
         "instrumental": 1,
-        "image": 0
+        "image": 0,
+        "hira": 1
       },
-      "displayNumber": 10
+      "displayNumber": 10,
+      "hira": "hira/inona-kosa-hira-r1-be08bea3a6684ca09e0e45e38c66eccd.mp3",
+      "updatedBy": "Fetra",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "updatedAt": "2026-10-18T19:42:44.688Z"
     },
     {
       "id": 24,
