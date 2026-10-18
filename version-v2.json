@@ -1,7 +1,7 @@
 {
   "schemaVersion": 11,
-  "contentVersion": 73,
-  "updatedAt": "2026-10-18T14:52:26.357Z",
+  "contentVersion": 74,
+  "updatedAt": "2026-10-18T14:54:43.792Z",
   "catalog": "data/songs-v2.json",
   "announcements": "data/announcements-v2.json",
   "prefetch": {
