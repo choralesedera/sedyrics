@@ -605,7 +605,7 @@
       "title": "Tsy mba vola",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "A/C : Andriamanohisoa",
-      "revision": 1,
+      "revision": 2,
       "lyrics": "lyrics/tsy-mba-vola.txt",
       "solfa": null,
       "instrumental": "instrumentals/tsy-mba-vola-instrumental.mp3",
@@ -616,9 +616,14 @@
         "lyrics": 1,
         "solfa": 0,
         "instrumental": 1,
-        "image": 0
+        "image": 0,
+        "hira": 1
       },
-      "displayNumber": 28
+      "displayNumber": 28,
+      "hira": "hira/tsy-mba-vola-hira-r1-4462ef4d1a184e99bfaedb2d55e9e7f1.mp3",
+      "updatedBy": "Fetra",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "updatedAt": "2026-10-18T19:14:44.650Z"
     },
     {
       "id": 28,
