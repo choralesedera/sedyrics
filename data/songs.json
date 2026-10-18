@@ -361,7 +361,7 @@
       "title": "Miandry anao",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "A/C Hervé Rafanomezantsoa",
-      "revision": 1,
+      "revision": 2,
       "lyrics": "lyrics/miandry-anao.txt",
       "solfa": null,
       "instrumental": "instrumentals/miandry-anao-instrumental.wma",
@@ -372,9 +372,14 @@
         "lyrics": 1,
         "solfa": 0,
         "instrumental": 1,
-        "image": 0
+        "image": 0,
+        "hira": 1
       },
-      "displayNumber": 17
+      "displayNumber": 17,
+      "hira": "hira/miandry-anao-hira-r1-227752457cf74fe7a8176b1624aebbb1.mp3",
+      "updatedBy": "Fetra",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "updatedAt": "2026-10-18T19:25:57.092Z"
     },
     {
       "id": 1,
