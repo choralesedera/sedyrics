@@ -88,6 +88,54 @@
       "removedFromPrograms": {},
       "restoredAt": null,
       "restoredBy": null
+    },
+    {
+      "id": "600fd110-2672-4f49-953d-33149b68a994",
+      "song": {
+        "id": 32,
+        "slug": "pb-test",
+        "title": "PB TEST",
+        "artist": "Chorale Sedera Ambalavato",
+        "credits": "",
+        "revision": 3,
+        "lyrics": "lyrics/pb-test-lyrics-r1-9341029609fc4936ba6639a7dfbb0fa9.txt",
+        "solfa": null,
+        "instrumental": null,
+        "hira": null,
+        "image": null,
+        "markers": [],
+        "tags": [],
+        "revisions": {
+          "lyrics": 1,
+          "solfa": 0,
+          "instrumental": 2,
+          "hira": 0,
+          "image": 0
+        },
+        "createdBy": "Fetra",
+        "createdAt": "2026-10-18T12:27:02.262Z",
+        "updatedBy": "Fetra",
+        "updatedAt": "2026-10-18T15:29:33.804Z",
+        "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+        "displayNumber": 24
+      },
+      "assets": [
+        {
+          "kind": "lyrics",
+          "oldPath": "lyrics/pb-test-lyrics-r1-9341029609fc4936ba6639a7dfbb0fa9.txt",
+          "trashPath": "corbeille/lyricsed/chants/600fd110-2672-4f49-953d-33149b68a994/lyrics-pb-test-lyrics-r1-9341029609fc4936ba6639a7dfbb0fa9.txt",
+          "storage": "r2",
+          "blobSha": null,
+          "shared": false
+        }
+      ],
+      "deletedAt": "2026-10-18T15:59:47.211Z",
+      "deletedBy": "Fetra",
+      "deletedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "deletedRole": "APP_ADMIN",
+      "removedFromPrograms": {},
+      "restoredAt": null,
+      "restoredBy": null
     }
   ]
 }

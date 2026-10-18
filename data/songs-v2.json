@@ -499,34 +499,6 @@
       "displayNumber": 23
     },
     {
-      "id": 32,
-      "slug": "pb-test",
-      "title": "PB TEST",
-      "artist": "Chorale Sedera Ambalavato",
-      "credits": "",
-      "revision": 3,
-      "lyrics": "lyrics/pb-test-lyrics-r1-9341029609fc4936ba6639a7dfbb0fa9.txt",
-      "solfa": null,
-      "instrumental": null,
-      "hira": null,
-      "image": null,
-      "markers": [],
-      "tags": [],
-      "revisions": {
-        "lyrics": 1,
-        "solfa": 0,
-        "instrumental": 2,
-        "hira": 0,
-        "image": 0
-      },
-      "createdBy": "Fetra",
-      "createdAt": "2026-10-18T12:27:02.262Z",
-      "updatedBy": "Fetra",
-      "updatedAt": "2026-10-18T15:29:33.804Z",
-      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "displayNumber": 24
-    },
-    {
       "id": 30,
       "slug": "ravoravo",
       "title": "Ravoravo",
@@ -550,7 +522,7 @@
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-17T19:38:55.460Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "displayNumber": 25
+      "displayNumber": 24
     },
     {
       "id": 2,
@@ -571,7 +543,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 26
+      "displayNumber": 25
     },
     {
       "id": 20,
@@ -592,7 +564,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 27,
+      "displayNumber": 26,
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
       "updatedAt": "2026-10-18T11:57:00.704Z"
@@ -623,7 +595,7 @@
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-17T19:49:42.384Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "displayNumber": 28
+      "displayNumber": 27
     },
     {
       "id": 21,
@@ -644,7 +616,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 29
+      "displayNumber": 28
     },
     {
       "id": 28,
@@ -665,7 +637,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 30
+      "displayNumber": 29
     },
     {
       "id": 5,
@@ -686,7 +658,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 31
+      "displayNumber": 30
     },
     {
       "id": 17,
@@ -707,7 +679,7 @@
         "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 32,
+      "displayNumber": 31,
       "updatedBy": "Fetra",
       "updatedById": "720068cc-364c-4553-a8c3-55166b51971f",
       "updatedAt": "2026-10-14T11:31:54.950Z"
