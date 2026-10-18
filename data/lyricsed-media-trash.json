@@ -35,6 +35,24 @@
       "restoredAt": null,
       "restoredBy": null,
       "restoredPath": null
+    },
+    {
+      "id": "d9558a8a-f49d-4d7b-b341-9e192c97955c",
+      "songId": 32,
+      "title": "PB TEST",
+      "kind": "instrumental",
+      "oldPath": "instrumentals/pb-test-instrumental-r1-8aa87efffc93432ab2f3fb6602215199.mp3",
+      "trashPath": "corbeille/lyricsed/instrumental/32/f65dfda8-7996-4e67-9d18-a92e965fb06d/pb-test-instrumental-r1-8aa87efffc93432ab2f3fb6602215199.mp3",
+      "storage": "r2",
+      "blobSha": null,
+      "shared": false,
+      "deletedAt": "2026-10-18T15:29:33.804Z",
+      "deletedBy": "Fetra",
+      "deletedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "deletedRole": "APP_ADMIN",
+      "restoredAt": null,
+      "restoredBy": null,
+      "restoredPath": null
     }
   ]
 }
