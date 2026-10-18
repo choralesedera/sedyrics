@@ -324,7 +324,7 @@
       "title": "Lovasoa",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "T/F: Eden RAKOTOASIMBOLA",
-      "revision": 1,
+      "revision": 2,
       "lyrics": "lyrics/lovasoa.txt",
       "solfa": null,
       "instrumental": "instrumentals/lovasoa-instrumental.mp3",
@@ -335,9 +335,14 @@
         "lyrics": 1,
         "solfa": 0,
         "instrumental": 1,
-        "image": 0
+        "image": 0,
+        "hira": 1
       },
-      "displayNumber": 15
+      "displayNumber": 15,
+      "hira": "hira/lovasoa-hira-r1-ea0c1bf5cafe4dceaa241d390f962e75.mp3",
+      "updatedBy": "Fetra",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "updatedAt": "2026-10-18T19:37:17.898Z"
     },
     {
       "id": 13,
