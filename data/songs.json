@@ -298,7 +298,7 @@
       "title": "Jesosy mandigny anao",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "A/C: Rina Rnt",
-      "revision": 1,
+      "revision": 2,
       "lyrics": "lyrics/jesosy-mandigny-anao.txt",
       "solfa": null,
       "instrumental": "instrumentals/Jesosy-mandigny-anao-instrumental.mp3",
@@ -309,9 +309,14 @@
         "lyrics": 1,
         "solfa": 0,
         "instrumental": 1,
-        "image": 0
+        "image": 0,
+        "hira": 1
       },
-      "displayNumber": 14
+      "displayNumber": 14,
+      "hira": "hira/jesosy-mandigny-anao-hira-r1-a1ae596f99454cf2b2f41de25cdb425a.mp3",
+      "updatedBy": "Fetra",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "updatedAt": "2026-10-18T19:29:39.221Z"
     },
     {
       "id": 12,
