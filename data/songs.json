@@ -169,7 +169,7 @@
       "title": "Ho avy ny Tomponao",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "A/C: Didy Alfa\n(c) Chorale Sedera Ambalavato",
-      "revision": 2,
+      "revision": 3,
       "lyrics": "lyrics/ho-avy-ny-tomponao.txt",
       "solfa": null,
       "instrumental": null,
@@ -180,9 +180,14 @@
         "lyrics": 2,
         "solfa": 0,
         "instrumental": 0,
-        "image": 0
+        "image": 0,
+        "hira": 1
       },
-      "displayNumber": 8
+      "displayNumber": 8,
+      "hira": "hira/ho-avy-ny-tomponao-hira-r1-eef576d5c29c4d93b8edca2f97890200.mp3",
+      "updatedBy": "Fetra",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "updatedAt": "2026-10-18T19:40:16.168Z"
     },
     {
       "id": 4,
