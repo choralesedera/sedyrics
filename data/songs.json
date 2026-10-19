@@ -589,21 +589,24 @@
       "slug": "ry-fanahy-masina",
       "title": "Ry Fanahy Masina",
       "artist": "Chorale Sedera Ambalavato",
-      "credits": "A/C: Fetra R.",
-      "revision": 1,
-      "lyrics": "lyrics/ry-fanahy-masina.txt",
+      "credits": "FR",
+      "revision": 2,
+      "lyrics": "lyrics/ry-fanahy-masina-lyrics-r2-e2bf9f40e6104dda931e468a43f66d71.txt",
       "solfa": null,
       "instrumental": "instrumentals/ry-fanahy-masina-instrumental.mp3",
       "image": null,
       "markers": [],
       "tags": [],
       "revisions": {
-        "lyrics": 1,
+        "lyrics": 2,
         "solfa": 0,
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 26
+      "displayNumber": 26,
+      "updatedBy": "Fetra",
+      "updatedAt": "2026-10-19T03:36:17.771Z",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839"
     },
     {
       "id": 20,
