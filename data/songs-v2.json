@@ -49,15 +49,15 @@
       "title": "Andriamanitra ô, henoy",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "(c) Rina Rnt",
-      "revision": 2,
-      "lyrics": "lyrics/andriamanitra-o-henoy.txt",
+      "revision": 3,
+      "lyrics": "lyrics/andriamanitra-o-henoy-lyrics-r2-691defaf111c41d4b03f06cd306caf0b.txt",
       "solfa": null,
       "instrumental": "instrumentals/andriamanitra-o-henoy.mp3",
       "image": null,
       "markers": [],
       "tags": [],
       "revisions": {
-        "lyrics": 1,
+        "lyrics": 2,
         "solfa": 0,
         "instrumental": 1,
         "image": 0,
@@ -67,7 +67,7 @@
       "hira": "hira/andriamanitra-o-henoy-hira-r1-a65e6d916b734576aad57f33554a74d6.mp3",
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "updatedAt": "2026-10-18T19:23:40.900Z"
+      "updatedAt": "2026-10-20T02:57:08.211Z"
     },
     {
       "id": 32,
