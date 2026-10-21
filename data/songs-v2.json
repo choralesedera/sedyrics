@@ -7,7 +7,7 @@
       "title": "Anao ny dera",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "A/C : Nomena Andrianiaina ( Mex )",
-      "revision": 2,
+      "revision": 3,
       "lyrics": "lyrics/anao-ny-dera.txt",
       "solfa": "solfa/anao-ny-dera-solfa.png",
       "instrumental": "instrumentals/anao-ny-dera-instrumental.mp3",
@@ -20,7 +20,11 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 1
+      "displayNumber": 1,
+      "album": "news",
+      "updatedBy": "Fetra",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "updatedAt": "2026-10-21T23:28:34.511Z"
     },
     {
       "id": 26,
