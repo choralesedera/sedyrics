@@ -103,7 +103,7 @@
       "title": "Famonjena ho ahy",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "A/C: Rina Rnt\n(c): Chorale Sedera Ambalavato",
-      "revision": 2,
+      "revision": 3,
       "lyrics": "lyrics/famonjena-ho-ahy.txt",
       "solfa": null,
       "instrumental": "instrumentals/famonjena-ho-ahy.mp3",
@@ -116,7 +116,11 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 5
+      "displayNumber": 5,
+      "album": "news",
+      "updatedBy": "Fetra",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "updatedAt": "2026-10-21T23:28:05.177Z"
     },
     {
       "id": 22,
