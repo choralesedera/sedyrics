@@ -722,7 +722,7 @@
       "title": "Zanahary ô, tahio",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "",
-      "revision": 3,
+      "revision": 4,
       "lyrics": "lyrics/zanahary-o-tahio.txt",
       "solfa": null,
       "instrumental": "instrumentals/zanahary-o-tahio-instrumental.mp3",
@@ -738,9 +738,10 @@
       },
       "displayNumber": 31,
       "updatedBy": "Fetra",
-      "updatedAt": "2026-10-18T19:02:36.252Z",
+      "updatedAt": "2026-10-21T23:29:19.659Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "hira": "hira/zanahary-o-tahio-hira-r1-34581b2a0cf74c9b9bf53c5686ed3bfe.mp3"
+      "hira": "hira/zanahary-o-tahio-hira-r1-34581b2a0cf74c9b9bf53c5686ed3bfe.mp3",
+      "album": "news"
     },
     {
       "id": 17,
