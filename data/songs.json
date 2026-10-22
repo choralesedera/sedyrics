@@ -415,7 +415,7 @@
       "title": "Mino Anao",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "A/C: Mino Rakotomiandrisoa\n(c) Chorale Sedera Ambalavato",
-      "revision": 1,
+      "revision": 2,
       "lyrics": "lyrics/mino-anao-aho.txt",
       "solfa": null,
       "instrumental": "instrumentals/mino-anao-instrumental.mp3",
@@ -428,7 +428,11 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 18
+      "displayNumber": 18,
+      "album": "news",
+      "updatedBy": "Fetra",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "updatedAt": "2026-10-22T05:51:34.539Z"
     },
     {
       "id": 27,
