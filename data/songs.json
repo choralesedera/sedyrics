@@ -366,6 +366,34 @@
       "updatedAt": "2026-10-18T19:29:39.221Z"
     },
     {
+      "id": 35,
+      "slug": "largo",
+      "title": "Largo",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "",
+      "revision": 1,
+      "lyrics": null,
+      "solfa": null,
+      "instrumental": null,
+      "hira": null,
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 0,
+        "solfa": 0,
+        "instrumental": 0,
+        "hira": 0,
+        "image": 0
+      },
+      "createdBy": "Fetra",
+      "createdAt": "2026-10-24T09:03:03.227Z",
+      "updatedBy": "Fetra",
+      "updatedAt": "2026-10-24T09:03:03.227Z",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "displayNumber": 16
+    },
+    {
       "id": 12,
       "slug": "lovasoa",
       "title": "Lovasoa",
@@ -385,7 +413,7 @@
         "image": 0,
         "hira": 1
       },
-      "displayNumber": 16,
+      "displayNumber": 17,
       "hira": "hira/lovasoa-hira-r1-ea0c1bf5cafe4dceaa241d390f962e75.mp3",
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -410,7 +438,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 17
+      "displayNumber": 18
     },
     {
       "id": 14,
@@ -432,7 +460,7 @@
         "image": 0,
         "hira": 1
       },
-      "displayNumber": 18,
+      "displayNumber": 19,
       "hira": "hira/miandry-anao-hira-r1-227752457cf74fe7a8176b1624aebbb1.mp3",
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -464,7 +492,7 @@
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-24T09:00:54.652Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "displayNumber": 19
+      "displayNumber": 20
     },
     {
       "id": 1,
@@ -485,7 +513,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 20,
+      "displayNumber": 21,
       "album": "news",
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -510,7 +538,7 @@
         "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 21,
+      "displayNumber": 22,
       "updatedBy": "Fetra",
       "updatedById": "720068cc-364c-4553-a8c3-55166b51971f",
       "updatedAt": "2026-10-13T09:46:08.341Z"
@@ -534,7 +562,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 22
+      "displayNumber": 23
     },
     {
       "id": 25,
@@ -555,7 +583,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 23
+      "displayNumber": 24
     },
     {
       "id": 3,
@@ -577,7 +605,7 @@
         "image": 0,
         "hira": 1
       },
-      "displayNumber": 24,
+      "displayNumber": 25,
       "hira": "hira/noho-ny-helokao-hira-r1-cae2b2590d1b463892164c1c774b9648.mp3",
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -603,7 +631,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 25
+      "displayNumber": 26
     },
     {
       "id": 16,
@@ -624,7 +652,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 26
+      "displayNumber": 27
     },
     {
       "id": 30,
@@ -651,7 +679,7 @@
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-21T23:30:00.832Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "displayNumber": 27,
+      "displayNumber": 28,
       "hira": "hira/ravoravo-hira-r1-8fcf17ca157c422291d680a7c854ffcc.mp3",
       "album": "news"
     },
@@ -674,7 +702,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 28,
+      "displayNumber": 29,
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-21T23:27:37.505Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -699,7 +727,7 @@
         "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 29,
+      "displayNumber": 30,
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
       "updatedAt": "2026-10-18T16:39:27.603Z"
@@ -730,7 +758,7 @@
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-17T19:49:42.384Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "displayNumber": 30
+      "displayNumber": 31
     },
     {
       "id": 21,
@@ -752,7 +780,7 @@
         "image": 0,
         "hira": 1
       },
-      "displayNumber": 31,
+      "displayNumber": 32,
       "hira": "hira/tsy-mba-vola-hira-r1-4462ef4d1a184e99bfaedb2d55e9e7f1.mp3",
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -777,7 +805,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 32
+      "displayNumber": 33
     },
     {
       "id": 5,
@@ -799,7 +827,7 @@
         "image": 0,
         "hira": 1
       },
-      "displayNumber": 33,
+      "displayNumber": 34,
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-21T23:29:19.659Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -826,7 +854,7 @@
         "image": 0,
         "hira": 1
       },
-      "displayNumber": 34,
+      "displayNumber": 35,
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
       "updatedAt": "2026-10-18T19:06:53.457Z",
