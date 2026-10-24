@@ -411,6 +411,34 @@
       "updatedAt": "2026-10-18T19:25:57.092Z"
     },
     {
+      "id": 33,
+      "slug": "midera-an-i-jehovah",
+      "title": "Miderà an’i Jehovah",
+      "artist": "Chorale Sedera Ambalavato",
+      "credits": "Antema 6",
+      "revision": 1,
+      "lyrics": "lyrics/midera-an-i-jehovah-lyrics-r1-0955be8c95b546f694afe630f9328995.txt",
+      "solfa": null,
+      "instrumental": null,
+      "hira": null,
+      "image": null,
+      "markers": [],
+      "tags": [],
+      "revisions": {
+        "lyrics": 1,
+        "solfa": 0,
+        "instrumental": 0,
+        "hira": 0,
+        "image": 0
+      },
+      "createdBy": "Fetra",
+      "createdAt": "2026-10-24T09:00:14.856Z",
+      "updatedBy": "Fetra",
+      "updatedAt": "2026-10-24T09:00:14.856Z",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "displayNumber": 18
+    },
+    {
       "id": 1,
       "slug": "mino-anao-aho",
       "title": "Mino Anao",
@@ -429,7 +457,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 18,
+      "displayNumber": 19,
       "album": "news",
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -454,7 +482,7 @@
         "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 19,
+      "displayNumber": 20,
       "updatedBy": "Fetra",
       "updatedById": "720068cc-364c-4553-a8c3-55166b51971f",
       "updatedAt": "2026-10-13T09:46:08.341Z"
@@ -478,7 +506,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 20
+      "displayNumber": 21
     },
     {
       "id": 25,
@@ -499,7 +527,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 21
+      "displayNumber": 22
     },
     {
       "id": 3,
@@ -521,7 +549,7 @@
         "image": 0,
         "hira": 1
       },
-      "displayNumber": 22,
+      "displayNumber": 23,
       "hira": "hira/noho-ny-helokao-hira-r1-cae2b2590d1b463892164c1c774b9648.mp3",
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -547,7 +575,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 23
+      "displayNumber": 24
     },
     {
       "id": 16,
@@ -568,7 +596,7 @@
         "instrumental": 0,
         "image": 0
       },
-      "displayNumber": 24
+      "displayNumber": 25
     },
     {
       "id": 30,
@@ -595,7 +623,7 @@
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-21T23:30:00.832Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "displayNumber": 25,
+      "displayNumber": 26,
       "hira": "hira/ravoravo-hira-r1-8fcf17ca157c422291d680a7c854ffcc.mp3",
       "album": "news"
     },
@@ -618,7 +646,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 26,
+      "displayNumber": 27,
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-21T23:27:37.505Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -643,7 +671,7 @@
         "instrumental": 2,
         "image": 0
       },
-      "displayNumber": 27,
+      "displayNumber": 28,
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
       "updatedAt": "2026-10-18T16:39:27.603Z"
@@ -674,7 +702,7 @@
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-17T19:49:42.384Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
-      "displayNumber": 28
+      "displayNumber": 29
     },
     {
       "id": 21,
@@ -696,7 +724,7 @@
         "image": 0,
         "hira": 1
       },
-      "displayNumber": 29,
+      "displayNumber": 30,
       "hira": "hira/tsy-mba-vola-hira-r1-4462ef4d1a184e99bfaedb2d55e9e7f1.mp3",
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -721,7 +749,7 @@
         "instrumental": 1,
         "image": 0
       },
-      "displayNumber": 30
+      "displayNumber": 31
     },
     {
       "id": 5,
@@ -743,7 +771,7 @@
         "image": 0,
         "hira": 1
       },
-      "displayNumber": 31,
+      "displayNumber": 32,
       "updatedBy": "Fetra",
       "updatedAt": "2026-10-21T23:29:19.659Z",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
@@ -770,7 +798,7 @@
         "image": 0,
         "hira": 1
       },
-      "displayNumber": 32,
+      "displayNumber": 33,
       "updatedBy": "Fetra",
       "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
       "updatedAt": "2026-10-18T19:06:53.457Z",
