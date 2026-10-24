@@ -292,7 +292,7 @@
       "title": "Inty aho ho Anao",
       "artist": "Chorale Sedera Ambalavato",
       "credits": "",
-      "revision": 2,
+      "revision": 3,
       "lyrics": null,
       "solfa": null,
       "instrumental": "instrumentals/ity-aho-ho-anao.mp3",
@@ -307,8 +307,9 @@
       },
       "displayNumber": 13,
       "updatedBy": "Fetra",
-      "updatedAt": "2026-10-12T01:38:52.939Z",
-      "updatedById": "720068cc-364c-4553-a8c3-55166b51971f"
+      "updatedAt": "2026-10-24T08:07:20.748Z",
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839",
+      "album": "news"
     },
     {
       "id": 18,
