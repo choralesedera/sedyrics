@@ -9,7 +9,12 @@
   "concert": {
     "part1": [],
     "part2": [],
-    "part3": []
+    "part3": [],
+    "__config": {
+      "typeLabel": "CONCERT",
+      "eventLabel": "",
+      "parts": []
+    }
   },
   "meta": {
     "liturgy": {
@@ -18,9 +23,9 @@
       "updatedById": "720068cc-364c-4553-a8c3-55166b51971f"
     },
     "concert": {
-      "updatedAt": "2026-10-11T23:42:25.102Z",
+      "updatedAt": "2026-10-24T12:33:24.155Z",
       "updatedBy": "Fetra",
-      "updatedById": "720068cc-364c-4553-a8c3-55166b51971f"
+      "updatedById": "0213d37a-ea4b-4922-9997-bf363441e839"
     }
   }
 }
