@@ -22,6 +22,20 @@ jobs:
           workspaces: projection/src-tauri -> target
       - name: Installer la CLI Tauri sans Node.js
         run: cargo install tauri-cli --version "^2" --locked
+      - name: Générer l'icône Windows
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force src-tauri/icons | Out-Null
+          Add-Type -AssemblyName System.Drawing
+          $bmp = New-Object System.Drawing.Bitmap(256,256)
+          $gfx = [System.Drawing.Graphics]::FromImage($bmp)
+          $gfx.Clear([System.Drawing.Color]::FromArgb(8,28,49))
+          $brush = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromArgb(239,188,55))
+          $gfx.FillEllipse($brush, 30,30,196,196)
+          $gfx.Dispose()
+          $bmp.Save("src-tauri/icons/logo.png", [System.Drawing.Imaging.ImageFormat]::Png)
+          $bmp.Dispose()
+          cargo tauri icon src-tauri/icons/logo.png
       - name: Compiler le programme Windows
         run: cargo tauri build --bundles nsis
       - uses: actions/upload-artifact@v4
