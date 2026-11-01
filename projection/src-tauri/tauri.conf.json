@@ -3,7 +3,7 @@
   "productName": "LyriCSED Projection",
   "version": "0.1.0",
   "identifier": "mg.ankino.lyricsedprojection",
-  "build": { "frontendDist": ".." },
+  "build": { "frontendDist": "../ui" },
   "app": {
     "withGlobalTauri": true,
     "windows": [{ "label": "main", "title": "LyriCSED Projection", "width": 1400, "height": 860, "minWidth": 980, "minHeight": 660 }],
