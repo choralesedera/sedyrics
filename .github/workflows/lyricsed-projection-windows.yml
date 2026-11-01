@@ -36,6 +36,11 @@ jobs:
           $bmp.Save("src-tauri/icons/logo.png", [System.Drawing.Imaging.ImageFormat]::Png)
           $bmp.Dispose()
           cargo tauri icon src-tauri/icons/logo.png
+      - name: Préparer les fichiers Web Tauri
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force ui | Out-Null
+          Copy-Item index.html,projection.html,style.css,renderer.js,projection.js ui/
       - name: Compiler le programme Windows
         run: cargo tauri build --bundles nsis
       - uses: actions/upload-artifact@v4
