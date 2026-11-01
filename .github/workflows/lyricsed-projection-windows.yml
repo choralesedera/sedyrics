@@ -1,0 +1,31 @@
+name: LyriCSED Projection Windows
+on:
+  push:
+    branches: [lyricsed-projection-tauri]
+    paths: ['projection/**', '.github/workflows/lyricsed-projection-windows.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: projection
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: projection/src-tauri -> target
+      - name: Installer la CLI Tauri sans Node.js
+        run: cargo install tauri-cli --version "^2" --locked
+      - name: Compiler le programme Windows
+        run: cargo tauri build --bundles nsis
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LyriCSED-Projection-Windows-Setup
+          path: projection/src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
