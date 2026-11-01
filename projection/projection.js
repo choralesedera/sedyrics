@@ -1,0 +1,4 @@
+const invoke=window.__TAURI__.core.invoke; const listen=window.__TAURI__.event.listen;
+const video=document.querySelector('#bgVideo'),img=document.querySelector('#bgImage'),overlay=document.querySelector('#overlay'),txt=document.querySelector('#projectedText');
+function paint(s){s=s||{};document.body.style.background=s.color||'#081c31';video.style.display=s.kind==='video'?'block':'none';img.style.display=s.kind==='image'?'block':'none';if(s.kind==='video'&&video.getAttribute('src')!==s.background){video.src=s.background;video.play().catch(()=>{})}else if(s.kind!=='video'){video.pause()}if(s.kind==='image')img.style.backgroundImage='url('+JSON.stringify(s.background||'')+')';overlay.style.background='rgba(0,0,0,'+(Number(s.dim)||0)/100+')';txt.textContent=s.visible?s.slide||'':'';txt.style.fontSize=(Number(s.fontSize)||64)+'px'}
+listen('projection-state',e=>paint(e.payload));invoke('get_state').then(paint);
